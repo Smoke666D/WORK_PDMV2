@@ -1,0 +1,270 @@
+/*
+ * hw_lib_adc.c
+ *
+ *  Created on: 9 апр. 2024 г.
+ *      Author: i.dymov
+ */
+
+#include "hw_lib_adc.h"
+
+
+static AIN_DATA_t xAinData[AIN_NUMBER];
+static LIN_COOF   xKoofData[ MAX_COOF_COUNT];
+static uint16_t usCurMaxIndex;
+
+
+void vAINInit()
+{
+    for (uint8_t i = 0; i < AIN_NUMBER; i++)
+    {
+        xAinData[i].coof_count = 0U;
+        xAinData[i].index = 0U;
+    }
+    usCurMaxIndex = 0;
+    return;
+}
+
+/*
+ * Функция преобразования данных аналогово канала по клаиборвочым коофициентам
+ */
+static float fConvertCalData( AIN_NAME_t name, float in_data )
+{
+    float out_data = 0;
+    for (uint16_t i =  xAinData[ name ].index; i < (xAinData[ name ].index + xAinData[ name ].coof_count ); i++ )
+    {
+        if ( (i ==  (xAinData[ name ].index + xAinData[ name ].coof_count)) || (in_data <= xKoofData[i].data ) )
+        {
+            out_data = xKoofData[i].k * in_data + xKoofData[i].b;
+        }
+    }
+    return ( out_data );
+}
+/*
+ *
+ */
+float fGetAinCalData( AIN_NAME_t name, float raw_data)
+{
+     float out_data = 0U;
+     if ( name < AIN_NUMBER )
+     {
+          if ( xAinData[ name ].coof_count == 0 )
+           {
+               out_data = raw_data;
+           }
+           else
+           {
+               out_data = fConvertCalData( name, raw_data);
+           }
+     }
+     return ( out_data );
+}
+
+CAL_ERROR_CODE  eAinCalDataConfig(AIN_NAME_t name, uint8_t cal_point_count )
+{
+    CAL_ERROR_CODE res = CAL_SUCCESS;
+    if (cal_point_count == 1)
+    {
+        res = CAL_POINT_COUNT_ERROR;
+    }
+    else
+    {
+        if (  xAinData[ name ].coof_count == 0 )
+        {
+            if  ( (cal_point_count +  usCurMaxIndex) > MAX_TOTAL_CAL_POINT )
+            {
+                res = CAL_MEMORY_FULL;
+            }
+            else
+            {
+                xAinData[ name ].coof_count = cal_point_count;
+                xAinData[ name ].index = usCurMaxIndex;
+                usCurMaxIndex += cal_point_count;
+            }
+        }
+        else
+        {
+                if ( xAinData[ name ].coof_count != ( cal_point_count- 1))
+                {
+                    res = CAL_OVERWRITE_ERROR;
+                }
+        }
+    }
+    return ( res );
+}
+/*
+ *
+ */
+CAL_ERROR_CODE  eSetAinCalPoint(AIN_NAME_t name, POINT_t * cal_point, uint16_t PointNumber )
+{
+	CAL_ERROR_CODE res = CAL_SUCCESS;
+
+	if ( PointNumber < xAinData[ name ].coof_count)
+	{
+		uint16_t index = PointNumber + xAinData[ name ].index;
+		vABLineKoofFinde ( &xKoofData[index].k, &xKoofData[index].b,
+									cal_point[0].X, cal_point[ 1 ].X, cal_point[0].Y,cal_point[1].Y);
+		xKoofData[index].data = cal_point[ 1 ].X;
+	}
+	else
+	{
+		res = CAL_OVERWRITE_ERROR;
+	}
+	return (res);
+}
+
+/*
+ *
+ */
+void vABLineKoofFinde(float * k, float * b,  float x1, float x2, float y1, float y2)
+{
+		 *k = (float)( y1 - y2 ) /(float) (x1 - x2);
+		 *b = (float)(y1*x2 - y2*x1) / (float) (x2-x1);
+		 return;
+}
+
+/*
+ *
+ */
+
+int16_t            ADC1_IN_Buffer[ADC_FRAME_SIZE*ADC1_CHANNELS] = { 0U };   //ADC1 input data buffer
+int16_t            ADC2_IN_Buffer[ADC_FRAME_SIZE*ADC2_CHANNELS] = { 0U };   //ADC2 input data buffer
+int16_t            ADC3_IN_Buffer[ADC_FRAME_SIZE*ADC3_CHANNELS] = { 0U };
+static uint16_t muRawCurData[OUT_COUNT];
+static uint16_t muRawVData[AIN_NUMBER + 2];
+static uint16_t muRawCurData[OUT_COUNT]	;
+static uint16_t muRawOldOutCurData[OUT_COUNT];
+static uint16_t muRawOldVData[AIN_NUMBER + 2];
+static uint16_t muRawVData[AIN_NUMBER + 2] ;
+
+
+
+/* Напряжение на аналогвом входе
+*/
+float fAinGetState ( AIN_NAME_t channel )
+{
+
+ float res = fGetAinCalData( channel , (float) muRawVData[channel] *  AINCOOF2 );
+
+return res;// ( (channel < AIN_COUNT) ? (float) muRawVData[channel] *  AINCOOF1 : 0U ) ;
+}
+/*
+*
+*/
+float fBatteryGet ( void )
+{
+	 return (float)muRawVData[3] * AINCOOF1 + INDIOD;
+}
+/*
+*
+*/
+
+float fTemperatureGet (  )
+{
+	return ((float)muRawVData[4] * K - 0.76) /0.0025 + 25;
+}
+
+static float fGetDataFromRaw( float fraw,LIN_COOF *  CSC)
+ {
+ 	float fRes;
+ 	for (uint8_t r = 0; r < ( KOOF_COUNT -1 ); r++)
+     {
+ 		if (( fraw < CSC[r].data ) || (r == (KOOF_COUNT -2)) )
+ 		{
+ 			fRes =  fraw * CSC[r].k;
+ 			fRes += CSC[r].b ;
+ 			fRes *= fraw/RR;
+ 			break;
+ 		}
+ 	 }
+ 	return ( fRes );
+ }
+
+float usGetCurrentToFloat( u8 ch, u8 filter_enable, LIN_COOF * xOut )
+
+{
+   if (filter_enable)
+   {
+	   muRawCurData[ch] = vRCFilter(muRawCurData[ch],&muRawOldOutCurData[ch]);
+   }
+   return fGetDataFromRaw( ((float) muRawCurData [ ch ] *K ) , xOut );
+}
+
+static void vGetAverDataFromRAW(uint16_t * InData, uint16_t *OutData, uint8_t InIndex, uint8_t OutIndex, uint8_t Size, uint16_t BufferSize);
+
+int16_t * getADC1Buffer()
+{
+	return (ADC1_IN_Buffer);
+}
+int16_t * getADC2Buffer()
+{
+	return (ADC2_IN_Buffer);
+}
+int16_t * getADC3Buffer()
+{
+	return (ADC3_IN_Buffer);
+}
+
+void vInitADCDATA()
+{
+	 for (int i = 0; i< OUT_COUNT;i++)
+	   {
+
+		   muRawOldOutCurData[i] = 0;
+	   }
+	   for (int i=0; i< AIN_NUMBER + 2;i++ )
+	   {
+		   muRawOldVData[i] = 0;
+	   }
+}
+
+void vDataConvertToFloat( void)
+{
+	 // Полчени из буфера ADC 1 данныех каналов каналов тока 7-8
+	 vGetAverDataFromRAW((uint16_t *)&ADC1_IN_Buffer, (uint16_t *)&muRawCurData, 0U, 6U, 2U , ADC1_CHANNELS);
+	 // Полчени из буфера ADC 1 данныех каналов каналов тока 19-20
+	 vGetAverDataFromRAW((uint16_t *)&ADC1_IN_Buffer, (uint16_t *)&muRawCurData, 2U, 18U, 2U , ADC1_CHANNELS);
+	 // Полчени из буфера ADC 1 данныех каналов каналов AIN
+	 vGetAverDataFromRAW((uint16_t *)&ADC1_IN_Buffer, (uint16_t *)&muRawVData, 4U, 0U, 5U , ADC1_CHANNELS);
+	 // Полчени из буфера ADC 2 данныех каналов каналов тока 4-6
+	 vGetAverDataFromRAW((uint16_t *)&ADC2_IN_Buffer, (uint16_t *)&muRawCurData,0U, 3U, 3U , ADC2_CHANNELS);
+	 // Полчени из буфера ADC 2 данныех каналов каналов тока 9-12
+	 vGetAverDataFromRAW((uint16_t *)&ADC2_IN_Buffer, (uint16_t *)&muRawCurData, 3U, 8U, 4U , ADC2_CHANNELS);
+	 // Полчени из буфера ADC 3 данныех каналов каналов тока 1-3
+	 vGetAverDataFromRAW((uint16_t *)&ADC3_IN_Buffer, (uint16_t *)&muRawCurData, 0U, 0U, 3U , ADC3_CHANNELS);
+	 // Полчени из буфера ADC 3 данныех каналов каналов тока 13-18
+	 vGetAverDataFromRAW((uint16_t *)&ADC3_IN_Buffer, (uint16_t *)&muRawCurData, 3U, 12U, 6U , ADC3_CHANNELS);
+	// for (int i =0;i<OUT_COUNT;i++)
+	// {
+	//	 muRawCurData[i] = vRCFilter(muRawCurData[i],&muRawOldOutCurData[i]);
+
+	// }
+	 for (int i = 0; i<AIN_NUMBER + 2;i++ )
+	 {
+		 muRawVData[i] = vRCFilter(  muRawVData[i] ,&muRawOldVData[i]);
+	 }
+	return;
+}
+
+
+/*
+ * Функция вытаскивает из входного буфера Indata  (размером FrameSize*BufferSize) со смещением InIndex FrameSize отсчетов,
+ * счетает среднее арефмитическое и записывает в буффер OutData со смещением OutIndex
+ */
+static void vGetAverDataFromRAW(uint16_t * InData, uint16_t *OutData, uint8_t InIndex, uint8_t OutIndex, uint8_t Size, uint16_t BufferSize)
+{
+	volatile uint32_t temp;
+	for (uint8_t i=0; i<Size; i++ )
+	{
+		temp = 0;
+		for (uint8_t j=0;j < ADC_FRAME_SIZE; j++ )
+		{
+		  temp += (InData[ InIndex + i + j * BufferSize ]);
+		}
+		OutData[ OutIndex + i ] = temp / ADC_FRAME_SIZE;
+
+
+	}
+	return;
+}
+
+
