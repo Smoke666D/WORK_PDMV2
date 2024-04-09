@@ -41,18 +41,26 @@
 /** @defgroup USBD_CUSTOM_HID_Macros Macros
   @{
 */
+#define  REPORT_COUNT  40U
+/** @addtogroup USBD_CUSTOM_HID_Class
+  @{
+  */
 
-#define USBD_CUSTOM_HID_REPORT_DESC_SIZE        63
+/** @defgroup USBD_CUSTOM_HID_Macros Macros
+  @{
+*/
+
+#define USBD_CUSTOM_HID_REPORT_DESC_SIZE        38
 #define USBD_CUSTOM_HID_DESC_SIZE               9
-#define USBD_CUSTOM_HID_FS_INTERVAL             10
-#define USBD_CUSTOM_HID_HS_INTERVAL             7
+#define USBD_CUSTOM_HID_FS_INTERVAL             5
+#define USBD_CUSTOM_HID_HS_INTERVAL             5
 #define USBD_CUSTOM_HID_IN_EP_ADDR              0x81
-#define USBD_CUSTOM_HID_IN_EP_SIZE              0x04
+#define USBD_CUSTOM_HID_IN_EP_SIZE              REPORT_COUNT
 
 #define USBD_CUSTOM_HID_OUT_EP_ADDR             0x01
-#define USBD_CUSTOM_HID_OUT_EP_SIZE             0x04
+#define USBD_CUSTOM_HID_OUT_EP_SIZE             REPORT_COUNT
 
-#define USBD_CUSTOM_HID_FS_MP_SIZE              0x40
+#define USBD_CUSTOM_HID_FS_MP_SIZE              0x41
 
 #define USBD_CLASS_SET_IDLE                     0x0A
 #define USBD_CLASS_GET_IDLE                     0x02

@@ -26,6 +26,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>APM_USB_LIB</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
 			<name>Application</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
@@ -57,6 +62,16 @@
 		</link>
 		<link>
 			<name>StdPeriphDriver</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>USB_DEV</name>
+			<type>2</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/USB_DEV</location>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
@@ -281,9 +296,29 @@
 			<locationURI>copy_PARENT/Libraries/APM32F4xx_StdPeriphDriver/src/apm32f4xx_usart.c</locationURI>
 		</link>
 		<link>
+			<name>StdPeriphDriver/apm32f4xx_usb.c</name>
+			<type>1</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/Libraries/APM32F4xx_StdPeriphDriver/src/apm32f4xx_usb.c</location>
+		</link>
+		<link>
+			<name>StdPeriphDriver/apm32f4xx_usb_device.c</name>
+			<type>1</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/Libraries/APM32F4xx_StdPeriphDriver/src/apm32f4xx_usb_device.c</location>
+		</link>
+		<link>
 			<name>StdPeriphDriver/apm32f4xx_wwdt.c</name>
 			<type>1</type>
 			<locationURI>copy_PARENT/Libraries/APM32F4xx_StdPeriphDriver/src/apm32f4xx_wwdt.c</locationURI>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Class</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Core</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>FREE_RTOS/portable/GCC</name>
@@ -292,6 +327,21 @@
 		</link>
 		<link>
 			<name>FREE_RTOS/portable/MemMang</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Class/CustomHid</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Core/Inc</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Core/Src</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
@@ -309,6 +359,61 @@
 			<name>APM32F407/FREE_RTOS/portable/GCC/port.c</name>
 			<type>1</type>
 			<locationURI>copy_PARENT/Middlewares/FreeRTOS/FreeRTOSv202012.00/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c</locationURI>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Class/CustomHid/Inc</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Class/CustomHid/Src</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Core/Inc/usbd_config.h</name>
+			<type>1</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/Middlewares/APM32_USB_Library/Device/Core/Inc/usbd_config.h</location>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Core/Inc/usbd_core.h</name>
+			<type>1</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/Middlewares/APM32_USB_Library/Device/Core/Inc/usbd_core.h</location>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Core/Inc/usbd_dataXfer.h</name>
+			<type>1</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/Middlewares/APM32_USB_Library/Device/Core/Inc/usbd_dataXfer.h</location>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Core/Inc/usbd_stdReq.h</name>
+			<type>1</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/Middlewares/APM32_USB_Library/Device/Core/Inc/usbd_stdReq.h</location>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Core/Src/usbd_core.c</name>
+			<type>1</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/Middlewares/APM32_USB_Library/Device/Core/Src/usbd_core.c</location>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Core/Src/usbd_dataXfer.c</name>
+			<type>1</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/Middlewares/APM32_USB_Library/Device/Core/Src/usbd_dataXfer.c</location>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Core/Src/usbd_stdReq.c</name>
+			<type>1</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/Middlewares/APM32_USB_Library/Device/Core/Src/usbd_stdReq.c</location>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Class/CustomHid/Inc/usbd_customhid.h</name>
+			<type>1</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/Middlewares/APM32_USB_Library/Device/Class/CustomHID/Inc/usbd_customhid.h</location>
+		</link>
+		<link>
+			<name>APM_USB_LIB/Device/Class/CustomHid/Src/usbd_customhid.c</name>
+			<type>1</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/Middlewares/APM32_USB_Library/Device/Class/CustomHID/Src/usbd_customhid.c</location>
 		</link>
 	</linkedResources>
 	<variableList>

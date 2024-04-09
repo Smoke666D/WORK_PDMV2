@@ -9,6 +9,7 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include system/subdir.mk
+-include USB_DEV/subdir.mk
 -include StdPeriphDriver/subdir.mk
 -include LUA/subdir.mk
 -include HW_LIB/subdir.mk
@@ -19,6 +20,8 @@ RM := rm -rf
 -include Drivers/subdir.mk
 -include CMSIS/subdir.mk
 -include Application/subdir.mk
+-include APM_USB_LIB/Device/Core/Src/subdir.mk
+-include APM_USB_LIB/Device/Class/CustomHid/Src/subdir.mk
 -include subdir.mk
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(strip $(ASM_DEPS)),)

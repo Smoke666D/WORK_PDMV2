@@ -20,6 +20,8 @@ S_UPPER_DEPS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 . \
+APM_USB_LIB/Device/Class/CustomHid/Src \
+APM_USB_LIB/Device/Core/Src \
 Application \
 CMSIS \
 Drivers \
@@ -30,5 +32,6 @@ HAL \
 HW_LIB \
 LUA \
 StdPeriphDriver \
+USB_DEV \
 system \
 

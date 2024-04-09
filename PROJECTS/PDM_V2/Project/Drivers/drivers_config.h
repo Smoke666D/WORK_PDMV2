@@ -218,6 +218,11 @@
 #define DIN_COUNT             12
 #define DOUT_COUNT            0
 
+
+#define DIN_CHANNEL 			11U
+#define VELOCITY_COUNT      2U     // Количество каналов скорости
+#define TEMPERATURE_COUNT   1U     /* Количество каналов температуры */
+#define ANGLE_COUNT         2U
 /*
  * Конфигурация AIN
  */
