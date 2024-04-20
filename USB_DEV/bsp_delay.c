@@ -78,13 +78,13 @@ void Delay_Init(void)
  */
 void APM_DelayInit(void)
 {
-    SystemCoreClockUpdate();
-    if (SysTick_Config(SystemCoreClock / 1000 / SYSTICK_FRQ))
-    {
-        while (1);
-    }
+   // SystemCoreClockUpdate();
+   // if (SysTick_Config(SystemCoreClock / 1000 / SYSTICK_FRQ))
+   // {
+   //     while (1);
+   // }
 
-    NVIC_SetPriority(SysTick_IRQn, 15U);
+   // NVIC_SetPriority(SysTick_IRQn, 15U);
 }
 
 /*!

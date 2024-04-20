@@ -19,7 +19,7 @@
 
 
 static PDM_TELEMETRY telemetry  = { 0U };
-static PDM_DATA      systemData = { 0U };
+static PDM_DATA      systemData  __SECTION(RAM_SECTION_CCMRAM); ;
 
 static uint8_t nullString[ERROR_STRING_LENGTH] = { 0U };
 
@@ -62,7 +62,7 @@ void vDATAupdate ( void )
     telemetry.douts[i].state   = eOutGetState( i );
     telemetry.douts[i].error   = eOutGetError( i );
   }
-  telemetry.lua.counter  = ucLUAgetErrorCount();
+  telemetry.lua.counter  = 0;
   telemetry.lua.time     = ulLUAgetWorkCicle();
   telemetry.lua.state    = eLUAgetSTATE();
   telemetry.velocity[0U] = uGetRPM1();
@@ -103,7 +103,7 @@ uint8_t uDATAgetErrorString ( uint8_t adr, uint8_t size, uint8_t* out )
 {
   uint8_t  len = ERROR_STRING_LENGTH;
   uint8_t* src = nullString;
-  if ( pcGetLUAError() != NULL ) {
+  if ( eLUAgetSTATE() == LUA_ERROR ) {
     src = ( uint8_t* )pcGetLUAError();
     len = strlen( pcGetLUAError() );
   }

@@ -11,11 +11,10 @@
 #include "string.h"
 #include "FreeRTOS.h"
 #include "event_groups.h"
+#include "system_init.h"
 
 
-
-void (*filter_set_function)(uint16_t);
-CANRX MailBoxBuffer[MAILBOXSIZE] ;
+CANRX MailBoxBuffer[MAILBOXSIZE] __SECTION(RAM_SECTION_CCMRAM);
 
 CANRX * getMailBox()
 {
@@ -43,16 +42,12 @@ void vCanInsertRXData(CAN_FRAME_TYPE * RXPacket)
 }
 
 
-void vsetFiterFunctionCallBack( void * t  )
-{
-	filter_set_function = t;
 
-}
 
 void vSetWaitFilter(uint32_t id)
 {
 	 MailBoxBuffer[0].ident = id;
-	 filter_set_function(0);
+	 vFilterSet(0);
 	 return;
 }
 
@@ -78,7 +73,7 @@ ERROR_TYPE_t eMailboxFilterSet(uint32_t id)
 		if (MailBoxBuffer[i].ident == 0U)
 		{
 			 MailBoxBuffer[i].ident = id;
-			 filter_set_function(i);
+			 vFilterSet(i);
 			 eRes = ERROR_NO;
 			 break;
 		}

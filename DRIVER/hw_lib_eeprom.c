@@ -8,16 +8,17 @@
 
 #include "hw_lib_eeprom.h"
 #include "string.h"
+#include "system_init.h"
 //#include "FreeRTOS.h"
 //#include "event_groups.h"
 
 
 
 
-static EEPOROM  Dev;
+static EEPOROM  Dev __SECTION(RAM_SECTION_CCMRAM);
 static void vSetAddr(EEPROM_ADRESS_TYPE addr );
 
-static uint8_t sector_buffer[SECTOR_SIZE + ADDRESS_DATA];
+static uint8_t sector_buffer[SECTOR_SIZE + ADDRESS_DATA] __SECTION(RAM_SECTION_CCMRAM);
 
 
 

@@ -11,6 +11,7 @@
 #include "main.h"
 #include "string.h"
 #include "drivers_config.h"
+
 #include "filters.h"
 
 #define DIN_PARAM_CHECK 0
@@ -41,7 +42,8 @@ typedef enum
 typedef enum {
     DIN_CONFIG_NEGATIVE = 0U,
     DIN_CONFIG_POSITIVE = 1U,
-    RPM_CONFIG = 2U
+    RPM_CONFIG = 2U,
+	DIN_IDLE   = 4,
 } DIN_INPUT_TYPE;
 
 
@@ -133,6 +135,11 @@ typedef enum {
 
 
 //#define  ucDinGet( a )  uGetDIN( a )
+void InitDinStcurt();
+DIN_INPUT_TYPE xGetDinType(DIN_INPUT_NAME ucCh);
+void vRecinfigDin(  DIN_INPUT_NAME ucCh, DinConfig_t * config    );
+void vDinInitStateProcess();
+void InitFilters();
 void vSetRPMConfig(uint8_t ch, float coof, float filter_coof);
 DIN_FUNCTION_ERROR_t eDOUTConfigWtihStruct(OUT_NAME_TYPE ucCh, DoutCinfig_t * config);
 uint8_t eGrtDUT(OUT_NAME_TYPE ucCh);

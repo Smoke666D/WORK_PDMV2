@@ -70,7 +70,7 @@ main-build: PDM_V2.elf secondary-outputs
 PDM_V2.elf: $(OBJS) $(USER_OBJS) makefile $(OPTIONAL_TOOL_DEPS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GNU Arm Cross C Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -O3 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wall -g3 -T "C:/Users/i.dymov/Desktop/WORK/PROJECTS/PDM_V2/Project/APM32F4xxxG_FLASH.ld" -Xlinker --gc-sections -Wl,-Map,"PDM_V2.map" --specs=nano.specs --specs=nosys.specs -mfloat-abi=hard -mfpu=vfpv4-d16 -o "PDM_V2.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O1 -ffunction-sections -fdata-sections -Wall -g3 -T "C:/Users/i.dymov/Desktop/WORK/PROJECTS/PDM_V2/Project/APM32F4xxxG_FLASH.ld" -Xlinker --gc-sections -Wl,-Map,"PDM_V2.map" --specs=nano.specs --specs=nosys.specs -mfloat-abi=hard -mfpu=vfpv4-d16 -o "PDM_V2.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

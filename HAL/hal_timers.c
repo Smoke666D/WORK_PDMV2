@@ -11,7 +11,7 @@
 
 static void vTimerInitRCC(TimerName_t TimerName);
 static uint32_t getTimerFreq( TimerName_t TimerName );
-void vHW_L_LIB_BaseTimerInit(TimerName_t TimerName  );
+
 static TMR_T * timers[TIMER14+1] = { TMR1,TMR2,TMR3,TMR4,TMR5,TMR6,TMR7,TMR8,TMR9,TMR10,TMR11,TMR12,TMR13,TMR14};
 static TimerConfif_t config[TIMER14];
 
@@ -79,11 +79,29 @@ void vHW_L_LIB_PWMTimersInit(TimerName_t TimerName , uint32_t freq_in_hz, uint32
 	OCcongigStruct.nIdleState = TMR_OC_NIDLE_STATE_RESET;
 	OCcongigStruct.nPolarity = TMR_OC_NPOLARITY_HIGH;
 	OCcongigStruct.outputNState = TMR_OC_NSTATE_DISABLE;
-	OCcongigStruct.pulse = Period + 1;
-	if (channel &  TIM_CHANNEL_1)  { TMR_ConfigOC1(timers[TimerName], &OCcongigStruct);   TMR_DisableCCxChannel(timers[TimerName],TMR_CHANNEL_1); }
-	if (channel &  TIM_CHANNEL_2)  { TMR_ConfigOC2(timers[TimerName], &OCcongigStruct);   TMR_DisableCCxChannel(timers[TimerName],TMR_CHANNEL_2);}
-	if (channel &  TIM_CHANNEL_3)  { TMR_ConfigOC3(timers[TimerName], &OCcongigStruct);   TMR_DisableCCxChannel(timers[TimerName],TMR_CHANNEL_3); }
-	if (channel &  TIM_CHANNEL_4)  { TMR_ConfigOC4(timers[TimerName], &OCcongigStruct);   TMR_DisableCCxChannel(timers[TimerName],TMR_CHANNEL_4); }
+	OCcongigStruct.pulse = Period;// + 1;
+	if (channel &  TIM_CHANNEL_1)
+	{ TMR_ConfigOC1(timers[TimerName], &OCcongigStruct);
+	  TMR_ConfigOC1Fast(timers[TimerName],TMR_OC_FAST_ENABLE);
+	  TMR_ConfigOC1Preload(timers[TimerName], TMR_OC_PRELOAD_ENABLE);
+	  TMR_DisableCCxChannel(timers[TimerName],TMR_CHANNEL_1); }
+	if (channel &  TIM_CHANNEL_2)
+	{ TMR_ConfigOC2(timers[TimerName], &OCcongigStruct);
+	  TMR_ConfigOC2Fast(timers[TimerName],TMR_OC_FAST_ENABLE);
+	  TMR_ConfigOC2Preload(timers[TimerName], TMR_OC_PRELOAD_ENABLE);
+	  TMR_DisableCCxChannel(timers[TimerName],TMR_CHANNEL_2);}
+	if (channel &  TIM_CHANNEL_3)
+	{ TMR_ConfigOC3(timers[TimerName], &OCcongigStruct);
+	  TMR_ConfigOC3Fast(timers[TimerName],TMR_OC_FAST_ENABLE);
+	  TMR_ConfigOC3Preload(timers[TimerName], TMR_OC_PRELOAD_ENABLE);
+	  TMR_DisableCCxChannel(timers[TimerName],TMR_CHANNEL_3); }
+	if (channel &  TIM_CHANNEL_4)
+	{ TMR_ConfigOC4(timers[TimerName], &OCcongigStruct);
+	  TMR_ConfigOC4Fast(timers[TimerName],TMR_OC_FAST_ENABLE);
+	  TMR_ConfigOC4Preload(timers[TimerName], TMR_OC_PRELOAD_ENABLE);
+	  TMR_DisableCCxChannel(timers[TimerName],TMR_CHANNEL_4); }
+
+	TMR_EnableAutoReload(timers[TimerName]);
 	TMR_Enable(timers[TimerName]);
 	TMR_EnablePWMOutputs(timers[TimerName]);
 }
@@ -238,7 +256,6 @@ static void vTimerInitRCC(TimerName_t TimerName)
 	switch (TimerName)
 	{
 		case TIMER1:
-
 			RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_TMR1);
 			break;
 		case TIMER2:

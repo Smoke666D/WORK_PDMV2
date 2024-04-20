@@ -33,6 +33,8 @@ Drivers/usb_task.o: ../Drivers/usb_task.c ../Drivers/usb_task.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_datastorage.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_eeprom.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
+ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h \
+ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_i2c.h \
  ../Drivers/data.h ../Drivers/drivers_config.h ../Drivers/lua_task.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\system/system_init.h \
@@ -46,9 +48,11 @@ Drivers/usb_task.o: ../Drivers/usb_task.c ../Drivers/usb_task.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/filters.h \
  C:\Users\i.dymov\Desktop\WORK\HAL/hal_gpio.h \
  C:\Users\i.dymov\Desktop\WORK\HAL/hal_timers.h \
- c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h \
- c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/lua_task.h \
+ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/usb_task.h \
+ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/adc_task.h \
+ C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h \
+ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
  ../Drivers/version.h
 
 ../Drivers/usb_task.h:
@@ -121,6 +125,10 @@ C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_eeprom.h:
 
 C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h:
 
+c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h:
+
+c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h:
+
 c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_i2c.h:
 
 ../Drivers/data.h:
@@ -151,10 +159,14 @@ C:\Users\i.dymov\Desktop\WORK\HAL/hal_gpio.h:
 
 C:\Users\i.dymov\Desktop\WORK\HAL/hal_timers.h:
 
-c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h:
-
-c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h:
-
 C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/lua_task.h:
+
+C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/usb_task.h:
+
+C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/adc_task.h:
+
+C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h:
+
+C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h:
 
 ../Drivers/version.h:

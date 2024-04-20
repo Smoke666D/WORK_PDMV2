@@ -9,17 +9,18 @@
 #include "event_groups.h"
 #include "adc_task.h"
 #include "lua_task.h"
+#include "hal_adc.h"
 #include "drivers_config.h"
 #include "apm32f4xx_adc.h"
-//#include "init.h"
 #include "apm32f4xx_dma.h"
 #define TEMP_DATA    5
 
 
-static PDM_OUTPUT_TYPE out[OUT_COUNT]  			    __SECTION(RAM_SECTION_CCMRAM);
-
-static   EventGroupHandle_t pADCEvent    __SECTION(RAM_SECTION_CCMRAM);
-static EventGroupHandle_t  * pxPDMstatusEvent;
+static PDM_OUTPUT_TYPE out[OUT_COUNT]  	 				__SECTION(RAM_SECTION_CCMRAM);
+static TaskHandle_t  pTaskHandle  						__SECTION(RAM_SECTION_CCMRAM);
+static EventGroupHandle_t  * pxPDMstatusEvent 		    __SECTION(RAM_SECTION_CCMRAM);
+static TaskHandle_t  pTaskToNotifykHandle  				__SECTION(RAM_SECTION_CCMRAM);
+static ADC_Task_State_t state 							__SECTION(RAM_SECTION_CCMRAM);
 
 static const KAL_DATA CurSensData[OUT_COUNT][KOOF_COUNT] ={   {{K002O20,V002O20},{K01O20,V01O20},{K10O20,V10O20},{K15O20,V15O20}},
 										{{K002O20,V002O20},{K01O20,V01O20},{K10O20,V10O20},{K15O20,V15O20}},
@@ -46,6 +47,16 @@ static const KAL_DATA CurSensData[OUT_COUNT][KOOF_COUNT] ={   {{K002O20,V002O20}
  *
  */
 static void ADC_Init(void);
+
+
+
+TaskHandle_t * xGetADCTaskHandle()
+{
+	return  &pTaskHandle;
+}
+
+
+
 /*
  *
  */
@@ -269,9 +280,7 @@ void vOutSetState(OUT_NAME_TYPE out_name, uint8_t state)
 void vHWOutOFF( uint8_t ucChannel )
 {
 	vHW_L_LIB_DisablePWMCH(out[ucChannel].ptim,out[ucChannel].channel );
-//	HAL_GPIO_WritePin(out[ucChannel].OutGPIOx, out[ucChannel].OutGPIO_Pin,GPIO_PIN_RESET);
 	out[ucChannel].POWER_SOFT = 0;
-
 	return;
 }
 /*
@@ -325,7 +334,15 @@ ERROR_CODE vHWOutOverloadConfig(OUT_NAME_TYPE out_name,  float power, uint16_t o
 	return ( res );
 }
 
-
+void vSetRendomResetState( OUT_NAME_TYPE out_name,  uint8_t state, uint8_t cool_down)
+{
+	if ( out_name < OUT_COUNT )
+	{
+		out[out_name].RanfomOverload = (state!=0) ? 1: 0;
+		out[out_name].cooldown_coof = (cool_down!=0)? cool_down : 1;
+		out[out_name].cooldown_timer   = 0;
+	}
+}
 /*
  * Функция конфигурации режима PWM
  */
@@ -369,6 +386,8 @@ static void vHWOutInit(OUT_NAME_TYPE out_name, TimerName_t ptim, uint8_t uiChann
 		out[out_name].channel 		   = uiChannel;
 		out[out_name].CS_PORT 		   = EnablePort;
 		out[out_name].CS_Pin		   = EnablePin;
+		out[out_name].OUT_PORT		   = OutPort;
+		out[out_name].OUT_Pin		   = OutPin;
 		out[out_name].error_counter    = 0U;
 		out[out_name].soft_start_timer = 0;
 		out[out_name].current 		   = 0.0;
@@ -377,7 +396,8 @@ static void vHWOutInit(OUT_NAME_TYPE out_name, TimerName_t ptim, uint8_t uiChann
 		out[out_name].state 		   = 0;
 		out[out_name].PWM_Freg         = 0;
 		out[out_name].PWM              = 100;
-		out[out_name].filter_enable     = 1;
+		out[out_name].filter_enable    = 1;
+		vSetRendomResetState(out_name, 0, 1);
 		//Конфигурация пина CurSens Enable
 		HAL_InitGpioOut( EnablePort, EnablePin );
 		vHWOutDisable( out_name);
@@ -452,7 +472,7 @@ void vOutInit( void )
 	vHW_L_LIB_PWMTimersInit(TIMER3, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 );
 	vHW_L_LIB_PWMTimersInit(TIMER8, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 | TIM_CHANNEL_3 | TIM_CHANNEL_4);
 	vHW_L_LIB_PWMTimersInit(TIMER12, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 );
-	vHWOutInit(OUT_1, TIMER4, TIM_CHANNEL_3, Cs_Dis20_1_GPIO_Port,Cs_Dis20_1_Pin,OUT1_PORT ,OUT1_PIN );
+	vHWOutInit(OUT_1, TIMER4, TIM_CHANNEL_3, Cs_Dis20_1_GPIO_Port,Cs_Dis20_1_Pin, OUT1_PORT ,OUT1_PIN );
 	vHWOutInit(OUT_2, TIMER4, TIM_CHANNEL_4, Cs_Dis20_2_GPIO_Port,Cs_Dis20_2_Pin, OUT2_PORT ,OUT2_PIN  );
 	vHWOutInit(OUT_3, TIMER2, TIM_CHANNEL_1, Cs_Dis20_3_GPIO_Port,Cs_Dis20_3_Pin, OUT3_PORT ,OUT3_PIN );
 	vHWOutInit(OUT_4, TIMER3, TIM_CHANNEL_2, Cs_Dis20_4_GPIO_Port,Cs_Dis20_4_Pin, OUT4_PORT ,OUT4_PIN );
@@ -472,7 +492,6 @@ void vOutInit( void )
 	vHWOutInit(OUT_18, TIMER8, TIM_CHANNEL_4, Cs_Dis8_17_18_GPIO_Port, Cs_Dis8_17_18_Pin , OUT18_PORT ,OUT18_PIN );
 	vHWOutInit(OUT_19, TIMER12,TIM_CHANNEL_2,Cs_Dis8_19_20_GPIO_Port,Cs_Dis8_19_20_Pin , OUT19_PORT ,OUT19_PIN );
 	vHWOutInit(OUT_20, TIMER4, TIM_CHANNEL_1, Cs_Dis8_19_20_GPIO_Port,Cs_Dis8_19_20_Pin,OUT20_PORT ,OUT20_PIN  );
-	//HAL_TIM_Base_Start_IT(&htim2);
 	return;
 }
 
@@ -503,8 +522,7 @@ void vOutInit( void )
 	 }
 
  }
-/*
- *
+
 
 static float fGetDataFromRaw( float fraw,PDM_OUTPUT_TYPE xOut)
 {
@@ -521,17 +539,19 @@ static float fGetDataFromRaw( float fraw,PDM_OUTPUT_TYPE xOut)
 	 }
 	return ( fRes );
 }
-*/
+
+
 /*
  *
  */
 static void vOutControlFSM(void)
 {
    for (uint8_t i = 0U; i < OUT_COUNT; i++ )
-	{
+   {
    	if (IS_FLAG_SET(i,ENABLE_FLAG) )		/*Если канал не выключен или не в режиме конфигурации*/
    	{
-   	    float fCurrent  =  usGetCurrentToFloat( i, out[i].filter_enable, out[i].CSC );
+   		uint16_t rawdata =  ucGetRawData( i , out[i].filter_enable);
+   	    float fCurrent  =  fGetDataFromRaw( ((float) rawdata *K ) ,   out[i]);
    	    if ( ( fCurrent > out[ i ].power) && (out[i].PWM != 100) )
    	    {
    	        if  (out[i].state == RESET)
@@ -554,81 +574,120 @@ static void vOutControlFSM(void)
 					out[i].current 	   		 = 0U;
 					out[i].restart_timer   	 = 0U;
 					RESET_FLAG(i,ERROR_MASK);
+					out[i].cool_down_flag    = 0U;
+					out[ i ].cooldown_timer  = 0U;
 					break;
 				case FSM_ON_PROCESS: //Состояния влючения
-
 					out[i].restart_timer++;
 					uint8_t ucCurrentPower;
 					if ((out[i].soft_start_timer !=0) && (out[i].PWM_Freg != 0))
 					{
-						if  ( fCurrent  > out[i].overload_power)
-						{
-							vGotoRestartState(i,fCurrent);
-							break;
-						}
-						if  ( out[i].restart_timer >= out[i].soft_start_timer ) //Если прошло время полонго пуска
-						{
-							  SET_STATE_FLAG(i, FSM_ON_STATE );
-							  ucCurrentPower = MAX_POWER;
-						}
-						else
-						 {   //время пуска не прошоло, вычисляем текущую мощность, котору надо пдать на выход.
-						 	    ucCurrentPower = out[i].soft_start_power + (uint8_t) (((float)out[i].restart_timer/(float)out[i].soft_start_timer)*(MAX_POWER - out[i].soft_start_power));
-						 		if (ucCurrentPower  >= MAX_POWER)
-						 		{
-						 			ucCurrentPower = MAX_POWER;
-						 		}
-						 }
-						vOutSetPWM(i, ucCurrentPower );
-					}
-					else
-					{
-
-						 if ( out[i].restart_timer  < 2 )
+					 		if  ( fCurrent  > out[i].overload_power)
+					 		{
+					 			vGotoRestartState(i,fCurrent);
+					 			break;
+					 		}
+					 		if  ( out[i].restart_timer >= out[i].soft_start_timer ) //Если прошло время полонго пуска
+					 		{
+					 			SET_STATE_FLAG(i, FSM_ON_STATE );
+					 			ucCurrentPower = MAX_POWER;
+					 		}
+					 		else
+					 		{   //время пуска не прошоло, вычисляем текущую мощность, котору надо пдать на выход.
+					 			ucCurrentPower = out[i].soft_start_power + (uint8_t) (((float)out[i].restart_timer/(float)out[i].soft_start_timer)*(MAX_POWER - out[i].soft_start_power));
+					 			if (ucCurrentPower  >= MAX_POWER)
+					 			{
+					 				ucCurrentPower = MAX_POWER;
+					 			}
+					 		}
+					 		vOutSetPWM(i, ucCurrentPower );
+					 }
+					 else
+					 {
+						 if ( out[i].restart_timer  >= 2 )
 						 {
-							 break;
-						 }
-						 if  ( fCurrent  > out[ i ].overload_power )
-						 {
-						 	vGotoRestartState(i,fCurrent);
-						 	break;
-						 }
-						 if ( out[ i ].restart_timer >= out[ i ].overload_config_timer )
-						 {
-							SET_STATE_FLAG(i, FSM_ON_STATE );
-						 }
-					}
+					 		if  ( fCurrent  > out[ i ].overload_power )
+					 		{
+					 			vGotoRestartState(i,fCurrent);
+					 		}
+					 		else
+					 		{
+					 			if  (fCurrent  > out[ i ].power  )
+					 			{
+					 					out[ i ].cooldown_timer = 0;
+					 					out[ i ].cool_down_flag = 0;
+					 			}
+					 			if ( out[ i ].restart_timer >= out[ i ].overload_config_timer )
+					 			{
+					 					SET_STATE_FLAG(i, FSM_ON_STATE );
+					 					out[ i ].restart_timer = 0;
+					 			}
+					 		}
+					 	 }
+					 }
 					out[i].current = fCurrent;
 					break;
 				case FSM_ON_STATE:  // Состояние входа - включен
+					out[i].current = fCurrent;
 					if  (fCurrent  > out[ i ].power  )
 					{
-						vGotoRestartState( i, fCurrent );
-						break;
-					}
-					RESET_FLAG(i,ERROR_MASK);
-					if (fCurrent  < CIRCUT_BREAK_CURRENT)
-					{
-						SET_ERROR_FLAG(i,OPEN_LOAD_ERROR);
-					}
-
-					out[i].current = fCurrent;
-					break;
+					 		if ((out[i].RanfomOverload) &&  (out[i].cool_down_flag   == 1))
+					 		{
+					 				out[ i ].cooldown_timer = 0;
+					 				out[i].restart_timer++;
+					 				if ( out[i].restart_timer  < 2 )  break;
+					 				if  (( fCurrent  > out[ i ].overload_power ) ||   ( out[ i ].restart_timer >= out[ i ].overload_config_timer ))
+					 				{
+					 						vGotoRestartState(i,fCurrent);
+					 						break;
+					 				}
+					 		}
+					 		else
+					 		{
+					 			vGotoRestartState( i, fCurrent );
+					 			break;
+					 		}
+					 }
+					 else
+					 {
+					 		out[ i ].restart_timer = 0;
+					 		if ( out[ i ].cooldown_timer <= ( out[ i ].overload_config_timer * out[ i ].cooldown_coof) )
+					 		{
+					 			out[i].cool_down_flag   = 0;
+					 			out[ i ].cooldown_timer++;
+					 		}
+					 		else
+					 			out[i].cool_down_flag   = 1;
+					 }
+					 RESET_FLAG(i,ERROR_MASK);
+					 if (fCurrent  < CIRCUT_BREAK_CURRENT)
+					 {
+					 		SET_ERROR_FLAG(i,OPEN_LOAD_ERROR);
+					 }
+					 break;
 				case FSM_RESTART_STATE:
 					out[ i ].restart_timer++;
-					if  ( out[ i ].restart_timer >= out[ i ].restart_config_timer )
-					{
-						SET_STATE_FLAG(i, FSM_ON_PROCESS );
-						vHWOutSet( i );
-						out[ i ].restart_timer =0;
-						RESET_FLAG(i,ERROR_MASK);
-						if ( out[i].error_counter !=0 )
-						{
-							out[i].error_counter--;
-						}
-					}
+					 if  ( out[ i ].restart_timer >= out[ i ].restart_config_timer )
+					 {
+					 		SET_STATE_FLAG(i, FSM_ON_PROCESS );
+					 		out[i].cool_down_flag   = 0;
+					 		out[ i ].cooldown_timer  = 0;
+					 		vHWOutSet( i );
+					 		out[ i ].restart_timer =0;
+					 		RESET_FLAG(i,ERROR_MASK);
+					 		if ( out[i].error_counter !=0 )
+					 		{
+					 			out[i].error_counter--;
+					 		}
+					 }
 					break;
 				case FSM_ERROR_STATE:
+					if (IS_FLAG_SET(i,RESETTEBLE_FLAG) && IS_FLAG_SET(i, CONTROL_OFF_STATE))
+					 {
+					 	RESET_FLAG(i, OVERLOAD_ERROR);
+					 	SET_STATE_FLAG(i, FSM_OFF_STATE);
+					 }
+					break;
 				default:
 					break;
 			}
@@ -654,141 +713,161 @@ static void vOutControlFSM(void)
       		 	 	vHWOutSet( i );
       		 }
       		 RESET_FLAG(i,CONTROL_FLAGS );
-      	//	 out[i].state = HAL_GPIO_ReadPin(out[i].OutGPIOx, out[i].OutGPIO_Pin);
+      		 out[i].state = xHAL_GetOutBit(out[i].OUT_PORT, out[i].OUT_Pin);
       	}
    }
 }
 
 
-void ADC_StartDMA( uint8_t chanel, uint16_t * data, uint16_t size);
+
+
+void ADC_InputPortInit()
+{
+	 HAL_InitGpioAIN(CS20_1_GPIO_Port,CS20_1_Pin);
+	 HAL_InitGpioAIN(CS20_2_GPIO_Port,CS20_2_Pin);
+	 HAL_InitGpioAIN(CS20_3_GPIO_Port,CS20_3_Pin);
+	 HAL_InitGpioAIN(CS20_4_GPIO_Port,CS20_4_Pin);
+	 HAL_InitGpioAIN(CS20_5_GPIO_Port,CS20_5_Pin);
+	 HAL_InitGpioAIN(CS20_6_GPIO_Port,CS20_6_Pin);
+	 HAL_InitGpioAIN(CS20_7_GPIO_Port,CS20_7_Pin);
+	 HAL_InitGpioAIN(CS20_8_GPIO_Port,CS20_8_Pin);
+	 HAL_InitGpioAIN(CS8_9_GPIO_Port,CS8_9_Pin);
+	 HAL_InitGpioAIN(CS8_10_GPIO_Port,CS8_10_Pin);
+	 HAL_InitGpioAIN(CS8_11_GPIO_Port,CS8_11_Pin);
+	 HAL_InitGpioAIN(CS8_12_GPIO_Port,CS8_12_Pin);
+	 HAL_InitGpioAIN(CS8_13_GPIO_Port,CS8_13_Pin);
+	 HAL_InitGpioAIN(CS8_14_GPIO_Port,CS8_14_Pin);
+	 HAL_InitGpioAIN(CS8_15_GPIO_Port,CS8_15_Pin);
+	 HAL_InitGpioAIN(CS8_16_GPIO_Port,CS8_16_Pin);
+	 HAL_InitGpioAIN(CS8_17_GPIO_Port,CS8_17_Pin);
+	 HAL_InitGpioAIN(CS8_18_GPIO_Port,CS8_18_Pin);
+	 HAL_InitGpioAIN(CS8_19_GPIO_Port,CS8_19_Pin);
+	 HAL_InitGpioAIN(CS8_20_GPIO_Port,CS8_20_Pin);
+	 HAL_InitGpioAIN(ADC1_4_GPIO_Port,ADC1_4_Pin);
+	 HAL_InitGpioAIN(ADC1_5_GPIO_Port,ADC1_5_Pin);
+	 HAL_InitGpioAIN(ADC1_8_GPIO_Port,ADC1_8_Pin);
+	 HAL_InitGpioAIN(ADC1_9_GPIO_Port,ADC1_9_Pin);
+}
+
+
+
+void HAL_ADC_StartDMA( uint8_t chanel, uint16_t * data, uint16_t size);
  /*
   *
   */
+
+
+
+
+
+
+
+
+void AinNotifyTaskToStop()
+{
+	xTaskNotify(pTaskHandle, TASK_STOP_NOTIFY , eSetValueWithOverwrite);
+}
+
+void AinNotifyTaskToInit()
+{
+	pTaskToNotifykHandle = xTaskGetCurrentTaskHandle();
+	xTaskNotify(pTaskHandle, TASK_INIT_NOTIFY , eSetValueWithOverwrite);
+}
+
+
+
+
  void vADCTask(void * argument)
  {
    /* USER CODE BEGIN vADCTask */
+   uint32_t ulNotifiedValue;
+   state = ADC_IDLE_STATE;
+   ADC_InputPortInit();
    ADC_Init();
-
-   pxPDMstatusEvent = osLUAetPDMstatusHandle();
+   pxPDMstatusEvent   = osLUAetPDMstatusHandle();
    TickType_t xLastWakeTime;
    const TickType_t xPeriod = pdMS_TO_TICKS( 1 );
    xLastWakeTime = xTaskGetTickCount();
    for(;;)
    {
-	  // WDT_Reset();
-	   vTaskDelayUntil( &xLastWakeTime, xPeriod );
-	   xEventGroupWaitBits(* pxPDMstatusEvent, RUN_STATE, pdFALSE, pdTRUE, portMAX_DELAY );
-	   ADC_StartDMA( 1, (uint16_t *)getADC1Buffer(), ( ADC_FRAME_SIZE * ADC1_CHANNELS ));
-	   ADC_StartDMA( 2, (uint16_t *)getADC2Buffer(), ( ADC_FRAME_SIZE * ADC2_CHANNELS ));
-	   ADC_StartDMA( 3, (uint16_t *)getADC3Buffer(), ( ADC_FRAME_SIZE * ADC3_CHANNELS ));
-	   xEventGroupWaitBits( pADCEvent, ( ADC3_READY  | ADC2_READY | ADC1_READY   ), pdTRUE, pdTRUE, 100 );
-	   vDataConvertToFloat();
-	   vOutControlFSM();
-	   ADC_Enable(ADC1);
-	   ADC_Enable(ADC2);
-	   ADC_Enable(ADC3);
-	    /* Влючаем АЦП, исходя из времени выполнения следующей функции,
-	   к моменту ее завершения, АЦП уже включаться*/
-
+       switch (state)
+	   {
+	   	   case ADC_IDLE_STATE:
+	   		    xTaskNotifyWait(0,0xFF ,&ulNotifiedValue,portMAX_DELAY);
+	   			if ((ulNotifiedValue & TASK_INIT_NOTIFY) !=0)
+	   			{
+	   			   vOutInit();
+	   			   state = ADC_INIT_STATE;
+	   			}
+	   		   break;
+	   	   case ADC_INIT_STATE:
+	   		    xTaskNotify(pTaskToNotifykHandle, AIN_DRIVER_READY , eIncrement);
+	   			state = ADC_RUN1_STATE;
+	   		   break;
+	   	   case ADC_RUN1_STATE:
+	   		    vTaskDelayUntil( &xLastWakeTime, xPeriod );
+	   		    ulTaskNotifyValueClearIndexed(NULL, 1, 0xFFFF);
+	   		    HAL_ADC_StartDMA( 1, (uint16_t *)getADC1Buffer(), ( ADC_FRAME_SIZE * ADC1_CHANNELS ));
+	   		    HAL_ADC_StartDMA( 2, (uint16_t *)getADC2Buffer(), ( ADC_FRAME_SIZE * ADC2_CHANNELS ));
+	   		    HAL_ADC_StartDMA( 3, (uint16_t *)getADC3Buffer(), ( ADC_FRAME_SIZE * ADC3_CHANNELS ));
+	   		    state = ADC_WHAIT_CONVERSION_STATE;
+	   		    break;
+	   	   case ADC_WHAIT_CONVERSION_STATE:
+	   		    xTaskNotifyWaitIndexed( 1, 0, 0  ,&ulNotifiedValue,portMAX_DELAY);
+	   		    if(  ulNotifiedValue >= 3 )
+	   		    {
+	   		    	HAL_ADCDMA_Disable(ADC_1);
+	   		    	HAL_ADCDMA_Disable(ADC_2);
+	   		    	HAL_ADCDMA_Disable(ADC_3);
+	   		    	vDataConvertToFloat();
+	   		    	vOutControlFSM();
+	   		    	HAL_ADC_Enable(ADC_1);
+	   		    	HAL_ADC_Enable(ADC_2);
+	   		    	HAL_ADC_Enable(ADC_3);
+	   		    	ulTaskNotifyValueClearIndexed(NULL, 1, 0xFFFF);
+	   		    	state = ADC_RUN2_STATE;
+	   		    }
+	   		    break;
+	   	   case ADC_RUN2_STATE:
+	   		  if ( xTaskNotifyWait(0xFFFF,0xFFFF,&ulNotifiedValue,0) == pdTRUE)
+	   		  {
+	   			  	   for (uint8_t i = 0; i<OUT_COUNT; i++ )
+	   			  	   {
+	   			  	   	   vHWOutOFF( i );
+	   			  	   	   vHWOutDisable( i );
+	   			  	   	}
+	   			  	   	state = ADC_IDLE_STATE;
+	   			}
+	   		    else
+	   		     state = ADC_RUN1_STATE;
+	   		    break;
+	   }
    }
    /* USER CODE END vADCTask */
  }
 
  static DMA_Config_T dmaConfig;
 
+
  static void ADC_Init(void)
  {
-
-	ADC_CommonConfig_T      adcCommonConfig;
-    ADC_Config_T  adcConfig;
-
-   RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_ADC1);
-   RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_ADC2);
-   RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_ADC3);
-
-   /* ADC configuration */
-   ADC_Reset();
-
-   adcCommonConfig.mode            = ADC_MODE_INDEPENDENT;
-   adcCommonConfig.prescaler       = ADC_PRESCALER_DIV8;
-   ADC_CommonConfig(&adcCommonConfig);
-   adcConfig.resolution            = ADC_RESOLUTION_12BIT;
-   adcConfig.scanConvMode          = ENABLE;
-   adcConfig.continuousConvMode    = ENABLE;
-   adcConfig.dataAlign             = ADC_DATA_ALIGN_RIGHT;
-   adcConfig.extTrigEdge           = ADC_EXT_TRIG_EDGE_NONE;
-   adcConfig.nbrOfChannel          = 9;
-   ADC_Config(ADC1, &adcConfig);
-   ADC_Config(ADC3, &adcConfig);
-   adcConfig.nbrOfChannel          = 7;
-   ADC_Config(ADC2, &adcConfig);
-   HAL_InitGpioAIN(CS20_1_GPIO_Port,CS20_1_Pin);
-   HAL_InitGpioAIN(CS20_2_GPIO_Port,CS20_2_Pin);
-   HAL_InitGpioAIN(CS20_3_GPIO_Port,CS20_3_Pin);
-   HAL_InitGpioAIN(CS20_4_GPIO_Port,CS20_4_Pin);
-   HAL_InitGpioAIN(CS20_5_GPIO_Port,CS20_5_Pin);
-   HAL_InitGpioAIN(CS20_6_GPIO_Port,CS20_6_Pin);
-   HAL_InitGpioAIN(CS20_7_GPIO_Port,CS20_7_Pin);
-   HAL_InitGpioAIN(CS20_8_GPIO_Port,CS20_8_Pin);
-   HAL_InitGpioAIN(CS8_9_GPIO_Port,CS8_9_Pin);
-   HAL_InitGpioAIN(CS8_10_GPIO_Port,CS8_10_Pin);
-   HAL_InitGpioAIN(CS8_11_GPIO_Port,CS8_11_Pin);
-   HAL_InitGpioAIN(CS8_12_GPIO_Port,CS8_12_Pin);
-   HAL_InitGpioAIN(CS8_13_GPIO_Port,CS8_13_Pin);
-   HAL_InitGpioAIN(CS8_14_GPIO_Port,CS8_14_Pin);
-   HAL_InitGpioAIN(CS8_15_GPIO_Port,CS8_15_Pin);
-   HAL_InitGpioAIN(CS8_16_GPIO_Port,CS8_16_Pin);
-   HAL_InitGpioAIN(CS8_17_GPIO_Port,CS8_17_Pin);
-   HAL_InitGpioAIN(CS8_18_GPIO_Port,CS8_18_Pin);
-   HAL_InitGpioAIN(CS8_19_GPIO_Port,CS8_19_Pin);
-   HAL_InitGpioAIN(CS8_20_GPIO_Port,CS8_20_Pin);
-   HAL_InitGpioAIN(ADC1_4_GPIO_Port,ADC1_4_Pin);
-   HAL_InitGpioAIN(ADC1_5_GPIO_Port,ADC1_5_Pin);
-   HAL_InitGpioAIN(ADC1_8_GPIO_Port,ADC1_8_Pin);
-   HAL_InitGpioAIN(ADC1_9_GPIO_Port,ADC1_9_Pin);
-   ADC_ConfigRegularChannel(ADC1,ADC_CHANNEL_4,  1, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC1,ADC_CHANNEL_7,  2, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC1,ADC_CHANNEL_6,  3, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC1,ADC_CHANNEL_5,  4, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC1,ADC_CHANNEL_14, 5, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC1,ADC_CHANNEL_15, 6, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC1,ADC_CHANNEL_8,  7, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC1,ADC_CHANNEL_9,  8, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC1,ADC_CHANNEL_16, 9, ADC_SAMPLETIME_112CYCLES);
-
-   ADC_ConfigRegularChannel(ADC2,ADC_CHANNEL_11,  1, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC2,ADC_CHANNEL_0,  2, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC2,ADC_CHANNEL_1,  3, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC2,ADC_CHANNEL_13,  4, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC2,ADC_CHANNEL_12, 5, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC2,ADC_CHANNEL_3, 6, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC2,ADC_CHANNEL_2,  7, ADC_SAMPLETIME_112CYCLES);
-
-   ADC_ConfigRegularChannel(ADC3,ADC_CHANNEL_14,  1, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC3,ADC_CHANNEL_9,  2, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC3,ADC_CHANNEL_7,  3, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC3,ADC_CHANNEL_4,  4, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC3,ADC_CHANNEL_15, 5, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC3,ADC_CHANNEL_8, 6, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC3,ADC_CHANNEL_10,  7, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC3,ADC_CHANNEL_6,  8, ADC_SAMPLETIME_112CYCLES);
-   ADC_ConfigRegularChannel(ADC3,ADC_CHANNEL_5, 9, ADC_SAMPLETIME_112CYCLES);
-
-
-   ADC_EnableDMA(ADC1);
-   ADC_EnableDMARequest(ADC1);
-   ADC_Enable(ADC1);
-   ADC_EnableDMA(ADC2);
-   ADC_EnableDMARequest(ADC2);
-   ADC_Enable(ADC2);
-   ADC_EnableDMA(ADC3);
-   ADC_EnableDMARequest(ADC3);
-   ADC_Enable(ADC3);
-
+   uint8_t ADC1_CHANNEL[9] = {ADC_CHANNEL_4,ADC_CHANNEL_7,ADC_CHANNEL_6,ADC_CHANNEL_5,ADC_CHANNEL_14,ADC_CHANNEL_15,ADC_CHANNEL_8,ADC_CHANNEL_9,ADC_CHANNEL_16};
+   uint8_t ADC2_CHANNEL[7] = {ADC_CHANNEL_11,ADC_CHANNEL_0,ADC_CHANNEL_1,ADC_CHANNEL_13,ADC_CHANNEL_12,ADC_CHANNEL_3,ADC_CHANNEL_2};
+   uint8_t ADC3_CHANNEL[9] = {ADC_CHANNEL_14,ADC_CHANNEL_9,ADC_CHANNEL_7,ADC_CHANNEL_4,ADC_CHANNEL_15,ADC_CHANNEL_8,ADC_CHANNEL_10,ADC_CHANNEL_6,ADC_CHANNEL_5};
+   HAL_ADC_ContiniusScanCinvertioDMA( 1 ,  9 ,  ADC1_CHANNEL);
+   HAL_ADC_ContiniusScanCinvertioDMA( 2 ,  7 ,  ADC2_CHANNEL);
+   HAL_ADC_ContiniusScanCinvertioDMA( 3 ,  9 ,  ADC3_CHANNEL);
+   HAL_ADC_TempEnable();
+   HAL_ADC_VrefEnable();
+   HAL_ADC_Enable(ADC_1);
+   HAL_ADC_Enable(ADC_2);
+   HAL_ADC_Enable(ADC_3);
 
    /* Enable DMA clock */
    RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_DMA2);
-
+   NVIC_EnableIRQRequest(DMA2_STR0_IRQn, 6, 0);
+   NVIC_EnableIRQRequest(DMA2_STR2_IRQn, 6, 0);
+   NVIC_EnableIRQRequest(DMA2_STR4_IRQn, 6, 0);
   // dmaConfig.bufferSize = 1;
    dmaConfig.memoryDataSize = DMA_MEMORY_DATA_SIZE_HALFWORD;
    dmaConfig.peripheralDataSize = DMA_PERIPHERAL_DATA_SIZE_HALFWORD;
@@ -798,9 +877,6 @@ void ADC_StartDMA( uint8_t chanel, uint16_t * data, uint16_t size);
    dmaConfig.priority = DMA_PRIORITY_LOW;
    /* read from peripheral*/
    dmaConfig.dir = DMA_DIR_PERIPHERALTOMEMORY;
-   /* Set memory Address*/
- //  dmaConfig.memoryBaseAddr = (uint32_t)Buf;
-   /* Set Peripheral Address*/
    dmaConfig.peripheralBaseAddr = (uint32_t)&ADC1->REGDATA;
 
    dmaConfig.channel           = DMA_CHANNEL_0;
@@ -808,35 +884,33 @@ void ADC_StartDMA( uint8_t chanel, uint16_t * data, uint16_t size);
    dmaConfig.fifoThreshold     = DMA_FIFOTHRESHOLD_FULL;
    dmaConfig.peripheralBurst   = DMA_PERIPHERALBURST_SINGLE;
    dmaConfig.memoryBurst       = DMA_MEMORYBURST_SINGLE;
-
-
    DMA_Config(DMA2_Stream4, &dmaConfig);
    DMA_ClearIntFlag(DMA2_Stream4, DMA_INT_TCIFLG4);
-   DMA_EnableInterrupt(DMA2_Stream4, DMA_INT_TCIFLG);
    DMA_Enable(DMA2_Stream4);
 
    dmaConfig.peripheralBaseAddr = (uint32_t)&ADC2->REGDATA;
+   dmaConfig.channel           = DMA_CHANNEL_1;
    DMA_Config(DMA2_Stream2, &dmaConfig);
    DMA_ClearIntFlag(DMA2_Stream2, DMA_INT_TCIFLG2);
-   DMA_EnableInterrupt(DMA2_Stream2, DMA_INT_TCIFLG);
    DMA_Enable(DMA2_Stream2);
 
    dmaConfig.peripheralBaseAddr = (uint32_t)&ADC3->REGDATA;
+   dmaConfig.channel           = DMA_CHANNEL_2;
    DMA_Config(DMA2_Stream0, &dmaConfig);
    DMA_ClearIntFlag(DMA2_Stream0, DMA_INT_TCIFLG0);
-   DMA_EnableInterrupt(DMA2_Stream0, DMA_INT_TCIFLG);
    DMA_Enable(DMA2_Stream0);
+
+
  }
 
 void DMA2_STR4_IRQHandler( void )
 {
 	if ( DMA_ReadIntFlag(DMA2_Stream4, DMA_INT_TCIFLG4) ==SET)
 	{
-
-		ADC_Disable(ADC1);
 		DMA_ClearIntFlag(DMA2_Stream4, DMA_INT_TCIFLG4);
+		DMA_DisableInterrupt(DMA2_Stream4, DMA_INT_TCIFLG);
 	    portBASE_TYPE xHigherPriorityTaskWoken =  pdFALSE;
-		xEventGroupSetBitsFromISR( pADCEvent, ADC1_READY, &xHigherPriorityTaskWoken );
+	    xTaskNotifyIndexedFromISR( pTaskHandle,1, ADC1_READY, eIncrement, &xHigherPriorityTaskWoken );
 		portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
 	}
 }
@@ -844,11 +918,10 @@ void DMA2_STR2_IRQHandler( void )
 {
 	if ( DMA_ReadIntFlag(DMA2_Stream2, DMA_INT_TCIFLG2) ==SET)
 	{
-
-		ADC_Disable(ADC2);
-		DMA_ClearIntFlag(DMA2_Stream2, DMA_INT_TCIFLG4);
+		DMA_DisableInterrupt(DMA2_Stream2, DMA_INT_TCIFLG);
+		DMA_ClearIntFlag(DMA2_Stream2, DMA_INT_TCIFLG2);
 	    portBASE_TYPE xHigherPriorityTaskWoken =  pdFALSE;
-		xEventGroupSetBitsFromISR( pADCEvent, ADC1_READY, &xHigherPriorityTaskWoken );
+	    xTaskNotifyIndexedFromISR( pTaskHandle,1, ADC2_READY, eIncrement, &xHigherPriorityTaskWoken );
 		portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
 	}
 }
@@ -856,50 +929,51 @@ void DMA2_STR0_IRQHandler( void )
 {
 	if ( DMA_ReadIntFlag(DMA2_Stream0, DMA_INT_TCIFLG0) ==SET)
 	{
-
-		ADC_Disable(ADC3);
-		DMA_ClearIntFlag(DMA2_Stream0, DMA_INT_TCIFLG4);
+		DMA_DisableInterrupt(DMA2_Stream0, DMA_INT_TCIFLG);
+		DMA_ClearIntFlag(DMA2_Stream0, DMA_INT_TCIFLG0);
 	    portBASE_TYPE xHigherPriorityTaskWoken =  pdFALSE;
-		xEventGroupSetBitsFromISR( pADCEvent, ADC1_READY, &xHigherPriorityTaskWoken );
+	    xTaskNotifyIndexedFromISR(pTaskHandle,1, ADC3_READY, eIncrement, &xHigherPriorityTaskWoken );
 		portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
 	}
 }
 
-
-
-void ADC_StartDMA( uint8_t chanel, uint16_t * data, uint16_t size)
+void HAL_ADC_StartDMA( uint8_t chanel, uint16_t * data, uint16_t size)
 {
+	ADC_T* adc;
+	DMA_Stream_T* stream;
 	dmaConfig.bufferSize = size;
 	dmaConfig.memoryBaseAddr = (uint32_t)data;
 	switch (chanel)
 	{
-	case 1:
-		xEventGroupClearBits( pADCEvent, ADC1_READY );
-		DMA_Disable(DMA2_Stream4);
-		dmaConfig.peripheralBaseAddr = (uint32_t)&ADC1->REGDATA;
-		DMA_Config(DMA2_Stream4, &dmaConfig);
-		DMA_Enable(DMA2_Stream4);
-		ADC_Enable(ADC1);
-		ADC_SoftwareStartConv(ADC1);
-		break;
-	case 2:
-		xEventGroupClearBits( pADCEvent, ADC2_READY );
-		DMA_Disable(DMA2_Stream2);
-		dmaConfig.peripheralBaseAddr = (uint32_t)&ADC2->REGDATA;
-		DMA_Config(DMA2_Stream2, &dmaConfig);
-		DMA_Enable(DMA2_Stream2);
-		ADC_Enable(ADC2);
-		ADC_SoftwareStartConv(ADC2);
-	    break;
-	case 3:
-		xEventGroupClearBits( pADCEvent, ADC3_READY );
-		DMA_Disable(DMA2_Stream0);
-		dmaConfig.peripheralBaseAddr = (uint32_t)&ADC3->REGDATA;
-		DMA_Config(DMA2_Stream0, &dmaConfig);
-		DMA_Enable(DMA2_Stream0);
-		ADC_Enable(ADC3);
-		ADC_SoftwareStartConv(ADC2);
-	    break;
+		case 1:
+			stream = DMA2_Stream4;
+			DMA_ClearStatusFlag(DMA2_Stream4, DMA_FLAG_TEIFLG4 | DMA_FLAG_DMEIFLG4 );
+			adc = ADC1;
+			dmaConfig.channel          	 = DMA_CHANNEL_0;
+			dmaConfig.peripheralBaseAddr = (uint32_t)&ADC1->REGDATA;
+			break;
+		case 2:
+			stream = DMA2_Stream2;
+			DMA_ClearStatusFlag(DMA2_Stream2, DMA_FLAG_TEIFLG2 | DMA_FLAG_DMEIFLG2 );
+			adc = ADC2;
+			dmaConfig.channel          	 = DMA_CHANNEL_1;
+			dmaConfig.peripheralBaseAddr = (uint32_t)&ADC2->REGDATA;
+			break;
+		case 3:
+			stream = DMA2_Stream0;
+			DMA_ClearStatusFlag(DMA2_Stream0, DMA_FLAG_TEIFLG0 | DMA_FLAG_DMEIFLG0 );
+			adc = ADC3;
+			dmaConfig.channel          	 = DMA_CHANNEL_2;
+			dmaConfig.peripheralBaseAddr = (uint32_t)&ADC3->REGDATA;
+			break;
+		default:
+			return;
 	}
+	ADC_ClearStatusFlag(adc, ADC_FLAG_EOC | ADC_FLAG_OVR);
+	ADC_EnableDMA(adc);
+	DMA_Config(stream, &dmaConfig);
+	DMA_EnableInterrupt(stream, DMA_INT_TCIFLG);
+	DMA_Enable(stream);
+	ADC_SoftwareStartConv(adc);
 }
 

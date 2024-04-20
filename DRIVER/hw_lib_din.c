@@ -6,15 +6,52 @@
  */
 
 #include "hw_lib_din.h"
+#include "system_init.h"
 
-static DinConfig_t 				xDinConfig[ DIN_COUNT];
+static DinConfig_t 				 xDinConfig[ DIN_COUNT] __SECTION(RAM_SECTION_CCMRAM);
 static median_filter_data_t      RPM_MIDIAN_FILTER_STRUC[RPM_CHANNEL_COUNT];
 static aver_filter_data_t        RPM_AVER_FILTER_STRUC  [RPM_CHANNEL_COUNT];
-static RPM_Struct                RPM[RPM_CHANNEL_COUNT];
-static DoutCinfig_t              xDoutConfig[DOUT_COUNT];
+static RPM_Struct                RPM[RPM_CHANNEL_COUNT] __SECTION(RAM_SECTION_CCMRAM);;
+static DoutCinfig_t              xDoutConfig[DOUT_COUNT] __SECTION(RAM_SECTION_CCMRAM);;
 
 
 
+
+void InitDinStcurt()
+{
+	for (uint8_t i = 0; i <DIN_COUNT; i++)
+	{
+		xDinConfig[i].eInputType = DIN_IDLE;
+	}
+}
+
+DIN_INPUT_TYPE xGetDinType(DIN_INPUT_NAME ucCh)
+{
+	return (xDinConfig[ucCh].eInputType);
+}
+
+void vRecinfigDin(  DIN_INPUT_NAME ucCh, DinConfig_t * config    )
+{
+	xDinConfig[ucCh].ulHighCounter = config->ulHighCounter;
+	xDinConfig[ucCh].ulLowCounter  = config->ulLowCounter;
+	xDinConfig[ucCh].ulCounter = 0;
+	if (xDinConfig[ucCh].eInputType != config->eInputType)
+	{
+		xDinConfig[ucCh].eInputType = config->eInputType;
+		xDinConfig[ucCh].ucValue = (xDinConfig[ucCh].ucValue == 1) ? 0 : 1U;
+		xDinConfig[ucCh].ucTempValue = xDinConfig[ucCh].ucValue;
+	}
+}
+
+
+void InitFilters()
+{
+	for (uint8_t i = 0; i < RPM_CHANNEL_COUNT; i++)
+	{
+	vInitMedianFilter(&RPM_MIDIAN_FILTER_STRUC[i]);
+	vInitRunAverga(&RPM_AVER_FILTER_STRUC[i],0.5);
+	}
+}
 /*
  *  DOUT
  */
@@ -105,6 +142,7 @@ DIN_FUNCTION_ERROR_t eDinConfigWtihStruct(DIN_INPUT_NAME ucCh, DinConfig_t * con
            xDinConfig[ucCh].ulLowCounter = config->ulLowCounter;
            xDinConfig[ucCh].getPortCallback = config->getPortCallback;
            xDinConfig[ucCh].ucTempValue = xDinConfig[ucCh].ucValue;
+           xDinConfig[ucCh].ulCounter = 0;
            eRes = DIN_CONFIG_OK;
 #if DIN_PARAM_CHECK == 1
     }
@@ -231,7 +269,7 @@ void RMPDataConvert(DIN_INPUT_NAME ucCh)
 uint16_t GetRPM( DIN_INPUT_NAME ucCh )
 {
     uint16_t usTemp = 0U;
-    if ( xDinConfig[ucCh].RPMDATA != 0)
+    if (( xDinConfig[ucCh].RPMDATA != 0) && (xDinConfig[ucCh].eInputType==RPM_CONFIG))
     {
     	if (xDinConfig[ucCh].RPMDATA->BufferData!= 0)
     	{
@@ -257,7 +295,23 @@ DIN_FUNCTION_ERROR_t xGetRPM( DIN_INPUT_NAME ucCh, uint16_t * data)
     return (DIN_NOT_CHANGE);
 }
 
+void vDinInitStateProcess()
+{
 
+	for (uint8_t i = 0; i <DIN_COUNT; i++)
+	    {
+	         if ( xDinConfig[i].eInputType != RPM_CONFIG )
+	         {
+	             uint8_t ucDinState =  xDinConfig[i].getPortCallback(i);
+	             if (ucDinState != xDinConfig[i].ucTempValue )
+	             {
+	                  xDinConfig[i].ucValue     = ucDinState ^ ( (~xDinConfig[i].eInputType) & 0x1);
+	                  xDinConfig[i].ucTempValue = ucDinState ;
+
+	             }
+	         }
+	     }
+}
 
 
 void vDinDoutProcess()

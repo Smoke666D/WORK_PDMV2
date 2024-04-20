@@ -5,7 +5,7 @@
  *      Author: i.dymov
  */
 
-
+#include "system_init.h"
 #include "can_task.h"
 #include "hw_lib_can.h"
 #include "apm32f4xx_can.h"
@@ -14,12 +14,22 @@
 #include "hw_lib_can.h"
 #include "apm32f4xx.h"
 
-static CAN_ERROR_TYPE eCanError;
-QueueHandle_t pCanRXHandle;
-QueueHandle_t pCanTXHandle;
-EventGroupHandle_t xCANstatusEvent;
+static CAN_ERROR_TYPE eCanError  	__section( TASK_RAM_SECTION ) ;
+QueueHandle_t pCanRXHandle    		__section( TASK_RAM_SECTION ) ;
+QueueHandle_t pCanTXHandle   		__section( TASK_RAM_SECTION ) ;
+//EventGroupHandle_t xCANstatusEvent  __section( TASK_RAM_SECTION ) ;
 static CANRX * MailBoxBuffer;
+static TaskHandle_t  pCanRXTaskHandle  	__SECTION(RAM_SECTION_CCMRAM);
+static TaskHandle_t  pCanTXTaskHandle  	__SECTION(RAM_SECTION_CCMRAM);
 
+TaskHandle_t * xGetCanRXTaskHandle()
+{
+	return  &pCanRXTaskHandle ;
+}
+TaskHandle_t * xGetCanTXTaskHandle()
+{
+	return  &pCanTXTaskHandle ;
+}
 
 
 static void vCANHWInit()
@@ -38,11 +48,11 @@ static void vCANHWInit()
 
 }
 
-EventGroupHandle_t * pCANEventGet()
+/*EventGroupHandle_t * pCANEventGet()
 {
 
 	return (&xCANstatusEvent);
-}
+}*/
 
 
 QueueHandle_t* pCANRXgetQueue ( void )
@@ -104,8 +114,8 @@ void vCANinit()
 	vCANHWInit();
 	vInitMailBoxBuffer();
 	MailBoxBuffer = getMailBox();
-	vsetFiterFunctionCallBack( &vFilterSet  );
-	xEventGroupSetBits(xCANstatusEvent, CANT_TX0_FREE | CANT_TX1_FREE |CANT_TX2_FREE);
+	//xEventGroupSetBits(xCANstatusEvent, CANT_TX0_FREE | CANT_TX1_FREE |CANT_TX2_FREE);
+	xTaskNotify(pCanTXTaskHandle, 3, eSetValueWithOverwrite);
 	return;
 }
 
@@ -144,14 +154,15 @@ void vCanTXTask(void *argument)
 	uint8_t mailboxnumber;
 	while(1)
 	{
-		xEventGroupWaitBits(xCANstatusEvent, CANT_TX0_FREE | CANT_TX1_FREE | CANT_TX2_FREE , pdFALSE, pdFALSE, portMAX_DELAY );
+		//xEventGroupWaitBits(xCANstatusEvent, CANT_TX0_FREE | CANT_TX1_FREE | CANT_TX2_FREE , pdFALSE, pdFALSE, portMAX_DELAY );
+		ulTaskNotifyTake(pdTRUE,portMAX_DELAY);
 		xQueuePeek( pCanTXHandle, &TXPacket, portMAX_DELAY);
 		mailboxnumber = uPDMCanSend(&TXPacket);
 		if (mailboxnumber!=3)
 		{
 			xQueueReceive( pCanTXHandle, &TXPacket, 1);
 			eCanError = CAN_NORMAL;
-			switch (mailboxnumber)
+			/*switch (mailboxnumber)
 			{
 				case 0:
 					xEventGroupClearBits(xCANstatusEvent, CANT_TX0_FREE );
@@ -162,7 +173,7 @@ void vCanTXTask(void *argument)
 				case 2:
 					xEventGroupClearBits(xCANstatusEvent, CANT_TX2_FREE);
 					break;
-			}
+			}*/
 		}
 	}
 }
@@ -246,19 +257,20 @@ void CAN1_TX_IRQHandler (void)
 	  if ( CAN_ReadStatusFlag(CAN1,CAN_FLAG_REQC0) == SET )
 	    {
 		  CAN_ClearStatusFlag (CAN1, CAN_FLAG_REQC0);
-		  xEventGroupSetBitsFromISR(xCANstatusEvent, CANT_TX0_FREE, &xHigherPriorityTaskWoken );
+		 // xEventGroupSetBitsFromISR(xCANstatusEvent, CANT_TX0_FREE, &xHigherPriorityTaskWoken );
 	    }
 	    if ( CAN_ReadStatusFlag(CAN1,CAN_FLAG_REQC1) == SET )
 	    {
 	    	CAN_ClearStatusFlag(CAN1, CAN_FLAG_REQC1);
-	    	xEventGroupSetBitsFromISR(xCANstatusEvent, CANT_TX1_FREE, &xHigherPriorityTaskWoken );
+	    	//xEventGroupSetBitsFromISR(xCANstatusEvent, CANT_TX1_FREE, &xHigherPriorityTaskWoken );
 	    }
 	    if ( CAN_ReadStatusFlag(CAN1,CAN_FLAG_REQC2) == SET )
 	    {
 	    	CAN_ClearStatusFlag (CAN1,CAN_FLAG_REQC2);
-	    	xEventGroupSetBitsFromISR(xCANstatusEvent, CANT_TX2_FREE, &xHigherPriorityTaskWoken );
+	    	//xEventGroupSetBitsFromISR(xCANstatusEvent, CANT_TX2_FREE, &xHigherPriorityTaskWoken );
 	    }
 	    CAN_ClearIntFlag(CAN1, CAN_INT_TXME );
+	    vTaskNotifyGiveFromISR(pCanTXTaskHandle,&xHigherPriorityTaskWoken);
 	    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 

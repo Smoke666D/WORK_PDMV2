@@ -508,6 +508,7 @@ void vUSBreceiveHandler ( uint8_t *buffer, uint16_t len)
 void vUSBtask ( void *argument )
 {
   USB_REPORT report = {.buf = inputBuffer};
+  vDATAinit();
   USB_DeviceInit();
   for(;;)
   {

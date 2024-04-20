@@ -10,7 +10,7 @@
 #include "main.h"
 #include "system_init.h"
 
-#define LUA_TASK_STACK_SIZE 3000
+
 #define LUA_TASK_PRIORITY    2
 
 
@@ -19,6 +19,12 @@
 #include "main.h"
 #include "FreeRTOS.h"
 #include "event_groups.h"
+
+
+#define PDM_STOP_STATE   0x01
+#define PDM_RUN_STATE   0x02
+#define PDM_INIT_STATE   0x04
+#define PDM_BUSY_STATE  0x08
 
 #define RUN_STATE 	   0x01
 #define STOPR_STATE    0x02
@@ -32,13 +38,14 @@ typedef enum {
 	LUA_ERROR,
 	LUA_STOP,
 	LUA_RESTART,
-	LUA_STATE_SIZE
+	LUA_STATE_SIZE,
+	LUA_WAIT_READY
 } LUA_STATE_t;
 
 
 typedef enum {
-	IS_ENABLE  =0,
-	IS_DISABLE  =1
+	IS_ENABLE   = 0,
+	IS_DISABLE  = 1
 } ENABLE_t;
 
 
@@ -48,18 +55,13 @@ typedef enum
 	RESULT_FALSE =0
 } RESULT_t;
 
-
-char * pcGetLUAError();
-uint8_t ucLUAgetErrorCount ( void );
-const char * pcLUAgetErrorString ( void );
+void vLUAInitPDM();
+const char * pcGetLUAError ( void );
 uint32_t ulLUAgetWorkCicle ( void );
 LUA_STATE_t eLUAgetSTATE ( void );
 void vLUAstopPDM();
 void vLUArestartPDM();
 EventGroupHandle_t* osLUAetPDMstatusHandle ( void );
-
-
-
 TaskHandle_t * xGetLUATaskHandle();
 void vLuaTask(void *argument);
 

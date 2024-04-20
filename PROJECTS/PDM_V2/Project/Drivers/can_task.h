@@ -19,6 +19,9 @@
 #define CANT_TX1_FREE   0x0002
 #define CANT_TX2_FREE   0x0004
 
+
+TaskHandle_t * xGetCanRXTaskHandle();
+TaskHandle_t * xGetCanTXTaskHandle();
 void vCANBoudInit( uint16_t boudrate );
 void vCANinit();
 void vCanInsertTXData(uint32_t CanID, uint8_t * data, uint8_t data_len );

@@ -72,6 +72,6 @@ void vHW_L_LIB_PWMTimersInit(TimerName_t TimerName , uint32_t freq_in_hz, uint32
 void vHW_L_LIB_SetPWMPulse( TimerName_t TimerName , uint8_t channel, uint32_t pulse );
 void vHAL_InitCaptureIRQTimer( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel );
 uint16_t vHAL_CaptureTimerInteruptCallback(TimerName_t TimerName , uint16_t TimInterupt  );
-
+void vHW_L_LIB_BaseTimerInit(TimerName_t TimerName  );
 
 #endif /* HAL_HAL_TIMERS_H_ */

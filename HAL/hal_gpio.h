@@ -34,8 +34,8 @@ typedef enum
 
 typedef enum
 {
-  PORT_INIT,
-  PORT_NOTINIT,
+  PORT_INIT = 1,
+  PORT_NOTINIT = 0,
 } PortInitState_t;
 
 
@@ -61,5 +61,6 @@ void vHAL_SetBit(  PortName_t  port, uint16_t pin );
 void vHAL_ResetBit(  PortName_t  port, uint16_t pin );
 void HAL_InitGpioAIN(PortName_t PORT, uint16_t Pin );
 BitState_t xHAL_GetBit( PortName_t  port, uint16_t pin);
+BitState_t xHAL_GetOutBit( PortName_t  port, uint16_t pin);
 
 #endif /* HAL_HAL_GPIO_H_ */

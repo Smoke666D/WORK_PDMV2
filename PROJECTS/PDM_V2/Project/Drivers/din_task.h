@@ -15,8 +15,6 @@
 #include "hal_timers.h"
 
 
-#define DIN_TASK_STACK_SIZE  130
-#define DIN_TASK_PRIORITY    2
 
 typedef struct {
 	uint16_t Pin;
@@ -30,8 +28,8 @@ typedef enum  {
 		WRONG_CHANNEL_MODE =3U,
 } PDM_INPUT_CONFIG_ERROR;
 
-void NotifyTaskToStop(TaskHandle_t * pTask);
-void NotifyTaskToInit(TaskHandle_t * pTask);
+void DinNotifyTaskToStop();
+void DinNotifyTaskToInit();
 TaskHandle_t * xGetDinTaskHandle();
 PDM_INPUT_CONFIG_ERROR eDinConfig( uint8_t ucCh, DIN_INPUT_TYPE inType, uint32_t ulHFront, uint32_t ulLFront);
 void vDinTask(void *argument);

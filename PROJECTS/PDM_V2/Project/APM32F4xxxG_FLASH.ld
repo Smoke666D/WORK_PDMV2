@@ -31,7 +31,7 @@ ENTRY(Reset_Handler)
 /* Flash Base Address */
 _rom_base = 0x8000000;
 /*Flash Size (in Bytes) */
-_rom_size = 0x00E0000;
+_rom_size = 0x00DFFFF;
 
 /* Embedded RAM Configuration */
 /* RAM Base Address           */

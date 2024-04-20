@@ -1,6 +1,6 @@
 Drivers/data.o: ../Drivers/data.c ../Drivers/data.h \
- ../Drivers/drivers_config.h ../Drivers/lua_task.h \
- c:\users\i.dymov\desktop\work\projects\pdm_v2\include\main.h \
+ ../Drivers/drivers_config.h \
+ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h \
  c:\users\i.dymov\desktop\work\libraries\device\geehy\apm32f4xx\include\apm32f4xx.h \
  c:\users\i.dymov\desktop\work\libraries\cmsis\include\core_cm4.h \
  c:\users\i.dymov\desktop\work\libraries\cmsis\include\cmsis_version.h \
@@ -8,6 +8,9 @@ Drivers/data.o: ../Drivers/data.c ../Drivers/data.h \
  c:\users\i.dymov\desktop\work\libraries\cmsis\include\cmsis_gcc.h \
  c:\users\i.dymov\desktop\work\libraries\cmsis\include\mpu_armv7.h \
  c:\users\i.dymov\desktop\work\libraries\device\geehy\apm32f4xx\include\system_apm32f4xx.h \
+ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h \
+ ../Drivers/lua_task.h \
+ c:\users\i.dymov\desktop\work\projects\pdm_v2\include\main.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_gpio.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_usart.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_misc.h \
@@ -32,11 +35,21 @@ Drivers/data.o: ../Drivers/data.c ../Drivers/data.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/filters.h \
  C:\Users\i.dymov\Desktop\WORK\HAL/hal_gpio.h \
  C:\Users\i.dymov\Desktop\WORK\HAL/hal_timers.h \
- c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h \
- c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/lua_task.h \
- ../Drivers/version.h ../Drivers/adc_task.h \
- C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h ../Drivers/din_task.h \
+ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/usb_task.h \
+ C:\Users\i.dymov\Desktop\WORK\Middlewares\APM32_USB_Library\Device\Class\CustomHID\Inc/usbd_customhid.h \
+ C:\Users\i.dymov\Desktop\WORK\Middlewares\APM32_USB_Library\Device\Core\Inc/usbd_core.h \
+ C:\Users\i.dymov\Desktop\WORK\Middlewares\APM32_USB_Library\Device\Core\Inc/usbd_config.h \
+ C:\Users\i.dymov\Desktop\WORK\USB_DEV/usbd_board.h \
+ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_usb.h \
+ C:\Users\i.dymov\Desktop\WORK\USB_DEV/bsp_delay.h \
+ C:\Users\i.dymov\Desktop\WORK\USB_DEV/usb_device_user.h \
+ C:\Users\i.dymov\Desktop\WORK\USB_DEV/usbd_descriptor.h \
+ C:\Users\i.dymov\Desktop\WORK\USB_DEV/usbd_custom_hid_if.h \
+ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/adc_task.h \
+ C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h \
+ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
+ ../Drivers/version.h ../Drivers/adc_task.h ../Drivers/din_task.h \
  C:\Users\i.dymov\Desktop\WORK\LUA/lua.h \
  C:\Users\i.dymov\Desktop\WORK\LUA/luaconf.h \
  C:\Users\i.dymov\Desktop\WORK\LUA/luaProjectConfig.h \
@@ -46,9 +59,7 @@ Drivers/data.o: ../Drivers/data.c ../Drivers/data.h \
 
 ../Drivers/drivers_config.h:
 
-../Drivers/lua_task.h:
-
-c:\users\i.dymov\desktop\work\projects\pdm_v2\include\main.h:
+c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h:
 
 c:\users\i.dymov\desktop\work\libraries\device\geehy\apm32f4xx\include\apm32f4xx.h:
 
@@ -63,6 +74,12 @@ c:\users\i.dymov\desktop\work\libraries\cmsis\include\cmsis_gcc.h:
 c:\users\i.dymov\desktop\work\libraries\cmsis\include\mpu_armv7.h:
 
 c:\users\i.dymov\desktop\work\libraries\device\geehy\apm32f4xx\include\system_apm32f4xx.h:
+
+c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h:
+
+../Drivers/lua_task.h:
+
+c:\users\i.dymov\desktop\work\projects\pdm_v2\include\main.h:
 
 c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_gpio.h:
 
@@ -112,17 +129,37 @@ C:\Users\i.dymov\Desktop\WORK\HAL/hal_gpio.h:
 
 C:\Users\i.dymov\Desktop\WORK\HAL/hal_timers.h:
 
-c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h:
-
-c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h:
-
 C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/lua_task.h:
+
+C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/usb_task.h:
+
+C:\Users\i.dymov\Desktop\WORK\Middlewares\APM32_USB_Library\Device\Class\CustomHID\Inc/usbd_customhid.h:
+
+C:\Users\i.dymov\Desktop\WORK\Middlewares\APM32_USB_Library\Device\Core\Inc/usbd_core.h:
+
+C:\Users\i.dymov\Desktop\WORK\Middlewares\APM32_USB_Library\Device\Core\Inc/usbd_config.h:
+
+C:\Users\i.dymov\Desktop\WORK\USB_DEV/usbd_board.h:
+
+c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_usb.h:
+
+C:\Users\i.dymov\Desktop\WORK\USB_DEV/bsp_delay.h:
+
+C:\Users\i.dymov\Desktop\WORK\USB_DEV/usb_device_user.h:
+
+C:\Users\i.dymov\Desktop\WORK\USB_DEV/usbd_descriptor.h:
+
+C:\Users\i.dymov\Desktop\WORK\USB_DEV/usbd_custom_hid_if.h:
+
+C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/adc_task.h:
+
+C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h:
+
+C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h:
 
 ../Drivers/version.h:
 
 ../Drivers/adc_task.h:
-
-C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h:
 
 ../Drivers/din_task.h:
 

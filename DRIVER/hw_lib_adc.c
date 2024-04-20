@@ -6,12 +6,19 @@
  */
 
 #include "hw_lib_adc.h"
+#include "system_init.h"
 
 
-static AIN_DATA_t xAinData[AIN_NUMBER];
-static LIN_COOF   xKoofData[ MAX_COOF_COUNT];
-static uint16_t usCurMaxIndex;
-
+static AIN_DATA_t xAinData[AIN_NUMBER] 			__SECTION(RAM_SECTION_CCMRAM);
+static LIN_COOF   xKoofData[ MAX_COOF_COUNT] 	__SECTION(RAM_SECTION_CCMRAM);
+static uint16_t usCurMaxIndex 					__SECTION(RAM_SECTION_CCMRAM);
+static uint16_t muRawCurData[OUT_COUNT] 		__SECTION(RAM_SECTION_CCMRAM);
+static uint16_t muRawOldOutCurData[OUT_COUNT] 	__SECTION(RAM_SECTION_CCMRAM);
+static uint16_t muRawVData[AIN_NUMBER + 2]  	__SECTION(RAM_SECTION_CCMRAM);
+static uint16_t muRawOldVData[AIN_NUMBER + 2]	__SECTION(RAM_SECTION_CCMRAM);
+int16_t            ADC1_IN_Buffer[ADC_FRAME_SIZE*ADC1_CHANNELS] __SECTION(RAM_SECTION_RAM );  //ADC1 input data buffer
+int16_t            ADC2_IN_Buffer[ADC_FRAME_SIZE*ADC2_CHANNELS] __SECTION(RAM_SECTION_RAM );   //ADC2 input data buffer
+int16_t            ADC3_IN_Buffer[ADC_FRAME_SIZE*ADC3_CHANNELS] __SECTION(RAM_SECTION_RAM );
 
 void vAINInit()
 {
@@ -20,9 +27,30 @@ void vAINInit()
         xAinData[i].coof_count = 0U;
         xAinData[i].index = 0U;
     }
+    for (uint8_t i = 0; i < OUT_COUNT; i++)
+    {
+    	muRawOldOutCurData[i]  = 0;
+    	muRawCurData[i] 		= 0;
+    }
+    for (uint8_t i = 0; i< AIN_NUMBER + 2;i++)
+    {
+    	muRawVData[i] 	 = 0;
+    	muRawOldVData[i] = 0;
+     }
     usCurMaxIndex = 0;
     return;
 }
+
+
+uint16_t ucGetRawData( uint8_t ch, uint8_t filter)
+{
+	if (filter)
+	{
+		muRawCurData[ch] = vRCFilter(muRawCurData[ch],&muRawOldOutCurData[ch]);
+	}
+	return (muRawCurData[ch]);
+}
+
 
 /*
  * Функция преобразования данных аналогово канала по клаиборвочым коофициентам
@@ -126,18 +154,6 @@ void vABLineKoofFinde(float * k, float * b,  float x1, float x2, float y1, float
  *
  */
 
-int16_t            ADC1_IN_Buffer[ADC_FRAME_SIZE*ADC1_CHANNELS] = { 0U };   //ADC1 input data buffer
-int16_t            ADC2_IN_Buffer[ADC_FRAME_SIZE*ADC2_CHANNELS] = { 0U };   //ADC2 input data buffer
-int16_t            ADC3_IN_Buffer[ADC_FRAME_SIZE*ADC3_CHANNELS] = { 0U };
-static uint16_t muRawCurData[OUT_COUNT];
-static uint16_t muRawVData[AIN_NUMBER + 2];
-static uint16_t muRawCurData[OUT_COUNT]	;
-static uint16_t muRawOldOutCurData[OUT_COUNT];
-static uint16_t muRawOldVData[AIN_NUMBER + 2];
-static uint16_t muRawVData[AIN_NUMBER + 2] ;
-
-
-
 /* Напряжение на аналогвом входе
 */
 float fAinGetState ( AIN_NAME_t channel )
@@ -158,12 +174,12 @@ float fBatteryGet ( void )
 *
 */
 
-float fTemperatureGet (  )
+float fTemperatureGet ( uint8_t i )
 {
-	return ((float)muRawVData[4] * K - 0.76) /0.0025 + 25;
+	 return ((float)muRawVData[4] * K - 0.7782) /0.0024 + 28;	//	HAL_GetTempSens( muRawVData[4])	;
 }
 
-static float fGetDataFromRaw( float fraw,LIN_COOF *  CSC)
+ float fGetDataFromRaw( float fraw, LIN_COOF *  CSC)
  {
  	float fRes;
  	for (uint8_t r = 0; r < ( KOOF_COUNT -1 ); r++)
@@ -179,14 +195,10 @@ static float fGetDataFromRaw( float fraw,LIN_COOF *  CSC)
  	return ( fRes );
  }
 
-float usGetCurrentToFloat( u8 ch, u8 filter_enable, LIN_COOF * xOut )
-
+float usGetCurrentToFloat( uint16_t rawdata, LIN_COOF * xOut )
 {
-   if (filter_enable)
-   {
-	   muRawCurData[ch] = vRCFilter(muRawCurData[ch],&muRawOldOutCurData[ch]);
-   }
-   return fGetDataFromRaw( ((float) muRawCurData [ ch ] *K ) , xOut );
+
+   return fGetDataFromRaw( ((float) rawdata *K ) , xOut );
 }
 
 static void vGetAverDataFromRAW(uint16_t * InData, uint16_t *OutData, uint8_t InIndex, uint8_t OutIndex, uint8_t Size, uint16_t BufferSize);
@@ -233,11 +245,6 @@ void vDataConvertToFloat( void)
 	 vGetAverDataFromRAW((uint16_t *)&ADC3_IN_Buffer, (uint16_t *)&muRawCurData, 0U, 0U, 3U , ADC3_CHANNELS);
 	 // Полчени из буфера ADC 3 данныех каналов каналов тока 13-18
 	 vGetAverDataFromRAW((uint16_t *)&ADC3_IN_Buffer, (uint16_t *)&muRawCurData, 3U, 12U, 6U , ADC3_CHANNELS);
-	// for (int i =0;i<OUT_COUNT;i++)
-	// {
-	//	 muRawCurData[i] = vRCFilter(muRawCurData[i],&muRawOldOutCurData[i]);
-
-	// }
 	 for (int i = 0; i<AIN_NUMBER + 2;i++ )
 	 {
 		 muRawVData[i] = vRCFilter(  muRawVData[i] ,&muRawOldVData[i]);
@@ -261,7 +268,6 @@ static void vGetAverDataFromRAW(uint16_t * InData, uint16_t *OutData, uint8_t In
 		  temp += (InData[ InIndex + i + j * BufferSize ]);
 		}
 		OutData[ OutIndex + i ] = temp / ADC_FRAME_SIZE;
-
 
 	}
 	return;

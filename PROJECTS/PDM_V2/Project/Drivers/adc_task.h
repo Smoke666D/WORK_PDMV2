@@ -49,9 +49,8 @@
 #define MAX_RESET_TIMER         32767U
 
 #define KOOF_COUNT 4
-#define ADC1_READY         0x01
-#define ADC2_READY         0x02
-#define ADC3_READY         0x04
+
+
 #define OUT_BUSY		   0x08
 #define ADC_DATA_READY     0x10
 #define ADC1_CHANNELS      9U
@@ -104,14 +103,30 @@
 
 #define STATE_OUT_CONFIG		  0x20
 
+typedef enum
+{
+	ADC_IDLE_STATE,
+	ADC_INIT_STATE,
+	ADC_RUN1_STATE,
+	ADC_WHAIT_CONVERSION_STATE,
+	ADC_RUN2_STATE,
+} ADC_Task_State_t;
+
 
 typedef struct __packed
 {
    PortName_t CS_PORT;
+   uint16_t   CS_Pin;
+   PortName_t OUT_PORT;
+   uint16_t   OUT_Pin;
    TimerName_t  ptim;
    uint8_t  channel;
    float power;
    uint8_t state;
+   uint8_t cooldown_coof;
+   uint32_t cooldown_timer;
+   uint8_t cool_down_flag;
+   uint8_t RanfomOverload;
    float overload_power;
    float current;
    uint8_t filter_enable;
@@ -122,7 +137,6 @@ typedef struct __packed
    uint8_t POWER_SOFT;
    uint16_t PWM_Freg;
    uint8_t soft_start_power;
-   uint16_t CS_Pin;
    uint16_t soft_start_timer;
    uint16_t overload_config_timer;
    uint16_t restart_timer;
@@ -177,6 +191,11 @@ typedef enum {
 #define  IS_FLAG_SET(i, flag)  ( ( (out[i].SysReg & flag ) == flag ) )
 #define  IS_FLAG_RESET(i, flag) ( ( (out[i].SysReg & flag ) != flag ) )
 
+EventGroupHandle_t * pADCEventGet();
+void AinNotifyTaskToStop();
+void AinNotifyTaskToInit();
+void vADCTask(void * argument);
+TaskHandle_t * xGetADCTaskHandle();
 ERROR_FLAGS_TYPE eOutGetError(OUT_NAME_TYPE eChNum );
 PDM_OUT_STATE_t eOutGetState ( OUT_NAME_TYPE eChNum  );
 float fOutGetMaxCurrent(OUT_NAME_TYPE eChNum);
@@ -195,5 +214,5 @@ void vPWMFreqSet( OUT_CH_GROUPE_TYPE groupe, uint32_t Freq);
 void DMA2_STR4_IRQHandler( void );
 void DMA2_STR2_IRQHandler( void );
 void DMA2_STR0_IRQHandler( void );
-
+void vSetRendomResetState( uint8_t out_name,  uint8_t state, uint8_t cool_down);
 #endif /* DRIVERS_ADC_TASK_H_ */

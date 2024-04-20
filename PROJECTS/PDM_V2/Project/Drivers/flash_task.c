@@ -96,7 +96,7 @@ FLASH_STATE eFLASHstartWriting ( void )
   vLUAstopPDM();
   FMC_Unlock();
   FMC_ClearStatusFlag(FMC_FLAG_ERROP | FMC_FLAG_ERRWRP | FMC_FLAG_ERRPGA | FMC_FLAG_ERRPGP | FMC_FLAG_ERRPGS  );
-  if ( FMC_EraseSector( FLASH_STORAGE_SECTOR, FLASH_STORAGE_VOLTAGE )!= FMC_COMPLETE)
+  if ( FMC_EraseSector( FLASH_STORAGE_SECTOR, FLASH_STORAGE_VOLTAGE )== FMC_COMPLETE)
   {
     flashLock = FLASH_UNLOCKED;
   }
@@ -110,7 +110,6 @@ FLASH_STATE eFLASHendWriting ( void )
 {
    eFLASHlock();
    vLUArestartPDM();
-
   return (FLASH_OK);
 }
 FLASH_LOCK  eFLASHgetLockState ( void )
@@ -127,9 +126,4 @@ uint32_t uFLASHgetLength ( void )
 }
 
 
-void vFLASHTask(void * argument)
-{
 
-
-
-}

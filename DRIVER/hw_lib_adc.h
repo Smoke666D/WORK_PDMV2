@@ -95,27 +95,28 @@ typedef enum {
 
 float fAinGetState ( AIN_NAME_t channel );
 float fBatteryGet ( void );
-float fTemperatureGet (  );
+float fTemperatureGet ( uint8_t i );
 CAL_ERROR_CODE  eAinCalDataConfig(AIN_NAME_t name, uint8_t cal_point_count );
 CAL_ERROR_CODE  eSetAinCalPoint(AIN_NAME_t name, POINT_t * cal_point, uint16_t PointNumber );
 CAL_ERROR_CODE  eSetAinCal(AIN_NAME_t name, POINT_t * cal_point, uint8_t cal_point_count);
 void vABLineKoofFinde(float * k, float * b,  float x1, float x2, float y1, float y2);
 float fGetAinCalData( AIN_NAME_t name, float raw_data);
 void vAINInit();
-
+uint16_t ucGetRawData( uint8_t ch, uint8_t filter);
+float usGetCurrentToFloat( uint16_t rawdata, LIN_COOF * xOut );
 
 /*
  */
-#define RR  300.0
+//#define RR  300.0
 #define ADC_FRAME_SIZE     3U
 
-
+//float fGetDataFromRaw( float fraw, LIN_COOF *  CSC);
 uint16_t usGetRawCurDataFilterd( u8 ch);
 int16_t * getADC1Buffer();
 int16_t * getADC2Buffer();
 int16_t * getADC3Buffer();
 void vDataConvertToFloat( void);
-float usGetCurrentToFloat( u8 ch, u8 filter_enable, LIN_COOF * xOut );
+
 
 
 #endif /* HW_LIB_HW_LIB_ADC_H_ */

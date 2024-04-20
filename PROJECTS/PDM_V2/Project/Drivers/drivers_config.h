@@ -43,46 +43,47 @@
 #define Din11_Port PORT_F
 #define Din12_Pin GPIO_PIN_15
 #define Din12_Port PORT_F
-#define CS20_2_Pin GPIO_PIN_3
-#define CS20_2_GPIO_Port PORT_F
 #define CS20_1_Pin GPIO_PIN_4
 #define CS20_1_GPIO_Port PORT_F
-#define CS8_14_Pin GPIO_PIN_5
-#define CS8_14_GPIO_Port PORT_F
-#define CS8_13_Pin GPIO_PIN_6
-#define CS8_13_GPIO_Port PORT_F
-#define CS8_18_Pin GPIO_PIN_7
-#define CS8_18_GPIO_Port PORT_F
-#define CS8_17_Pin GPIO_PIN_8
-#define CS8_17_GPIO_Port PORT_F
+#define CS20_2_Pin GPIO_PIN_3
+#define CS20_2_GPIO_Port PORT_F
 #define CS20_3_Pin GPIO_PIN_9
 #define CS20_3_GPIO_Port PORT_F
-#define CS8_15_Pin GPIO_PIN_10
-#define CS8_15_GPIO_Port PORT_F
-#define CS8_16_Pin GPIO_PIN_0
-#define CS8_16_GPIO_Port PORT_C
 #define CS20_4_Pin GPIO_PIN_1
 #define CS20_4_GPIO_Port PORT_C
-#define CS8_10_Pin GPIO_PIN_2
-#define CS8_10_GPIO_Port PORT_C
-#define CS8_9_Pin GPIO_PIN_3
-#define CS8_9_GPIO_Port PORT_C
 #define CS20_5_Pin GPIO_PIN_0
 #define CS20_5_GPIO_Port PORT_A
 #define CS20_6_Pin GPIO_PIN_1
 #define CS20_6_GPIO_Port PORT_A
-#define CS8_12_Pin GPIO_PIN_2
-#define CS8_12_GPIO_Port PORT_A
-#define CS8_11_Pin GPIO_PIN_3
-#define CS8_11_GPIO_Port PORT_A
 #define CS20_7_Pin GPIO_PIN_4
 #define CS20_7_GPIO_Port PORT_A
+#define CS20_8_Pin GPIO_PIN_7
+#define CS20_8_GPIO_Port PORT_A
+#define CS8_9_Pin GPIO_PIN_3
+#define CS8_9_GPIO_Port PORT_C
+#define CS8_10_Pin GPIO_PIN_2
+#define CS8_10_GPIO_Port PORT_C
+#define CS8_11_Pin GPIO_PIN_3
+#define CS8_11_GPIO_Port PORT_A
+#define CS8_12_Pin GPIO_PIN_2
+#define CS8_12_GPIO_Port PORT_A
+#define CS8_13_Pin GPIO_PIN_6
+#define CS8_13_GPIO_Port PORT_F
+#define CS8_14_Pin GPIO_PIN_5
+#define CS8_14_GPIO_Port PORT_F
+#define CS8_15_Pin GPIO_PIN_10
+#define CS8_15_GPIO_Port PORT_F
+#define CS8_16_Pin GPIO_PIN_0
+#define CS8_16_GPIO_Port PORT_C
+#define CS8_18_Pin GPIO_PIN_7
+#define CS8_18_GPIO_Port PORT_F
+#define CS8_17_Pin GPIO_PIN_8
+#define CS8_17_GPIO_Port PORT_F
 #define CS8_20_Pin GPIO_PIN_5
 #define CS8_20_GPIO_Port PORT_A
 #define CS8_19_Pin GPIO_PIN_6
 #define CS8_19_GPIO_Port PORT_A
-#define CS20_8_Pin GPIO_PIN_7
-#define CS20_8_GPIO_Port PORT_A
+
 #define ADC1_4_Pin GPIO_PIN_4
 #define ADC1_4_GPIO_Port PORT_C
 #define ADC1_5_Pin GPIO_PIN_5
@@ -97,75 +98,85 @@
 #define Din11_GPIO_Port GPIOF
 #define Din12_Pin GPIO_PIN_15
 #define Din12_GPIO_Port GPIOF
+
+
+#define Cs_Dis20_1_Pin GPIO_PIN_3
+#define Cs_Dis20_1_GPIO_Port PORT_G
+#define Cs_Dis20_2_Pin GPIO_PIN_2
+#define Cs_Dis20_2_GPIO_Port PORT_G
+#define Cs_Dis20_3_Pin GPIO_PIN_10
+#define Cs_Dis20_3_GPIO_Port PORT_G
+#define Cs_Dis20_4_Pin GPIO_PIN_11
+#define Cs_Dis20_4_GPIO_Port PORT_G
 #define Cs_Dis20_5_Pin GPIO_PIN_1
 #define Cs_Dis20_5_GPIO_Port PORT_G
 #define Cs_Dis20_6_Pin GPIO_PIN_7
 #define Cs_Dis20_6_GPIO_Port PORT_E
-#define Cs_Dis8_9_10_Pin GPIO_PIN_8
-#define Cs_Dis8_9_10_GPIO_Port PORT_E
-#define InCH8_9_Pin GPIO_PIN_9
-#define InCH8_9_GPIO_Port PORT_E
-#define InCH8_10_Pin GPIO_PIN_11
-#define InCH8_10_GPIO_Port PORT_E
-#define InCH20_5_Pin GPIO_PIN_13
-#define InCH20_5_GPIO_Port PORT_E
-#define InCH20_6_Pin GPIO_PIN_14
-#define InCH20_6_GPIO_Port PORT_E
-#define InCH8_12_Pin GPIO_PIN_10
-#define InCH8_12_GPIO_Port PORT_B
-#define InCH8_11_Pin GPIO_PIN_11
-#define InCH8_11_GPIO_Port PORT_B
-#define InCH20_7_Pin GPIO_PIN_14
-#define InCH20_7_GPIO_Port PORT_B
-#define InCH8_19_Pin GPIO_PIN_15
-#define InCH8_19_GPIO_Port PORT_B
-#define Cs_Dis8_11_12_Pin GPIO_PIN_8
-#define Cs_Dis8_11_12_GPIO_Port PORT_D
 #define Cs_Dis20_7_Pin GPIO_PIN_9
 #define Cs_Dis20_7_GPIO_Port PORT_D
-#define Cs_Dis8_19_20_Pin GPIO_PIN_10
-#define Cs_Dis8_19_20_GPIO_Port PORT_D
 #define Cs_Dis20_8_Pin GPIO_PIN_11
 #define Cs_Dis20_8_GPIO_Port PORT_D
-#define InCH8_20_Pin GPIO_PIN_12
-#define InCH8_20_GPIO_Port PORT_A
-#define InCH20_8_Pin GPIO_PIN_13
-#define InCH20_8_GPIO_Port PORT_D
+#define Cs_Dis8_9_10_Pin GPIO_PIN_8
+#define Cs_Dis8_9_10_GPIO_Port PORT_E
+#define Cs_Dis8_11_12_Pin GPIO_PIN_8
+#define Cs_Dis8_11_12_GPIO_Port PORT_D
+#define Cs_Dis8_13_14_Pin GPIO_PIN_4
+#define Cs_Dis8_13_14_GPIO_Port PORT_G
+#define Cs_Dis8_15_16_Pin GPIO_PIN_9
+#define Cs_Dis8_15_16_GPIO_Port PORT_G
+#define Cs_Dis8_17_18_Pin GPIO_PIN_5
+#define Cs_Dis8_17_18_GPIO_Port PORT_G
+#define Cs_Dis8_19_20_Pin GPIO_PIN_10
+#define Cs_Dis8_19_20_GPIO_Port PORT_D
+
 #define InCH20_1_Pin GPIO_PIN_14
 #define InCH20_1_GPIO_Port PORT_D
 #define InCH20_2_Pin GPIO_PIN_15
 #define InCH20_2_GPIO_Port PORT_D
-#define Cs_Dis20_2_Pin GPIO_PIN_2
-#define Cs_Dis20_2_GPIO_Port PORT_G
-#define Cs_Dis20_1_Pin GPIO_PIN_3
-#define Cs_Dis20_1_GPIO_Port PORT_G
-#define Cs_Dis8_13_14_Pin GPIO_PIN_4
-#define Cs_Dis8_13_14_GPIO_Port PORT_G
-#define Cs_Dis8_17_18_Pin GPIO_PIN_5
-#define Cs_Dis8_17_18_GPIO_Port PORT_G
-
+#define InCH20_3_Pin GPIO_PIN_15
+#define InCH20_3_GPIO_Port PORT_A
+#define InCH20_4_Pin GPIO_PIN_5
+#define InCH20_4_GPIO_Port PORT_B
+#define InCH20_5_Pin GPIO_PIN_13
+#define InCH20_5_GPIO_Port PORT_E
+#define InCH20_6_Pin GPIO_PIN_14
+#define InCH20_6_GPIO_Port PORT_E
+#define InCH20_7_Pin GPIO_PIN_14
+#define InCH20_7_GPIO_Port PORT_B
+#define InCH20_8_Pin GPIO_PIN_13
+#define InCH20_8_GPIO_Port PORT_D
+#define InCH8_9_Pin GPIO_PIN_9
+#define InCH8_9_GPIO_Port PORT_E
+#define InCH8_10_Pin GPIO_PIN_11
+#define InCH8_10_GPIO_Port PORT_E
+#define InCH8_11_Pin GPIO_PIN_11
+#define InCH8_11_GPIO_Port PORT_B
+#define InCH8_12_Pin GPIO_PIN_10
+#define InCH8_12_GPIO_Port PORT_B
 #define InCH8_13_Pin GPIO_PIN_6
 #define InCH8_13_GPIO_Port PORT_C
 #define InCH8_14_Pin GPIO_PIN_7
 #define InCH8_14_GPIO_Port PORT_C
+#define InCH8_15_Pin GPIO_PIN_4
+#define InCH8_15_GPIO_Port PORT_B
+#define InCH8_16_Pin GPIO_PIN_3
+#define InCH8_16_GPIO_Port PORT_B
 #define InCH8_17_Pin GPIO_PIN_8
 #define InCH8_17_GPIO_Port PORT_C
 #define InCH8_18_Pin GPIO_PIN_9
 #define InCH8_18_GPIO_Port PORT_C
-#define InCH20_3_Pin GPIO_PIN_15
-#define InCH20_3_GPIO_Port PORT_A
-#define Cs_Dis8_15_16_Pin GPIO_PIN_9
-#define Cs_Dis8_15_16_GPIO_Port PORT_B
-#define Cs_Dis20_3_Pin GPIO_PIN_10
-#define Cs_Dis20_3_GPIO_Port PORT_B
-#define Cs_Dis20_4_Pin GPIO_PIN_11
-#define Cs_Dis20_4_GPIO_Port PORT_B
-#define InCH8_16_Pin GPIO_PIN_3
-#define InCH8_16_GPIO_Port PORT_B
-#define InCH8_15_Pin GPIO_PIN_4
-#define InCH8_15_GPIO_Port PORT_B
-#define InCH20_4_Pin GPIO_PIN_5
-#define InCH20_4_GPIO_Port PORT_B
+#define InCH8_19_Pin GPIO_PIN_15
+#define InCH8_19_GPIO_Port PORT_B
+#define InCH8_20_Pin GPIO_PIN_12
+#define InCH8_20_GPIO_Port PORT_D
+
+
+
+
+
+
+
+
 
 #define OUT1_PIN  InCH20_1_Pin
 #define OUT1_PORT InCH20_1_GPIO_Port
@@ -253,5 +264,21 @@ typedef enum {
   STATE_OUT_ERROR,
   STATE_OUT_RESTART_PROCESS
 } PDM_OUT_STATE_t;
+
+
+
+#if PLATFORM == RISC
+    #include "ch32v20x_tim.h"
+	#define TIMER_Type TIM_TypeDef
+#endif
+#if PLATFORM == APM32
+	#include "apm32f4xx_tmr.h"
+    #include "apm32f4xx_rcm.h"
+	#define TIMER_Type TMR_T
+#endif
+
+void vHWLilBaseTimerInit(TIMER_Type * tim );
+uint16_t GetBaseTick();
+uint16_t GetDelay( uint16_t start_delay);
 
 #endif /* DRIVERS_DRIVERS_CONFIG_H_ */

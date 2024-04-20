@@ -34,6 +34,7 @@
 #include "queue.h"
 #include "list.h"
 
+
 /*!
  * @brief       Main program
  *
@@ -43,15 +44,16 @@
  */
 int main(void)
 {
-	 SystemCoreClockUpdate();
-	 NVIC_SetPriorityGrouping(NVIC_PRIORITY_GROUP_4);
- 
-	 vSYStaskInit ();
+	SystemCoreClockUpdate();
+	NVIC_ConfigPriorityGroup(NVIC_PRIORITY_GROUP_3);
+	HAL_InitGpioLib();
+	vSYSqueueInit ( );
+	vSYSeventInit ( );
+	vSYStaskInit ( );
     /* User create task */
-
+	 vCANinit();
     /* Startup FreeRTOS */
     vTaskStartScheduler();
-
     while(1);
 }
 
