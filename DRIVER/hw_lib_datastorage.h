@@ -98,6 +98,12 @@ typedef enum
 #define GET_LONG(ADD) ( ((uint32_t)datacash[ADD] << 24 ) | (uint32_t)(datacash[ADD+1]<<16) | (uint32_t)(datacash[ADD+2]<<8) | (uint32_t)(datacash[ADD+3]) )
 #define GET_SHORT(ADD) ( ((uint16_t)datacash[ADD] << 8 ) | datacash[ADD+1] )
 
+
+typedef enum {
+	ACCESS_CHECK_ENABLE =  1,
+	ACCESS_CHECK_DISABLE = 0,
+} ACCESS_CHECK_t;
+
 typedef enum {
 	ACCESS_DENIED = 0,
 	ACCESS_ALLOWED = 1,
@@ -144,6 +150,8 @@ typedef struct {
 	uint8_t Year;
 } PDM_DATA_TIME;
 
+void vTestEEPROM( void );
+EERPOM_ERROR_CODE_t eIntiDataStorage( ACCESS_CHECK_t access_check );
 EERPOM_ERROR_CODE_t eEEPROMWriteExternData ( uint32_t adr, const uint8_t* data, uint32_t length );
 EERPOM_ERROR_CODE_t eEEPROMRegTypeWrite( EEPROM_ADRESS_TYPE addr, void * data, REGISTE_DATA_TYPE_t datatype );
 STORAGE_ERROR vSetRecordData(uint8_t index, uint8_t * data);

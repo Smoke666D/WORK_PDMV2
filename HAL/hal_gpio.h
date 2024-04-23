@@ -54,7 +54,7 @@ typedef enum
 } BitState_t;
 
 void HAL_InitGpioLib();
-void HAL_InitGpioAF(PortName_t PORT, uint16_t Pin, uint16_t AF );
+void HAL_InitGpioAF(PortName_t PORT, uint16_t Pin, uint16_t AF , GPIO_MODE_T mode );
 void HAL_InitGpioInPUP(PortName_t PORT, uint16_t Pin);
 void HAL_InitGpioOut( PortName_t PORT, uint16_t Pin  );
 void vHAL_SetBit(  PortName_t  port, uint16_t pin );

@@ -79,7 +79,7 @@ void HAL_InitGpioInPUP(PortName_t PORT, uint16_t Pin)
 /*
  * Иницализация порта в режиме альтернативной функции
  */
-void HAL_InitGpioAF(PortName_t PORT, uint16_t Pin, uint16_t AF )
+void HAL_InitGpioAF(PortName_t PORT, uint16_t Pin, uint16_t AF , GPIO_MODE_T mode )
 {
 	GPIO_PIN_SOURCE_T pin_source;
 	switch (Pin)
@@ -139,7 +139,7 @@ void HAL_InitGpioAF(PortName_t PORT, uint16_t Pin, uint16_t AF )
 	GPIO_ConfigPinAF(Ports[PORT] ,  pin_source , AF);
 	gpioConfigStruct.mode = GPIO_MODE_AF;
     gpioConfigStruct.pin = Pin;
-    gpioConfigStruct.otype = GPIO_OTYPE_PP;
+    gpioConfigStruct.otype = mode;//GPIO_OTYPE_PP;
 	gpioConfigStruct.pupd = GPIO_PUPD_NOPULL;
 	gpioConfigStruct.speed = GPIO_SPEED_50MHz  ;
     GPIO_Config(Ports[PORT], &gpioConfigStruct);

@@ -13,7 +13,7 @@
 #include "lapi.h"
 #include "din_task.h"
 #include "flash_task.h"
-
+#include "hw_lib_datastorage.h"
 
 
 
@@ -235,6 +235,7 @@ void vLuaTask(void *argument)
 		 {
 		       case LUA_INIT:
 		         vAINInit();
+		         vTestEEPROM();
 			   	 L  = luaL_newstate();
 			   	 L1 = lua_newthread(L);
 			   	 luaL_openlibs(L1); // open standard libraries

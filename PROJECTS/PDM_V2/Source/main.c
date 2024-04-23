@@ -27,7 +27,8 @@
 #include "main.h"
 #include "stdio.h"
 #include "system_init.h"
-
+#include "hw_lib_eeprom.h"
+#include "can_task.h"
 /** FreeRTOS */
 #include "FreeRTOS.h"
 #include "task.h"
@@ -47,11 +48,13 @@ int main(void)
 	SystemCoreClockUpdate();
 	NVIC_ConfigPriorityGroup(NVIC_PRIORITY_GROUP_3);
 	HAL_InitGpioLib();
+	vHWLilBaseTimerInit(TMR13);
 	vSYSqueueInit ( );
 	vSYSeventInit ( );
 	vSYStaskInit ( );
     /* User create task */
 	 vCANinit();
+	 vInitEEPROM();
     /* Startup FreeRTOS */
     vTaskStartScheduler();
     while(1);

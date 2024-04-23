@@ -426,7 +426,7 @@ static void vHWOutInit(OUT_NAME_TYPE out_name, TimerName_t ptim, uint8_t uiChann
 			default:
 				break;
 		}
-		HAL_InitGpioAF( OutPort,  OutPin,  AF );
+		HAL_InitGpioAF( OutPort,  OutPin,  AF ,GPIO_OTYPE_PP );
 		RESET_FLAG(out_name,CONTROL_FLAGS );
 		SET_STATE_FLAG(out_name, FSM_OFF_STATE );
 		if (out_name < OUT_HPOWER_COUNT)

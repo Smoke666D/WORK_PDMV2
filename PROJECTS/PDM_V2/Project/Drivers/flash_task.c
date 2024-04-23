@@ -23,11 +23,21 @@ FLASH_STATE eFLASHwriteScript ( uint32_t adr, const uint8_t* data, uint32_t leng
 {
   FLASH_STATE       res       = FLASH_OK;
   uint32_t          curentAdr = FLASH_STORAGE_ADR + adr;
-  if ( flashLock == FLASH_UNLOCKED )
+  if ( flashLock != FLASH_UNLOCKED )
   {
-    if ( adr < FLASH_STORAGE_LENGTH )
+	  res = FLASH_ERROR_ACCESS;
+  }
+  else
+    if ( adr >= FLASH_STORAGE_LENGTH )
     {
-      if ( ( length + adr ) < FLASH_STORAGE_LENGTH )
+    	res = FLASH_ERROR_ADR;
+    }
+    else
+      if ( ( length + adr ) >= FLASH_STORAGE_LENGTH )
+      {
+    	  res = FLASH_ERROR_LENGTH;
+      }
+      else
       {
         for ( uint32_t i=0U; i<length; i++ )
         {
@@ -35,36 +45,16 @@ FLASH_STATE eFLASHwriteScript ( uint32_t adr, const uint8_t* data, uint32_t leng
           if ( FMC_ProgramByte(  curentAdr, data[i] ) != FMC_COMPLETE )
           {
             res = FLASH_ERROR_WRITING;
-            ( void )eFLASHlock();
             break;
           }
           else if ( *( uint8_t* )( curentAdr ) != data[i] )
           {
             res = FLASH_ERROR_VERIFICATION;
-            ( void )eFLASHlock();
             break;
-          }
-          else
-          {
           }
         }
       }
-      else
-      {
-        res = FLASH_ERROR_LENGTH;
-        ( void )eFLASHlock();
-      }
-    }
-    else
-    {
-      res = FLASH_ERROR_ADR;
-      ( void )eFLASHlock();
-    }
-  }
-  else
-  {
-    res = FLASH_ERROR_ACCESS;
-  }
+  if ( res != FLASH_OK) ( void )eFLASHlock();
   return res;
 }
 FLASH_STATE eFLASHreadScript ( uint32_t adr, uint8_t* data, uint32_t length )

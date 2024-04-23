@@ -111,8 +111,6 @@ void vHAL_EnableTimerIRQ(TimerName_t TimerName,uint8_t priority, uint16_t interu
 {
 	NVIC_EnableIRQRequest((IRQn_Type)interupt, priority, 0);
 	TMR_EnableInterrupt(timers[TimerName], INT_FLAG);
-
-
 }
 
 IRQn_Type getTimerIRQ(TimerName_t TimerName )

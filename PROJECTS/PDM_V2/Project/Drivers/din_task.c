@@ -108,7 +108,7 @@ PDM_INPUT_CONFIG_ERROR eDinConfig( uint8_t ucCh, DIN_INPUT_TYPE inType, uint32_t
 		{
 			if ( ( ucCh == INPUT_9 ) || ( ucCh == INPUT_6 ) )
 			{
-				HAL_InitGpioAF(xDinPortConfig[ucCh].PORT, xDinPortConfig[ucCh].Pin, (ucCh == INPUT_9) ? TIMER10_AF  : TIMER9_AF );
+				HAL_InitGpioAF(xDinPortConfig[ucCh].PORT, xDinPortConfig[ucCh].Pin, (ucCh == INPUT_9) ? TIMER10_AF  : TIMER9_AF , GPIO_OTYPE_PP );
 			    if (ucCh == INPUT_9)
 			    {
 			    	eRPMConfig(INPUT_9 ,RPM_CH1);

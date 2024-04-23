@@ -49,6 +49,7 @@ system/system_init.o: ../system/system_init.c ../system/system_init.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_can.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_eeprom.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/hal_i2c.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_i2c.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/can_task.h
 
@@ -153,6 +154,8 @@ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h:
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_can.h:
 
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_eeprom.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_i2c.h:
 
 c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_i2c.h:
 

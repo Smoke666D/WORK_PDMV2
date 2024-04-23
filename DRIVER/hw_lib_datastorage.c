@@ -30,20 +30,48 @@ static uint16_t vAddRecordToStorage();
 static void vSetTimeToReg( uint8_t * DataStorage, void * data);
 static void vWriteDescriptorReg( uint8_t addr, EEPROM_ADRESS_TYPE data);
 STORAGE_ERROR eWriteNewDescriptor( EEPROM_DISCRIPTOR desc);
-/*
- * Функция инициализации
- */
+
+
+uint8_t data[100] __SECTION(RAM_SECTION_RAM);
+
+
+void vTestEEPROM()
+{
+
+	for (u8 i = 0; i< 100; i++)
+	    {
+					data[i] = 0;
+	     }
+
+	eEEPROMRd( 0, data, 100 ,2);
+	for (u8 i = 0; i< 100; i++)
+	{
+		data[i] = i+2;
+	}
+	eEEPROMWr( 0, data, 100, 2);
+	for (u8 i = 0; i< 100; i++)
+	{
+			data[i] = 0;
+	}
+	eEEPROMRd( 0, data, 10 ,2);
+	for (u8 i = 0; i< 100; i++)
+    {
+		data[i] = i;
+    }
+	eEEPROMWr( 0, data, 100, 2);
+}
+
 
 /*
  * Функция инициализации хранилища данных
  */
-EERPOM_ERROR_CODE_t eIntiDataStorage()
+EERPOM_ERROR_CODE_t eIntiDataStorage( ACCESS_CHECK_t access_check )
 {
 
 	EERPOM_ERROR_CODE_t res = EEPROM_OK;
-	DataStorageDiscriptor.access = ACCESS_DENIED;
+	DataStorageDiscriptor.access = ( access_check == ACCESS_CHECK_ENABLE )? ACCESS_DENIED : ACCESS_ALLOWED;
 	( void )memset(datacash,0U,REGISTER_OFFSET );
-	res =  eEEPROMRd(VALIDE_CODE_ADDR, datacash, REGISTER_OFFSET  );
+	res =  eEEPROMRd(VALIDE_CODE_ADDR, datacash, REGISTER_OFFSET ,2  );
 	if ( res== EEPROM_OK )
 	{
 		if (datacash[VALIDE_CODE_ADDR ] != VALID_CODE)
@@ -88,7 +116,7 @@ STORAGE_ERROR eCreateDataStorage(EEPROM_ADRESS_TYPE reg_count, uint8_t * record_
 		tempDataStorageDiscriptor.record_count = 0;
 		tempDataStorageDiscriptor.record_pointer = 0;
 	}
-	eIntiDataStorage();
+	eIntiDataStorage( ACCESS_CHECK_DISABLE );
 	if ( (tempDataStorageDiscriptor.register_count != DataStorageDiscriptor.register_count ) ||
 			( tempDataStorageDiscriptor.record_mask  != DataStorageDiscriptor.record_mask ))
 		{
@@ -108,7 +136,7 @@ STORAGE_ERROR eCreateDataStorage(EEPROM_ADRESS_TYPE reg_count, uint8_t * record_
 			eResetDataStorage(statrt_address );
 			tempDataStorageDiscriptor.token = DataStorageDiscriptor.token;
 			eWriteNewDescriptor( tempDataStorageDiscriptor);
-			eIntiDataStorage();
+			eIntiDataStorage(ACCESS_CHECK_DISABLE );
 			return (STORAGE_NEW);
 		}
 	else
@@ -128,7 +156,7 @@ STORAGE_ERROR eWriteNewDescriptor( EEPROM_DISCRIPTOR desc)
 	datacash[RECORD_FORMAT_ADDR + SECOND_BYTE_ADDR ] = ( desc.record_mask >> SECOND_BYTE_OFS ) & BYTE_MASK;
 	datacash[RECORD_FORMAT_ADDR + THRID_BYTE_ADDR ] = ( desc.record_mask >> THRID_BYTE_OFS) & BYTE_MASK;
 	datacash[RECORD_FORMAT_ADDR + FOURTH_BYTE_ADDR ] = ( desc.record_mask >> FOURTH_BYTE_OFS) & BYTE_MASK;
-	eEEPROMWr(VALIDE_CODE_ADDR, datacash,REGISTER_OFFSET);
+	eEEPROMWr(VALIDE_CODE_ADDR, datacash,REGISTER_OFFSET, 2);
 	return  ( STORAGE_OK );
 }
 
@@ -169,7 +197,7 @@ EERPOM_ERROR_CODE_t eEEPROMRegWrite( EEPROM_ADRESS_TYPE addr, uint8_t * data )
 	{
 		uint8_t Data[REGISTER_SIZE];
 		( void )memcpy(Data,data,REGISTER_SIZE);
-		return ( eEEPROMWr(usAddres,&Data[0],REGISTER_SIZE));
+		return ( eEEPROMWr(usAddres,&Data[0],REGISTER_SIZE, 2));
 
 	}
 	return ( EEPROM_NOT_VALIDE_ADRESS );
@@ -181,7 +209,7 @@ REGISTE_DATA_TYPE_t eEEPROMReadRegister( EEPROM_ADRESS_TYPE addr, void * pData )
 {
 	EEPROM_ADRESS_TYPE usAddres = addr * REGISTER_SIZE  + REGISTER_OFFSET ;
 	uint8_t Data[REGISTER_SIZE];
-	eEEPROMRd(usAddres , Data, REGISTER_SIZE);
+	eEEPROMRd(usAddres , Data, REGISTER_SIZE , 2);
 	REGISTE_DATA_TYPE_t register_type = (Data[0] & REGISTER_TYPE_MASK);
 	switch ( register_type )
 	{
@@ -241,7 +269,7 @@ void eEEPROMRegisterAddToFastWrite(void * data, REGISTE_DATA_TYPE_t datatype )
 }
 EERPOM_ERROR_CODE_t eEEPROMRegisterFastWrtie()
 {
-	return (  eEEPROMWr(fast_write_descriptor.cur_addres,fast_write_descriptor.buffer,fast_write_descriptor.cur_offset) );
+	return (  eEEPROMWr(fast_write_descriptor.cur_addres,fast_write_descriptor.buffer,fast_write_descriptor.cur_offset ,2 ) );
 }
 
 
@@ -335,7 +363,7 @@ EERPOM_ERROR_CODE_t eEEPROMRecordADD()
 	if ( ( DataStorageDiscriptor.max_record_count != 0 ) && (USB_access==0))
 	    {
 	    	uint16_t record_start_index  = vAddRecordToStorage();
-	    	return (  eEEPROMWr(record_start_index,record_data,DataStorageDiscriptor.record_byte_size) );
+	    	return (  eEEPROMWr(record_start_index,record_data,DataStorageDiscriptor.record_byte_size, 2)  );
 	    }
 		return ( EEPROM_NOT_VALIDE_ADRESS );
 }
@@ -386,7 +414,7 @@ int eAccessToken( uint16_t token)
 	{
 		SET_SHORT( ACCESS_TOKEN_ADDR,  token);
 		DataStorageDiscriptor.token = token;
-		eEEPROMWr(ACCESS_TOKEN_ADDR, &datacash[ACCESS_TOKEN_ADDR],2);
+		eEEPROMWr(ACCESS_TOKEN_ADDR, &datacash[ACCESS_TOKEN_ADDR],2, 2);
 		DataStorageDiscriptor.access = ACCESS_ALLOWED;
 	}
 	else
@@ -409,7 +437,7 @@ uint16_t usEEPROMReadToExternData(EEPROM_ADRESS_TYPE addr, uint8_t * data, uint8
 		USB_access = 1;
 		uint16_t remain = usGetEEPROMSize() - addr;
 		uint8_t  length = ( remain > len ) ? len : ( uint8_t )remain;
-		eEEPROMRd( addr , data,  length );
+		eEEPROMRd( addr , data,  length , 2);
 	    USB_access = 0;
 		return ( length );
 	}
@@ -425,7 +453,7 @@ EERPOM_ERROR_CODE_t eEEPROMWriteExternData ( uint32_t adr, const uint8_t* data, 
 		if ( length + adr  <= EEPROM_MAX_ADRRES )
 		{
 			USB_access = 1;
-			eEEPROMWr( adr,(uint8_t*)data,  length );
+			eEEPROMWr( adr,(uint8_t*)data,  length , 2);
 			USB_access = 0;
 			return (EEPROM_OK);
         }
@@ -523,7 +551,7 @@ static uint16_t vAddRecordToStorage()
 	current_offset = DataStorageDiscriptor.current_reccord_offset;
 	DataStorageDiscriptor.current_reccord_offset += DataStorageDiscriptor.record_byte_size;
 	vWriteDescriptor();
-	eEEPROMWr(0, datacash, REGISTER_OFFSET);
+	eEEPROMWr(0, datacash, REGISTER_OFFSET, 2 );
 	return (current_offset);
 }
 

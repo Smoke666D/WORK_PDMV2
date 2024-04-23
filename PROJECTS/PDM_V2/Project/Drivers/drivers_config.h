@@ -170,14 +170,6 @@
 #define InCH8_20_Pin GPIO_PIN_12
 #define InCH8_20_GPIO_Port PORT_D
 
-
-
-
-
-
-
-
-
 #define OUT1_PIN  InCH20_1_Pin
 #define OUT1_PORT InCH20_1_GPIO_Port
 #define OUT2_PIN  InCH20_2_Pin
