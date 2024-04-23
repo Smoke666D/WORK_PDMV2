@@ -50,7 +50,7 @@ void vTestEEPROM()
 	{
 			data[i] = 0;
 	}
-	eEEPROMRd( 0, data, 10 ,2);
+	eEEPROMRd( 0, data, 100 ,2);
 	for (u8 i = 0; i< 100; i++)
     {
 		data[i] = i;
@@ -65,6 +65,7 @@ void vTestEEPROM()
 		{
 			data[i] = i*2;
 		}
+		eEEPROMWr( 0, data, 100, 2);
 }
 
 
