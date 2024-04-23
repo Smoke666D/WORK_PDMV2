@@ -83,18 +83,11 @@ EERPOM_ERROR_CODE_t eEEPROMWr(  EEPROM_ADRESS_TYPE addr, uint8_t * data, EEPROM_
 
 EERPOM_ERROR_CODE_t eEEPROMRd(  EEPROM_ADRESS_TYPE addr, uint8_t * data,   EEPROM_ADRESS_TYPE len , uint8_t NotifyIndex )
 {
-
-    EERPOM_ERROR_CODE_t res = EEPROM_NOT_VALIDE_ADRESS;
     if ( (addr +len)  <= EEPROM_SIZE)
     {
-       //  vSetAddr( addr);
-     //   res = Dev.I2C_Master_Transmit_func( Device_ADD | GET_ADDR_MSB( addr ), Dev.ADDR, ADDRESS_DATA ,EEPROM_TIME_OUT , NotifyIndex);
-      //   if (res ==EEPROM_OK)
-      //   {
-                return (  Dev.I2C_Master_Recive_func(  Device_ADD, addr, data, len ,EEPROM_TIME_OUT, NotifyIndex ) );
-      //   }
-     }
-     return ( res );
+        return (  Dev.I2C_Master_Recive_func(  Device_ADD, addr, data, len ,EEPROM_TIME_OUT, NotifyIndex ) );
+    }
+     return (  EEPROM_NOT_VALIDE_ADRESS );
 }
 
 static void vSetAddr(EEPROM_ADRESS_TYPE addr )
