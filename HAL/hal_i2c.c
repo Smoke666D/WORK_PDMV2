@@ -352,36 +352,55 @@ static void I2C_FSM()
 	     I2C_ReadRegister(I2C_NAME[ pEEPROM->dev],  I2C_REGISTER_STS2 );
 	     return;
     }
-    if ( ( int_flags  & (I2C_INT_FLAG_ADDR  & 0xFF) )  &&  ( pEEPROM->direciorn == DIR_TRANSMIT )  && (pEEPROM->DMA_TX == 0) )
+    if ( ( int_flags  & (I2C_INT_FLAG_ADDR  & 0xFF) )  &&  ( pEEPROM->direciorn == DIR_TRANSMIT )  )
     {
-    	 I2C_ReadRegister(I2C_NAME[ pEEPROM->dev],  I2C_REGISTER_STS2 );
-    	 I2C_TxData( I2C_NAME[ pEEPROM->dev] , (pEEPROM->Index & 0xFF) );
+
+    	if (pEEPROM->DMA_TX == 0)
+    	{
+    		I2C_ReadRegister(I2C_NAME[ pEEPROM->dev],  I2C_REGISTER_STS2 );
+    		I2C_TxData( I2C_NAME[ pEEPROM->dev] , (pEEPROM->Index & 0xFF) );
+    	}
+    	else
+    	{
+    		 I2C_EnableDMA(I2C_NAME[ pEEPROM->dev ]);
+    		 I2C_ReadRegister(I2C_NAME[ pEEPROM->dev],  I2C_REGISTER_STS2 );
+    	}
     	 return;
     }
 
-    if ( ( int_flags  & (I2C_INT_FLAG_ADDR  & 0xFF) )  &&  ( pEEPROM->direciorn == DIR_TRANSMIT ) && (pEEPROM->DMA_TX == 1)  )
+   /* if ( ( int_flags  & (I2C_INT_FLAG_ADDR  & 0xFF) )  &&  ( pEEPROM->direciorn == DIR_TRANSMIT ) && (pEEPROM->DMA_TX == 1)  )
        {
     	 I2C_EnableDMA(I2C_NAME[ pEEPROM->dev ]);
     	// DMA_Enable(DMA1_Stream7);
    	     I2C_ReadRegister(I2C_NAME[ pEEPROM->dev],  I2C_REGISTER_STS2 );
    	     return;
 
-     }
-    if (( int_flags  & ((I2C_INT_FLAG_TXBE  | I2C_INT_FLAG_BTC)   & 0xFF) ) && (pEEPROM->DMA_TX == 0))
+     }*/
+    if (( int_flags  & ((I2C_INT_FLAG_TXBE  | I2C_INT_FLAG_BTC)   & 0xFF) ) )
     {
+    	if (pEEPROM->DMA_TX == 0)
+    	{
     	pEEPROM->direciorn =   DIR_RECIEVE;
     	I2C_EnableGenerateStart( I2C_NAME[ pEEPROM->dev ] );
+    	}
+    	else
+    	{
+
+        	I2C_EnableGenerateStop(  I2C_NAME[ pEEPROM->dev] );
+            xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
+            portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+    	}
     	return;
 
     }
-    if (( int_flags  & ((I2C_INT_FLAG_TXBE  | I2C_INT_FLAG_BTC)   & 0xFF) ) && (pEEPROM->DMA_TX == 1))
+  /*  if (( int_flags  & ((I2C_INT_FLAG_TXBE  | I2C_INT_FLAG_BTC)   & 0xFF) ) && (pEEPROM->DMA_TX == 1))
     {
     	I2C_EnableGenerateStop(  I2C_NAME[ pEEPROM->dev] );
         xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
         portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
         return;
 
-    }
+    }*/
 
 #endif
 }
