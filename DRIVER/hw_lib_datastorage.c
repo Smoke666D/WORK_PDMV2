@@ -38,15 +38,12 @@ uint8_t data[100] __SECTION(RAM_SECTION_RAM);
 void vTestEEPROM()
 {
 
-	for (u8 i = 0; i< 100; i++)
-	    {
-					data[i] = 0;
-	     }
+
 
 	eEEPROMRd( 0, data, 100 ,2);
 	for (u8 i = 0; i< 100; i++)
 	{
-		data[i] = i+2;
+		data[i] = i+4;
 	}
 	eEEPROMWr( 0, data, 100, 2);
 	for (u8 i = 0; i< 100; i++)
@@ -59,6 +56,15 @@ void vTestEEPROM()
 		data[i] = i;
     }
 	eEEPROMWr( 0, data, 100, 2);
+	for (u8 i = 0; i< 100; i++)
+		    {
+						data[i] = 0;
+		     }
+	eEEPROMRd( 0, data, 100 ,2);
+		for (u8 i = 0; i< 100; i++)
+		{
+			data[i] = i*2;
+		}
 }
 
 
