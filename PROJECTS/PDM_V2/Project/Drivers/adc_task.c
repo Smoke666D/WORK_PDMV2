@@ -941,37 +941,33 @@ void HAL_ADC_StartDMA( uint8_t chanel, uint16_t * data, uint16_t size)
 {
 	ADC_T* adc;
 	DMA_Stream_T* stream;
-	dmaConfig.bufferSize = size;
-	dmaConfig.memoryBaseAddr = (uint32_t)data;
 	switch (chanel)
 	{
 		case 1:
 			stream = DMA2_Stream4;
 			DMA_ClearStatusFlag(DMA2_Stream4, DMA_FLAG_TEIFLG4 | DMA_FLAG_DMEIFLG4 );
 			adc = ADC1;
-			dmaConfig.channel          	 = DMA_CHANNEL_0;
-			dmaConfig.peripheralBaseAddr = (uint32_t)&ADC1->REGDATA;
+
 			break;
 		case 2:
 			stream = DMA2_Stream2;
 			DMA_ClearStatusFlag(DMA2_Stream2, DMA_FLAG_TEIFLG2 | DMA_FLAG_DMEIFLG2 );
 			adc = ADC2;
-			dmaConfig.channel          	 = DMA_CHANNEL_1;
-			dmaConfig.peripheralBaseAddr = (uint32_t)&ADC2->REGDATA;
+
 			break;
 		case 3:
 			stream = DMA2_Stream0;
 			DMA_ClearStatusFlag(DMA2_Stream0, DMA_FLAG_TEIFLG0 | DMA_FLAG_DMEIFLG0 );
 			adc = ADC3;
-			dmaConfig.channel          	 = DMA_CHANNEL_2;
-			dmaConfig.peripheralBaseAddr = (uint32_t)&ADC3->REGDATA;
+
 			break;
 		default:
 			return;
 	}
+	DMA_ConfigDataNumber(stream, size);
+	DMA_ConfigMemoryTarget(stream, data, DMA_MEMORY_0);
 	ADC_ClearStatusFlag(adc, ADC_FLAG_EOC | ADC_FLAG_OVR);
 	ADC_EnableDMA(adc);
-	DMA_Config(stream, &dmaConfig);
 	DMA_EnableInterrupt(stream, DMA_INT_TCIFLG);
 	DMA_Enable(stream);
 	ADC_SoftwareStartConv(adc);
