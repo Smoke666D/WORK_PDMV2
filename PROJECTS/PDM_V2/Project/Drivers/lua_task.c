@@ -208,12 +208,12 @@ void vRegisterHWLib( lua_State *L1 )
 	lua_register(L1,"OutSetPWM", iOutSetPWM);
 	lua_register(L1,"setPWMGroupeFreq",isetPWMFreq);
 	lua_register(L1,"RandomRestart",iSetRandomRestart);
-	//lua_register(L1,"GetEEPROMReg",iGetEEPROM);
-	//lua_register(L1,"SetEEPROMReg",iSetEEPROM);
-	//lua_register(L1,"SetTimeDate",iSetTime);
-	//lua_register(L1,"GetTimeDate",iGetTime);
-	//lua_register(L1,"AddReccord",iSetRecord);
-	//lua_register(L1,"ConfigStorage",iSetStorageFormat);
+	lua_register(L1,"GetEEPROMReg",iGetEEPROM);
+	lua_register(L1,"SetEEPROMReg",iSetEEPROM);
+	lua_register(L1,"SetTimeDate",iSetTime);
+	lua_register(L1,"GetTimeDate",iGetTime);
+	lua_register(L1,"AddReccord",iSetRecord);
+	lua_register(L1,"ConfigStorage",iSetStorageFormat);
 }
 
 void vLuaTask(void *argument)
@@ -235,7 +235,7 @@ void vLuaTask(void *argument)
 		 {
 		       case LUA_INIT:
 		         vAINInit();
-		        // vTestEEPROM();
+		      //   vTestEEPROM();
 			   	 L  = luaL_newstate();
 			   	 L1 = lua_newthread(L);
 			   	 luaL_openlibs(L1); // open standard libraries

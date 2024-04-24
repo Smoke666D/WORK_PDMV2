@@ -60,17 +60,12 @@ EERPOM_ERROR_CODE_t eEEPROMWr(  EEPROM_ADRESS_TYPE addr, uint8_t * data, EEPROM_
              memcpy( &sector_buffer[ADDRESS_DATA], &data[offset], cur_len );
              //sector_buffer[0] =  (cur_addr >> 8) & 0xFF ;
              sector_buffer[0] =  cur_addr & 0xFF ;
-             vTaskDelay(5);
-            // while (timeout < 5000)
-             //{
-              //  uint32_t start_tick = GetBaseTick();
+             for (int i =0; i<6;i++)
+             {
                 res = Dev.I2C_Master_Transmit_func( Device_ADD | GET_ADDR_MSB( cur_addr) ,(uint8_t *) sector_buffer,  cur_len + ADDRESS_DATA , EEPROM_TIME_OUT, NotifyIndex );
-               // if  (res != EEPROM_OK)
-               // {
-                //     timeout = GetDelay(start_tick);
-                // }
-                // else break;
-            // }
+                if  (res == EEPROM_OK) break;
+                vTaskDelay(1);
+             }
              offset         = offset  + cur_len;
              byte_to_send   = byte_to_send - cur_len;
              cur_addr       = cur_addr  + cur_len;

@@ -127,7 +127,7 @@ static EERPOM_ERROR_CODE_t I2C_Master_TransmitDMA(  u8 DevAdrees,   u8 * data, u
 		pEEPROM->DMA_TX = 1;
         pEEPROM->NotifyTaskHeandle = xTaskGetCurrentTaskHandle();
         I2C_DisableAcknowledge( I2C_NAME[ pEEPROM->dev]);
-        I2C_EnableInterrupt(I2C_NAME[ pEEPROM->dev ] , I2C_INT_EVT );
+        I2C_EnableInterrupt(I2C_NAME[ pEEPROM->dev ] , I2C_INT_EVT | I2C_INT_FLAG_AE);
         I2C_DisableInterrupt(I2C_NAME[ pEEPROM->dev ],  I2C_INT_BUF );
         DMA_ConfigDataNumber(DMA1_Stream7, data_size);
         DMA_ConfigMemoryTarget(DMA1_Stream7, data, DMA_MEMORY_0);
@@ -368,14 +368,6 @@ static void I2C_FSM()
     	 return;
     }
 
-   /* if ( ( int_flags  & (I2C_INT_FLAG_ADDR  & 0xFF) )  &&  ( pEEPROM->direciorn == DIR_TRANSMIT ) && (pEEPROM->DMA_TX == 1)  )
-       {
-    	 I2C_EnableDMA(I2C_NAME[ pEEPROM->dev ]);
-    	// DMA_Enable(DMA1_Stream7);
-   	     I2C_ReadRegister(I2C_NAME[ pEEPROM->dev],  I2C_REGISTER_STS2 );
-   	     return;
-
-     }*/
     if (( int_flags  & ((I2C_INT_FLAG_TXBE  | I2C_INT_FLAG_BTC)   & 0xFF) ) )
     {
     	if (pEEPROM->DMA_TX == 0)
@@ -393,14 +385,7 @@ static void I2C_FSM()
     	return;
 
     }
-  /*  if (( int_flags  & ((I2C_INT_FLAG_TXBE  | I2C_INT_FLAG_BTC)   & 0xFF) ) && (pEEPROM->DMA_TX == 1))
-    {
-    	I2C_EnableGenerateStop(  I2C_NAME[ pEEPROM->dev] );
-        xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
-        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-        return;
 
-    }*/
 
 #endif
 }
