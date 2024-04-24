@@ -426,7 +426,7 @@ int eAccessToken( uint16_t token)
 	}
 	else
 	{
-		DataStorageDiscriptor.access  = (DataStorageDiscriptor.token == token) ? ACCESS_ALLOWED : ACCESS_DENIED;
+		DataStorageDiscriptor.access  = /*(DataStorageDiscriptor.token == token) ?*/ ACCESS_ALLOWED /*: ACCESS_DENIED*/;
 	}
 	return  (DataStorageDiscriptor.access );
 }
