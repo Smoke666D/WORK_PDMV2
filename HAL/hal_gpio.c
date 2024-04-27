@@ -36,6 +36,8 @@ void HAL_InitGpioRCC( PortName_t PORT  )
 	return;
 }
 
+
+
 /*
  * Инициализация прота в режиме выхода
  */

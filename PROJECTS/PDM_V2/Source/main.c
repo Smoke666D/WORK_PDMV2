@@ -34,8 +34,20 @@
 #include "task.h"
 #include "queue.h"
 #include "list.h"
+#include "hal_rtc.h"
 
 
+
+void vInitGPIO()
+{
+	HAL_InitGpioAIN(PORT_A, GPIO_PIN_8 | GPIO_PIN_10  );
+	HAL_InitGpioAIN(PORT_B, GPIO_PIN_12 | GPIO_PIN_13  | GPIO_PIN_7  | GPIO_PIN_8  | GPIO_PIN_2 );
+	HAL_InitGpioAIN(PORT_C, GPIO_PIN_15| GPIO_PIN_13 | GPIO_PIN_14  );
+	HAL_InitGpioAIN(PORT_D, GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7 );
+	HAL_InitGpioAIN(PORT_G, GPIO_PIN_0  | GPIO_PIN_8 | GPIO_PIN_12| GPIO_PIN_13 | GPIO_PIN_14| GPIO_PIN_15);
+	HAL_InitGpioAIN(PORT_E, GPIO_PIN_10 | GPIO_PIN_12 |GPIO_PIN_15 );
+	HAL_InitGpioAIN(PORT_F, GPIO_PIN_2 | GPIO_PIN_11| GPIO_PIN_12);
+}
 /*!
  * @brief       Main program
  *
@@ -48,6 +60,8 @@ int main(void)
 	SystemCoreClockUpdate();
 	NVIC_ConfigPriorityGroup(NVIC_PRIORITY_GROUP_3);
 	HAL_InitGpioLib();
+	vInitGPIO();
+    vRTCInit();
 	vHWLilBaseTimerInit(TMR13);
 	vSYSqueueInit ( );
 	vSYSeventInit ( );

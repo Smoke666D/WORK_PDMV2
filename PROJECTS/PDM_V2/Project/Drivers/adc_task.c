@@ -11,8 +11,7 @@
 #include "lua_task.h"
 #include "hal_adc.h"
 #include "drivers_config.h"
-#include "apm32f4xx_adc.h"
-#include "apm32f4xx_dma.h"
+#include "hal_dma.h"
 #define TEMP_DATA    5
 
 
@@ -47,6 +46,7 @@ static const KAL_DATA CurSensData[OUT_COUNT][KOOF_COUNT] ={   {{K002O20,V002O20}
  *
  */
 static void ADC_Init(void);
+static void ADC_ReadyEvent( uint32_t event );
 
 
 
@@ -750,18 +750,9 @@ void ADC_InputPortInit()
 }
 
 
-
-void HAL_ADC_StartDMA( uint8_t chanel, uint16_t * data, uint16_t size);
  /*
   *
   */
-
-
-
-
-
-
-
 
 void AinNotifyTaskToStop()
 {
@@ -773,7 +764,6 @@ void AinNotifyTaskToInit()
 	pTaskToNotifykHandle = xTaskGetCurrentTaskHandle();
 	xTaskNotify(pTaskHandle, TASK_INIT_NOTIFY , eSetValueWithOverwrite);
 }
-
 
 
 
@@ -793,32 +783,32 @@ void AinNotifyTaskToInit()
        switch (state)
 	   {
 	   	   case ADC_IDLE_STATE:
-	   		    xTaskNotifyWait(0,0xFF ,&ulNotifiedValue,portMAX_DELAY);
-	   			if ((ulNotifiedValue & TASK_INIT_NOTIFY) !=0)
+	   		    xTaskNotifyWait(0,0xFF ,&ulNotifiedValue,portMAX_DELAY);							//Состояние инициализации
+	   			if ((ulNotifiedValue & TASK_INIT_NOTIFY) !=0)										//Ждем уведомления от другого процесса, что можно начинать работу
 	   			{
 	   			   vOutInit();
 	   			   state = ADC_INIT_STATE;
 	   			}
 	   		   break;
 	   	   case ADC_INIT_STATE:
-	   		    xTaskNotify(pTaskToNotifykHandle, AIN_DRIVER_READY , eIncrement);
+	   		    xTaskNotify(pTaskToNotifykHandle, AIN_DRIVER_READY , eIncrement);					//Уведомляем вызвавший процесс, что драйвер запущен
 	   			state = ADC_RUN1_STATE;
 	   		   break;
 	   	   case ADC_RUN1_STATE:
-	   		    vTaskDelayUntil( &xLastWakeTime, xPeriod );
+	   		    vTaskDelayUntil( &xLastWakeTime, xPeriod );											//Запускаем преобразование на 3-х АЦП
 	   		    ulTaskNotifyValueClearIndexed(NULL, 1, 0xFFFF);
-	   		    HAL_ADC_StartDMA( 1, (uint16_t *)getADC1Buffer(), ( ADC_FRAME_SIZE * ADC1_CHANNELS ));
-	   		    HAL_ADC_StartDMA( 2, (uint16_t *)getADC2Buffer(), ( ADC_FRAME_SIZE * ADC2_CHANNELS ));
-	   		    HAL_ADC_StartDMA( 3, (uint16_t *)getADC3Buffer(), ( ADC_FRAME_SIZE * ADC3_CHANNELS ));
+	   		    HAL_ADC_StartDMA( Stream_4, (uint16_t *)getADC1Buffer(), ( ADC_FRAME_SIZE * ADC1_CHANNELS ));
+	   		    HAL_ADC_StartDMA( Stream_2, (uint16_t *)getADC2Buffer(), ( ADC_FRAME_SIZE * ADC2_CHANNELS ));
+	   		    HAL_ADC_StartDMA( Stream_0, (uint16_t *)getADC3Buffer(), ( ADC_FRAME_SIZE * ADC3_CHANNELS ));
 	   		    state = ADC_WHAIT_CONVERSION_STATE;
 	   		    break;
 	   	   case ADC_WHAIT_CONVERSION_STATE:
-	   		    xTaskNotifyWaitIndexed( 1, 0, 0  ,&ulNotifiedValue,portMAX_DELAY);
+	   		    xTaskNotifyWaitIndexed( 1, 0, 0  ,&ulNotifiedValue,portMAX_DELAY);					//Ждем пока из обработчиков прерваний DMA прилетят уведомления об окончании преобразований
 	   		    if(  ulNotifiedValue >= 3 )
 	   		    {
-	   		    	HAL_ADCDMA_Disable(ADC_1);
-	   		    	HAL_ADCDMA_Disable(ADC_2);
-	   		    	HAL_ADCDMA_Disable(ADC_3);
+	   		    	HAL_ADCDMA_Disable(ADC_1);														//Выключаем DMA и АЦП
+	   		    	HAL_ADCDMA_Disable(ADC_2);														//АЦП в режиме циклеческого сканирования последовательности каналов
+	   		    	HAL_ADCDMA_Disable(ADC_3);														//C программным запуском. Нужон его выклчюать
 	   		    	vDataConvertToFloat();
 	   		    	vOutControlFSM();
 	   		    	HAL_ADC_Enable(ADC_1);
@@ -846,14 +836,29 @@ void AinNotifyTaskToInit()
    /* USER CODE END vADCTask */
  }
 
- static DMA_Config_T dmaConfig;
 
+
+
+ static void ADC1_Ready()
+ {
+	 ADC_ReadyEvent(ADC1_READY);
+ }
+
+ static void ADC2_Ready()
+  {
+ 	 ADC_ReadyEvent(ADC2_READY);
+  }
+
+ static void ADC3_Ready()
+  {
+ 	 ADC_ReadyEvent(ADC3_READY);
+  }
 
  static void ADC_Init(void)
  {
-   uint8_t ADC1_CHANNEL[9] = {ADC_CHANNEL_4,ADC_CHANNEL_7,ADC_CHANNEL_6,ADC_CHANNEL_5,ADC_CHANNEL_14,ADC_CHANNEL_15,ADC_CHANNEL_8,ADC_CHANNEL_9,ADC_CHANNEL_16};
-   uint8_t ADC2_CHANNEL[7] = {ADC_CHANNEL_11,ADC_CHANNEL_0,ADC_CHANNEL_1,ADC_CHANNEL_13,ADC_CHANNEL_12,ADC_CHANNEL_3,ADC_CHANNEL_2};
-   uint8_t ADC3_CHANNEL[9] = {ADC_CHANNEL_14,ADC_CHANNEL_9,ADC_CHANNEL_7,ADC_CHANNEL_4,ADC_CHANNEL_15,ADC_CHANNEL_8,ADC_CHANNEL_10,ADC_CHANNEL_6,ADC_CHANNEL_5};
+   uint8_t ADC1_CHANNEL[9] = { ADC_CH_4,  ADC_CH_7, ADC_CH_6, ADC_CH_5,  ADC_CH_14, ADC_CH_15, ADC_CH_8,  ADC_CH_16, ADC_CH_9};
+   uint8_t ADC2_CHANNEL[7] = { ADC_CH_11, ADC_CH_0, ADC_CH_1, ADC_CH_13, ADC_CH_12, ADC_CH_3,  ADC_CH_2 };
+   uint8_t ADC3_CHANNEL[9] = { ADC_CH_14, ADC_CH_9, ADC_CH_7, ADC_CH_4,  ADC_CH_15, ADC_CH_8,  ADC_CH_10, ADC_CH_6, ADC_CH_5};
    HAL_ADC_ContiniusScanCinvertioDMA( 1 ,  9 ,  ADC1_CHANNEL);
    HAL_ADC_ContiniusScanCinvertioDMA( 2 ,  7 ,  ADC2_CHANNEL);
    HAL_ADC_ContiniusScanCinvertioDMA( 3 ,  9 ,  ADC3_CHANNEL);
@@ -862,114 +867,20 @@ void AinNotifyTaskToInit()
    HAL_ADC_Enable(ADC_1);
    HAL_ADC_Enable(ADC_2);
    HAL_ADC_Enable(ADC_3);
-
-   /* Enable DMA clock */
-   RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_DMA2);
-   NVIC_EnableIRQRequest(DMA2_STR0_IRQn, 6, 0);
-   NVIC_EnableIRQRequest(DMA2_STR2_IRQn, 6, 0);
-   NVIC_EnableIRQRequest(DMA2_STR4_IRQn, 6, 0);
-  // dmaConfig.bufferSize = 1;
-   dmaConfig.memoryDataSize = DMA_MEMORY_DATA_SIZE_HALFWORD;
-   dmaConfig.peripheralDataSize = DMA_PERIPHERAL_DATA_SIZE_HALFWORD;
-   dmaConfig.memoryInc = DMA_MEMORY_INC_ENABLE;
-   dmaConfig.peripheralInc = DMA_PERIPHERAL_INC_DISABLE;
-   dmaConfig.loopMode = DMA_MODE_NORMAL;
-   dmaConfig.priority = DMA_PRIORITY_LOW;
-   /* read from peripheral*/
-   dmaConfig.dir = DMA_DIR_PERIPHERALTOMEMORY;
-   dmaConfig.peripheralBaseAddr = (uint32_t)&ADC1->REGDATA;
-
-   dmaConfig.channel           = DMA_CHANNEL_0;
-   dmaConfig.fifoMode          = DMA_FIFOMODE_DISABLE;
-   dmaConfig.fifoThreshold     = DMA_FIFOTHRESHOLD_FULL;
-   dmaConfig.peripheralBurst   = DMA_PERIPHERALBURST_SINGLE;
-   dmaConfig.memoryBurst       = DMA_MEMORYBURST_SINGLE;
-   DMA_Config(DMA2_Stream4, &dmaConfig);
-   DMA_ClearIntFlag(DMA2_Stream4, DMA_INT_TCIFLG4);
-   DMA_Enable(DMA2_Stream4);
-
-   dmaConfig.peripheralBaseAddr = (uint32_t)&ADC2->REGDATA;
-   dmaConfig.channel           = DMA_CHANNEL_1;
-   DMA_Config(DMA2_Stream2, &dmaConfig);
-   DMA_ClearIntFlag(DMA2_Stream2, DMA_INT_TCIFLG2);
-   DMA_Enable(DMA2_Stream2);
-
-   dmaConfig.peripheralBaseAddr = (uint32_t)&ADC3->REGDATA;
-   dmaConfig.channel           = DMA_CHANNEL_2;
-   DMA_Config(DMA2_Stream0, &dmaConfig);
-   DMA_ClearIntFlag(DMA2_Stream0, DMA_INT_TCIFLG0);
-   DMA_Enable(DMA2_Stream0);
-
+   HAL_DMA2InitIT( Stream_4 ,  PTOM, DMA_HWORD, (uint32_t)&ADC1->REGDATA, DMA_CH_0, &ADC1_Ready);
+   HAL_DMA2InitIT( Stream_2 ,  PTOM, DMA_HWORD, (uint32_t)&ADC2->REGDATA, DMA_CH_1, &ADC2_Ready);
+   HAL_DMA2InitIT( Stream_0 ,  PTOM, DMA_HWORD, (uint32_t)&ADC3->REGDATA, DMA_CH_2, &ADC3_Ready);
 
  }
 
-void DMA2_STR4_IRQHandler( void )
-{
-	if ( DMA_ReadIntFlag(DMA2_Stream4, DMA_INT_TCIFLG4) ==SET)
-	{
-		DMA_ClearIntFlag(DMA2_Stream4, DMA_INT_TCIFLG4);
-		DMA_DisableInterrupt(DMA2_Stream4, DMA_INT_TCIFLG);
+ static void ADC_ReadyEvent( uint32_t event )
+ {
 	    portBASE_TYPE xHigherPriorityTaskWoken =  pdFALSE;
-	    xTaskNotifyIndexedFromISR( pTaskHandle,1, ADC1_READY, eIncrement, &xHigherPriorityTaskWoken );
-		portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
-	}
-}
-void DMA2_STR2_IRQHandler( void )
-{
-	if ( DMA_ReadIntFlag(DMA2_Stream2, DMA_INT_TCIFLG2) ==SET)
-	{
-		DMA_DisableInterrupt(DMA2_Stream2, DMA_INT_TCIFLG);
-		DMA_ClearIntFlag(DMA2_Stream2, DMA_INT_TCIFLG2);
-	    portBASE_TYPE xHigherPriorityTaskWoken =  pdFALSE;
-	    xTaskNotifyIndexedFromISR( pTaskHandle,1, ADC2_READY, eIncrement, &xHigherPriorityTaskWoken );
-		portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
-	}
-}
-void DMA2_STR0_IRQHandler( void )
-{
-	if ( DMA_ReadIntFlag(DMA2_Stream0, DMA_INT_TCIFLG0) ==SET)
-	{
-		DMA_DisableInterrupt(DMA2_Stream0, DMA_INT_TCIFLG);
-		DMA_ClearIntFlag(DMA2_Stream0, DMA_INT_TCIFLG0);
-	    portBASE_TYPE xHigherPriorityTaskWoken =  pdFALSE;
-	    xTaskNotifyIndexedFromISR(pTaskHandle,1, ADC3_READY, eIncrement, &xHigherPriorityTaskWoken );
-		portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
-	}
-}
+		xTaskNotifyIndexedFromISR( pTaskHandle,1, event , eIncrement, &xHigherPriorityTaskWoken );
+	    portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
+ }
 
-void HAL_ADC_StartDMA( uint8_t chanel, uint16_t * data, uint16_t size)
-{
-	ADC_T* adc;
-	DMA_Stream_T* stream;
-	switch (chanel)
-	{
-		case 1:
-			stream = DMA2_Stream4;
-			DMA_ClearStatusFlag(DMA2_Stream4, DMA_FLAG_TEIFLG4 | DMA_FLAG_DMEIFLG4 );
-			adc = ADC1;
 
-			break;
-		case 2:
-			stream = DMA2_Stream2;
-			DMA_ClearStatusFlag(DMA2_Stream2, DMA_FLAG_TEIFLG2 | DMA_FLAG_DMEIFLG2 );
-			adc = ADC2;
 
-			break;
-		case 3:
-			stream = DMA2_Stream0;
-			DMA_ClearStatusFlag(DMA2_Stream0, DMA_FLAG_TEIFLG0 | DMA_FLAG_DMEIFLG0 );
-			adc = ADC3;
 
-			break;
-		default:
-			return;
-	}
-	DMA_ConfigDataNumber(stream, size);
-	DMA_ConfigMemoryTarget(stream, data, DMA_MEMORY_0);
-	ADC_ClearStatusFlag(adc, ADC_FLAG_EOC | ADC_FLAG_OVR);
-	ADC_EnableDMA(adc);
-	DMA_EnableInterrupt(stream, DMA_INT_TCIFLG);
-	DMA_Enable(stream);
-	ADC_SoftwareStartConv(adc);
-}
 

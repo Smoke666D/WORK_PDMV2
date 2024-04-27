@@ -211,8 +211,5 @@ ERROR_CODE vHWOutResetConfig(OUT_NAME_TYPE out_name, uint8_t restart_count, uint
 void vHWOutEnable(OUT_NAME_TYPE out_name);
 ERROR_CODE vHWOutOverloadConfig(OUT_NAME_TYPE out_name,  float power, uint16_t overload_timer, float overload_power, OFF_STATE_TYPE off_state, uint8_t filter_enable);
 void vPWMFreqSet( OUT_CH_GROUPE_TYPE groupe, uint32_t Freq);
-void DMA2_STR4_IRQHandler( void );
-void DMA2_STR2_IRQHandler( void );
-void DMA2_STR0_IRQHandler( void );
 void vSetRendomResetState( uint8_t out_name,  uint8_t state, uint8_t cool_down);
 #endif /* DRIVERS_ADC_TASK_H_ */

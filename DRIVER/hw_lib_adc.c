@@ -168,7 +168,7 @@ return res;// ( (channel < AIN_COUNT) ? (float) muRawVData[channel] *  AINCOOF1 
 */
 float fBatteryGet ( void )
 {
-	 return (float)muRawVData[3] * AINCOOF1 + INDIOD;
+	 return (float)muRawVData[4] * AINCOOF1 + INDIOD;
 }
 /*
 *
@@ -176,7 +176,7 @@ float fBatteryGet ( void )
 
 float fTemperatureGet ( uint8_t i )
 {
-	 return ((float)muRawVData[4] * K - 0.7782) /0.0024 + 28;	//	HAL_GetTempSens( muRawVData[4])	;
+	 return ((float)muRawVData[3] * K - 0.7782) /0.0024 + 28;	//	HAL_GetTempSens( muRawVData[4])	;
 }
 
  float fGetDataFromRaw( float fraw, LIN_COOF *  CSC)
@@ -220,7 +220,6 @@ void vInitADCDATA()
 {
 	 for (int i = 0; i< OUT_COUNT;i++)
 	   {
-
 		   muRawOldOutCurData[i] = 0;
 	   }
 	   for (int i=0; i< AIN_NUMBER + 2;i++ )

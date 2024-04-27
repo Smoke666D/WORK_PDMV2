@@ -9,6 +9,7 @@
 #include "hw_lib_eeprom.h"
 #include "string.h"
 #include "system_init.h"
+#include "hal_wdt.h"
 //#include "FreeRTOS.h"
 //#include "event_groups.h"
 
@@ -65,6 +66,7 @@ EERPOM_ERROR_CODE_t eEEPROMWr(  EEPROM_ADRESS_TYPE addr, uint8_t * data, EEPROM_
                 res = Dev.I2C_Master_Transmit_func( Device_ADD | GET_ADDR_MSB( cur_addr) ,(uint8_t *) sector_buffer,  cur_len + ADDRESS_DATA , EEPROM_TIME_OUT, NotifyIndex );
                 if  (res == EEPROM_OK) break;
                 vTaskDelay(1);
+                HAL_WDTReset();
              }
              offset         = offset  + cur_len;
              byte_to_send   = byte_to_send - cur_len;

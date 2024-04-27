@@ -12,6 +12,28 @@
 #include "main.h"
 
 
+typedef enum
+{
+    ADC_CH_0 = 0,  /*!< ADC Channel 0 */
+    ADC_CH_1 = 1,  /*!< ADC Channel 1 */
+    ADC_CH_2 = 2,  /*!< ADC Channel 2 */
+    ADC_CH_3 = 3,  /*!< ADC Channel 3 */
+    ADC_CH_4 = 4,  /*!< ADC Channel 4 */
+    ADC_CH_5 = 5,  /*!< ADC Channel 5 */
+    ADC_CH_6 = 6,  /*!< ADC Channel 6 */
+    ADC_CH_7 = 7,  /*!< ADC Channel 7 */
+    ADC_CH_8 = 8,  /*!< ADC Channel 8 */
+    ADC_CH_9 = 9,  /*!< ADC Channel 9 */
+    ADC_CH_10 = 10, /*!< ADC Channel 10 */
+    ADC_CH_11 = 11, /*!< ADC Channel 11 */
+    ADC_CH_12 = 12, /*!< ADC Channel 12 */
+    ADC_CH_13 = 13, /*!< ADC Channel 13 */
+    ADC_CH_14 = 14, /*!< ADC Channel 14 */
+    ADC_CH_15 = 15, /*!< ADC Channel 15 */
+    ADC_CH_16 = 16, /*!< ADC Channel 16 */
+    ADC_CH_17 = 17, /*!< ADC Channel 17 */
+    ADC_CH_18 = 18, /*!< ADC Channel 18 */
+} ADC_CH_T;
 
 typedef enum {
 	ADC_1 = 0,

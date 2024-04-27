@@ -16,6 +16,7 @@
 #include "apm32f4xx_rtc.h"
 #include "hw_lib_datastorage.h"
 #include "data.h"
+#include "hal_wdt.h"
 #include <stdio.h>
 
 
@@ -306,6 +307,7 @@ USB_STATUS  eUSBreportToTime  ( const USB_REPORT* report )
 	}
 	else
 	{
+		time_buffer.h12 =
 		time_buffer.hours    = report->data[0];
 		time_buffer.minutes  = report->data[1];
 		time_buffer.seconds	 = report->data[2];
@@ -514,7 +516,7 @@ void vUSBtask ( void *argument )
   {
     if ( ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) > 0U )
     {
-      //WDT_Reset();
+      HAL_WDTReset();
       vUSBparseReport( &report );
       switch( report.cmd )
       {

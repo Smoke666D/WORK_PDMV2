@@ -372,8 +372,8 @@ static void I2C_FSM()
     {
     	if (pEEPROM->DMA_TX == 0)
     	{
-    	pEEPROM->direciorn =   DIR_RECIEVE;
-    	I2C_EnableGenerateStart( I2C_NAME[ pEEPROM->dev ] );
+    		pEEPROM->direciorn =   DIR_RECIEVE;
+    		I2C_EnableGenerateStart( I2C_NAME[ pEEPROM->dev ] );
     	}
     	else
     	{

@@ -13,6 +13,9 @@
 
 static uint8_t ADC_INIT = 0;
 static const ADC_T*  ADC_ref[]={ADC1,ADC2,ADC3};
+static const  ADC_CHANNEL_T ADC_chennel_ref[]={  ADC_CHANNEL_0,  ADC_CHANNEL_1,  ADC_CHANNEL_2, ADC_CHANNEL_3, ADC_CHANNEL_4,  ADC_CHANNEL_5,  ADC_CHANNEL_6,  ADC_CHANNEL_7,  ADC_CHANNEL_8,  ADC_CHANNEL_9,  ADC_CHANNEL_10,
+    ADC_CHANNEL_11, ADC_CHANNEL_12, ADC_CHANNEL_13, ADC_CHANNEL_14, ADC_CHANNEL_15,  ADC_CHANNEL_16,  ADC_CHANNEL_17, ADC_CHANNEL_18, } ;
+
 
 void HAL_ADC_CommonConfig()
  {
@@ -30,7 +33,7 @@ void HAL_ADC_CommonConfig()
  }
 
 
-void HAL_ADC_ContiniusScanCinvertioDMA( uint8_t ADC_NUMBER, uint8_t channel_count, uint8_t * channel_nmber)
+void HAL_ADC_ContiniusScanCinvertioDMA( uint8_t ADC_NUMBER, uint8_t channel_count, uint8_t *  channel_nmber)
  {
 	 ADC_T* adc;
 	 ADC_Config_T  adcConfig;
@@ -62,7 +65,7 @@ void HAL_ADC_ContiniusScanCinvertioDMA( uint8_t ADC_NUMBER, uint8_t channel_coun
 	 ADC_Config(adc, &adcConfig);
 	 for (u8 i=0; i< (channel_count) ;i++)
 	 {
-		 ADC_ConfigRegularChannel(adc,channel_nmber[ i  ],  i + 1, ADC_SAMPLETIME_112CYCLES);
+		 ADC_ConfigRegularChannel(adc,  ADC_chennel_ref[channel_nmber[ i  ]],  i + 1, ADC_SAMPLETIME_112CYCLES);
 	 }
 	 ADC_EnableEOCOnEachChannel( adc );
  }
@@ -80,14 +83,6 @@ void HAL_ADC_VrefEnable()
 }
 
 
-void HAL_ADCInit()
-{
-
-
-
-
-
-}
 
 
 void HAL_ADC_Enable(ADC_NUMBER_t adc_number)

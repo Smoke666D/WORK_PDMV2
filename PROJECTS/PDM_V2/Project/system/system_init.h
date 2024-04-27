@@ -24,10 +24,11 @@
 
 #define  DEFAULT_TASK_STACK_SIZE        128U
 #define  LUA_TASK_STACK_SIZE            3000U
-#define  ADC_TASK_STACK_SIZE            200U
+#define  ADC_TASK_STACK_SIZE            250U
 #define  DOUT_TASK_STACK_SIZE           128U
 #define  CAN_RX_TASK_STACK_SIZE         128U
 #define  CAN_TX_TASK_STACK_SIZE         128U
+#define  DEFAULT_TASK_STACK_SIZE         128U
 #define  DIN_TASK_STACK_SIZE            128U
 #define  SERIAL_TX_TSAK_STACK_SIZE      256U
 #define  SERIAL_RX_TSAK_STACK_SIZE      128U

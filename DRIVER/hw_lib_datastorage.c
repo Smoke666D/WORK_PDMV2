@@ -16,7 +16,7 @@
 /*
  *  Объявление переменных драйвера
  */
-static uint8_t  datacash[REGISTER_OFFSET ]		    __SECTION(RAM_SECTION_CCMRAM);
+static uint8_t  datacash[REGISTER_OFFSET ]		    __SECTION(RAM_SECTION_RAM);
 static uint8_t  USB_access  = 0;
 static EEPROM_DISCRIPTOR DataStorageDiscriptor  __SECTION(RAM_SECTION_CCMRAM);
 static uint8_t record_data[REGISTER_SIZE*MAX_RECORD_SIZE];
@@ -40,7 +40,7 @@ void vTestEEPROM()
 
 
 
-	eEEPROMRd( 0, data, 100 ,2);
+	eEEPROMRd( 0, data, 14 ,2);
 	for (u8 i = 0; i< 100; i++)
 	{
 		data[i] = i+4;
