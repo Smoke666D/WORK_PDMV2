@@ -7,7 +7,6 @@
 
 
 #include "hw_lib_datastorage.h"
-//#include "stm32f4xx_hal.h"
 #include "apm32f4xx_rtc.h"
 #include "system_init.h"
 #include "main.h"
@@ -16,11 +15,17 @@
 /*
  *  Объявление переменных драйвера
  */
-static uint8_t  datacash[REGISTER_OFFSET ]		    __SECTION(RAM_SECTION_RAM);
+static uint8_t  datacash[REGISTER_OFFSET ]		    		__SECTION(RAM_SECTION_RAM);
 static uint8_t  USB_access  = 0;
-static EEPROM_DISCRIPTOR DataStorageDiscriptor  __SECTION(RAM_SECTION_CCMRAM);
-static uint8_t record_data[REGISTER_SIZE*MAX_RECORD_SIZE];
+static EEPROM_DISCRIPTOR DataStorageDiscriptor  			__SECTION(RAM_SECTION_CCMRAM);
+static uint8_t record_data[REGISTER_SIZE*MAX_RECORD_SIZE] 	__SECTION(RAM_SECTION_CCMRAM);
+static uint8_t Data[REGISTER_SIZE]						 	__SECTION(RAM_SECTION_RAM);
+static uint8_t data_buffer[SECTOR_SIZE] 	 				__SECTION(RAM_SECTION_RAM);
+/* блок функций быстрой записи*/
+static FAST_WRITE_EEPROM_DISCRIPTOR fast_write_descriptor   __SECTION(RAM_SECTION_RAM);
+/* блок функций быстрой записи*/
 
+//uint8_t data[100] __SECTION(RAM_SECTION_RAM);
 
 static void eResetDataStorage(uint32_t start_addr);
 static void vInitDescriptor();
@@ -32,8 +37,8 @@ static void vWriteDescriptorReg( uint8_t addr, EEPROM_ADRESS_TYPE data);
 STORAGE_ERROR eWriteNewDescriptor( EEPROM_DISCRIPTOR desc);
 
 
-uint8_t data[100] __SECTION(RAM_SECTION_RAM);
 
+/*
 
 void vTestEEPROM()
 {
@@ -68,7 +73,7 @@ void vTestEEPROM()
 		eEEPROMWr( 0, data, 100, 2);
 }
 
-
+*/
 /*
  * Функция инициализации хранилища данных
  */
@@ -183,7 +188,7 @@ void vSetRegData(uint8_t * buf, uint8_t * data, uint8_t data_type)
  */
 EERPOM_ERROR_CODE_t eEEPROMRegTypeWrite( EEPROM_ADRESS_TYPE addr, void * data, REGISTE_DATA_TYPE_t datatype )
 {
-	uint8_t Data[REGISTER_SIZE];
+
 	if  (datatype ==TIME_STAMP )
 	{
 		vSetTimeToReg(Data,  data);
@@ -202,7 +207,7 @@ EERPOM_ERROR_CODE_t eEEPROMRegWrite( EEPROM_ADRESS_TYPE addr, uint8_t * data )
 	EEPROM_ADRESS_TYPE usAddres = addr * REGISTER_SIZE + REGISTER_OFFSET ;
 	if (( addr  <  DataStorageDiscriptor.register_count  ) && (USB_access==0))
 	{
-		uint8_t Data[REGISTER_SIZE];
+
 		( void )memcpy(Data,data,REGISTER_SIZE);
 		return ( eEEPROMWr(usAddres,&Data[0],REGISTER_SIZE, 2));
 
@@ -234,8 +239,7 @@ REGISTE_DATA_TYPE_t eEEPROMReadRegister( EEPROM_ADRESS_TYPE addr, void * pData )
 	}
 	return ( register_type );
 }
-/* блок функций быстрой записи*/
-static FAST_WRITE_EEPROM_DISCRIPTOR fast_write_descriptor;
+
 
 
 void eEEPROMConfigFastWrite(REGISTE_DATA_TYPE_t start_address)
@@ -479,7 +483,7 @@ EERPOM_ERROR_CODE_t eEEPROMWriteExternData ( uint32_t adr, const uint8_t* data, 
  */
 static void eResetDataStorage(uint32_t start_addr)
 {
-	 uint8_t data_buffer[SECTOR_SIZE];
+
 	 ( void )memset(data_buffer,0U,SECTOR_SIZE);
 	 DataStorageDiscriptor.access = ACCESS_ALLOWED;
 	 for ( uint16_t i= start_addr; i < EEPROM_SIZE; i = i + SECTOR_SIZE )

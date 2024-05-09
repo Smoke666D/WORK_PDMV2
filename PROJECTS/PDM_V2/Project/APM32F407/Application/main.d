@@ -1,6 +1,5 @@
-FREE_RTOS/portable/MemMang/heap_4.o: \
- C:/Users/i.dymov/Desktop/WORK/Middlewares/FreeRTOS/FreeRTOSv202012.00/FreeRTOS/Source/portable/MemMang/heap_4.c \
- C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\system/system_init.h \
+Application/main.o: \
+ C:/Users/i.dymov/Desktop/WORK/PROJECTS/PDM_V2/Source/main.c \
  c:\users\i.dymov\desktop\work\projects\pdm_v2\include\main.h \
  c:\users\i.dymov\desktop\work\libraries\device\geehy\apm32f4xx\include\apm32f4xx.h \
  c:\users\i.dymov\desktop\work\libraries\cmsis\include\core_cm4.h \
@@ -21,6 +20,7 @@ FREE_RTOS/portable/MemMang/heap_4.o: \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\mpu_wrappers.h \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\task.h \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\list.h \
+ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\system/system_init.h \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\queue.h \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\task.h \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\list.h \
@@ -50,9 +50,12 @@ FREE_RTOS/portable/MemMang/heap_4.o: \
  C:\Users\i.dymov\Desktop\WORK\USB_DEV/usbd_custom_hid_if.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/adc_task.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h \
- C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h
-
-C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\system/system_init.h:
+ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
+ C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_eeprom.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/hal_i2c.h \
+ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_i2c.h \
+ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/can_task.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/hal_rtc.h
 
 c:\users\i.dymov\desktop\work\projects\pdm_v2\include\main.h:
 
@@ -93,6 +96,8 @@ c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\s
 c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\task.h:
 
 c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\list.h:
+
+C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\system/system_init.h:
 
 c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\queue.h:
 
@@ -153,3 +158,13 @@ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/adc_task.h:
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h:
 
 C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h:
+
+C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_eeprom.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_i2c.h:
+
+c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_i2c.h:
+
+C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/can_task.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_rtc.h:

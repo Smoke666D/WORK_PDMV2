@@ -8,7 +8,7 @@
 #ifndef HAL_HAL_GPIO_H_
 #define HAL_HAL_GPIO_H_
 
-
+#include "hal_config.h"
 #include "main.h"
 
 #define TIMER1_PWM_AF GPIO_AF_TMR1
@@ -20,17 +20,7 @@
 #define TIMER10_AF GPIO_AF_TMR10
 #define TIMER9_AF GPIO_AF_TMR9
 
-typedef enum
-{
-   PORT_A = 0,
-   PORT_B = 1,
-   PORT_C = 2,
-   PORT_D = 3,
-   PORT_E = 4,
-   PORT_F = 5,
-   PORT_G = 6,
-   PORT_H = 7,
-} PortName_t;
+
 
 typedef enum
 {
@@ -47,14 +37,38 @@ typedef enum
   GPIO_OUT_PDOWN,
 } PortType_t;
 
+
+
 typedef enum
 {
-  HAL_BIT_RESET = 0,
-  HAL_BIT_SET   = 1,
+#if MCU == APM32
+  HAL_BIT_RESET = BIT_RESET,
+  HAL_BIT_SET   = BIT_SET,
+#endif
+#if MCU == CH32
+  HAL_BIT_RESET = Bit_RESET,
+  HAL_BIT_SET   = Bit_SET,
+#endif
 } BitState_t;
 
+
+
+typedef enum
+{
+#if MCU == APM32
+	MODE_OUT_PP = GPIO_OTYPE_PP,   /*!< GPIO push-pull mode */
+	MODE_OUT_OD = GPIO_OTYPE_OD,
+#endif
+#if MCU == CH32
+	MODE_OUT_PP =  GPIO_Mode_AF_PP,   /*!< GPIO push-pull mode */
+	MODE_OUT_OD =  GPIO_Mode_AF_OD ,
+	MODE_IN_PU  =  GPIO_Mode_IPU,
+	MODE_IN_PD  =  GPIO_Mode_IPD
+#endif
+} GPIO_MODE_t;
+
 void HAL_InitGpioLib();
-void HAL_InitGpioAF(PortName_t PORT, uint16_t Pin, uint16_t AF , GPIO_MODE_T mode );
+void HAL_InitGpioAF(PortName_t PORT, uint16_t Pin, uint32_t AF , GPIO_MODE_t mode );
 void HAL_InitGpioInPUP(PortName_t PORT, uint16_t Pin);
 void HAL_InitGpioOut( PortName_t PORT, uint16_t Pin  );
 void vHAL_SetBit(  PortName_t  port, uint16_t pin );

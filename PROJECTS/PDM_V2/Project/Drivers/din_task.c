@@ -81,11 +81,11 @@ uint16_t uGetRPM2()
 PDM_INPUT_CONFIG_ERROR eDinConfig( uint8_t ucCh, DIN_INPUT_TYPE inType, uint32_t ulHFront, uint32_t ulLFront)
 {
 	PDM_INPUT_CONFIG_ERROR eRes = WRONG_CHANNEL_NUMBER;
+	DinConfig_t DIN_CONFIG;
 	if ( ucCh < DIN_COUNT)
 	{
 		if (inType != RPM_CONFIG)
 		{
-			DinConfig_t DIN_CONFIG;
 			DIN_CONFIG.eInputType = inType;
 			DIN_CONFIG.ulHighCounter = ulLFront;
 			DIN_CONFIG.ulLowCounter  = ulHFront;
@@ -108,7 +108,7 @@ PDM_INPUT_CONFIG_ERROR eDinConfig( uint8_t ucCh, DIN_INPUT_TYPE inType, uint32_t
 		{
 			if ( ( ucCh == INPUT_9 ) || ( ucCh == INPUT_6 ) )
 			{
-				HAL_InitGpioAF(xDinPortConfig[ucCh].PORT, xDinPortConfig[ucCh].Pin, (ucCh == INPUT_9) ? TIMER10_AF  : TIMER9_AF , GPIO_OTYPE_PP );
+				HAL_InitGpioAF(xDinPortConfig[ucCh].PORT, xDinPortConfig[ucCh].Pin, (ucCh == INPUT_9) ? TIMER10_AF  : TIMER9_AF , MODE_OUT_PP);
 			    if (ucCh == INPUT_9)
 			    {
 			    	eRPMConfig(INPUT_9 ,RPM_CH1);

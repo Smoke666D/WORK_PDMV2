@@ -10,7 +10,7 @@
 
 
 #include "main.h"
-
+#include "hal_config.h"
 
 typedef enum
 {
@@ -35,14 +35,24 @@ typedef enum
     ADC_CH_18 = 18, /*!< ADC Channel 18 */
 } ADC_CH_T;
 
-typedef enum {
-	ADC_1 = 0,
-	ADC_2 = 1,
-	ADC_3 = 2
-} ADC_NUMBER_t;
+
+
+
+#if MCU == APM32
+	#define ADC_NUMBER_t ADC_T*
+	#define	ADC_1  ADC1
+	#define ADC_2  ADC2
+	#define ADC_3  ADC3
+#endif
+#if MCU == CH32
+	#define ADC_NUMBER_t ADC_TypeDef*
+	#define	ADC_1  ADC1
+	#define ADC_2  ADC2
+#endif
+
 
 void HAL_ADC_CommonConfig();
-void HAL_ADC_ContiniusScanCinvertioDMA( uint8_t ADC_NUMBER, uint8_t channel_count, uint8_t * channel_nmber);
+void HAL_ADC_ContiniusScanCinvertionDMA( ADC_NUMBER_t adc, uint8_t channel_count, uint8_t * channel_nmber);
 void HAL_ADC_TempEnable();
 void HAL_ADC_VrefEnable();
 void HAL_ADC_Enable(ADC_NUMBER_t adc_number);

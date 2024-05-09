@@ -48,8 +48,8 @@ void InitFilters()
 {
 	for (uint8_t i = 0; i < RPM_CHANNEL_COUNT; i++)
 	{
-	vInitMedianFilter(&RPM_MIDIAN_FILTER_STRUC[i]);
-	vInitRunAverga(&RPM_AVER_FILTER_STRUC[i],0.5);
+		vInitMedianFilter(&RPM_MIDIAN_FILTER_STRUC[i]);
+		vInitRunAverga(&RPM_AVER_FILTER_STRUC[i],0.5);
 	}
 }
 /*
@@ -109,8 +109,9 @@ DIN_FUNCTION_ERROR_t eSetDUT(OUT_NAME_TYPE ucCh, uint8_t state )
     #endif
         return ( eRes );
 }
-
-
+/*
+ *
+ */
 uint8_t eGrtDUT(OUT_NAME_TYPE ucCh)
 {
     #if DIN_PARAM_CHECK == 1
@@ -126,9 +127,9 @@ uint8_t eGrtDUT(OUT_NAME_TYPE ucCh)
           }
     #endif
 }
-
-
-
+/*
+ *
+ */
 DIN_FUNCTION_ERROR_t eDinConfigWtihStruct(DIN_INPUT_NAME ucCh, DinConfig_t * config)
 {
     DIN_FUNCTION_ERROR_t eRes = DIN_WRONG_CHANNEL_NUMBER ;
@@ -207,8 +208,9 @@ DIN_FUNCTION_ERROR_t eRPMConfig(DIN_INPUT_NAME ucCh, uint8_t ucRPM)
 #endif
     return ( eRes );
 }
-
-
+/*
+ *
+ */
 void vAddRPMData(DIN_INPUT_NAME ucCh, uint16_t data  )
 {
 	u8 Index = xDinConfig[ucCh].ucTempValue;
@@ -220,10 +222,9 @@ void vAddRPMData(DIN_INPUT_NAME ucCh, uint16_t data  )
 	}
 	xDinConfig[ucCh].RPMDATA->bValidFlag =  RPM_VALID;
 }
-
-
-
-
+/*
+ *
+ */
 static void vCheckRPM( DIN_INPUT_NAME ucCh )
 {
     xDinConfig[ucCh].ucValue++;
@@ -241,8 +242,9 @@ static void vCheckRPM( DIN_INPUT_NAME ucCh )
    }
    return;
 }
-
-
+/*
+ *
+ */
 void RMPDataConvert(DIN_INPUT_NAME ucCh)
 {
     int32_t u16temp;
@@ -261,8 +263,6 @@ void RMPDataConvert(DIN_INPUT_NAME ucCh)
     xDinConfig[ucCh].RPMDATA->BufferData =  RunAvrageFilter(xDinConfig[ucCh].RPMDATA->BufferData,&RPM_AVER_FILTER_STRUC[ucCh] );
     xDinConfig[ucCh].RPMDATA->bValidFlag =  RPM_VALID;
 }
-
-
 /*
  *
  */
@@ -294,7 +294,9 @@ DIN_FUNCTION_ERROR_t xGetRPM( DIN_INPUT_NAME ucCh, uint16_t * data)
     }
     return (DIN_NOT_CHANGE);
 }
-
+/*
+ *
+ */
 void vDinInitStateProcess()
 {
 
@@ -312,8 +314,9 @@ void vDinInitStateProcess()
 	         }
 	     }
 }
-
-
+/*
+ *
+ */
 void vDinDoutProcess()
 {
     for (uint8_t i = 0; i <DIN_COUNT; i++)
@@ -342,7 +345,6 @@ void vDinDoutProcess()
         xDoutConfig[i].setPortCallback(i, xDoutConfig[i].ucValue);
     }
 }
-
 /*
  *   Возвращает состония порта
 */
@@ -355,7 +357,6 @@ uint8_t ucDinGet( DIN_INPUT_NAME eChNum )
     return (xDinConfig[eChNum].ucValue);
 
 }
-
 /*
  *  Функция, запаковывает текущие состония входов в 32-битное слово.
  */

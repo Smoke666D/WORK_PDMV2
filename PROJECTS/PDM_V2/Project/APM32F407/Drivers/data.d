@@ -1,6 +1,9 @@
 Drivers/data.o: ../Drivers/data.c ../Drivers/data.h \
  ../Drivers/drivers_config.h \
- c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
+ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_gpio.h \
  c:\users\i.dymov\desktop\work\libraries\device\geehy\apm32f4xx\include\apm32f4xx.h \
  c:\users\i.dymov\desktop\work\libraries\cmsis\include\core_cm4.h \
  c:\users\i.dymov\desktop\work\libraries\cmsis\include\cmsis_version.h \
@@ -8,10 +11,10 @@ Drivers/data.o: ../Drivers/data.c ../Drivers/data.h \
  c:\users\i.dymov\desktop\work\libraries\cmsis\include\cmsis_gcc.h \
  c:\users\i.dymov\desktop\work\libraries\cmsis\include\mpu_armv7.h \
  c:\users\i.dymov\desktop\work\libraries\device\geehy\apm32f4xx\include\system_apm32f4xx.h \
+ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h \
  ../Drivers/lua_task.h \
  c:\users\i.dymov\desktop\work\projects\pdm_v2\include\main.h \
- c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_gpio.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_usart.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_misc.h \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\freertos.h \
@@ -59,7 +62,13 @@ Drivers/data.o: ../Drivers/data.c ../Drivers/data.h \
 
 ../Drivers/drivers_config.h:
 
-c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h:
+C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
+
+c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_gpio.h:
 
 c:\users\i.dymov\desktop\work\libraries\device\geehy\apm32f4xx\include\apm32f4xx.h:
 
@@ -75,13 +84,13 @@ c:\users\i.dymov\desktop\work\libraries\cmsis\include\mpu_armv7.h:
 
 c:\users\i.dymov\desktop\work\libraries\device\geehy\apm32f4xx\include\system_apm32f4xx.h:
 
+c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h:
+
 c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h:
 
 ../Drivers/lua_task.h:
 
 c:\users\i.dymov\desktop\work\projects\pdm_v2\include\main.h:
-
-c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_gpio.h:
 
 c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_usart.h:
 

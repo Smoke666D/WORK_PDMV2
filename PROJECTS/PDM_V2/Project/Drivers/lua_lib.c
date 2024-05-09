@@ -61,7 +61,6 @@
 			}
 			break;
 		case ONE_ARGUMENT:
-
 			RTC_ReadTime( RTC_FORMAT_BIN, &time_buffer );
 		    RTC_ReadDate( RTC_FORMAT_BIN, &date_buffer);
 			temp_time.Day 	 = date_buffer.date;
@@ -113,7 +112,6 @@
 						lua_pushnumber( L, fdata);
 						break;
 					case TIME_STAMP:
-
 						vGetRegToTime( d,  &data);
 						lua_pushnumber( L, data.Day);
 						lua_pushnumber( L, data.Month);
@@ -133,22 +131,24 @@
 	return ( TWO_RESULT );
 }
 
-
+/*
+ *
+ */
  int iSetRecord( lua_State *L )
  {
- 	   int start_index = 0;
- 	   uint8_t cd;
- 	   uint16_t sd;
- 	  uint8_t record[REGISTER_SIZE];
+ 	 int start_index = 0;
+ 	 uint8_t cd;
+ 	 uint16_t sd;
+ 	 uint8_t record[REGISTER_SIZE];
  	 uint32_t temp_int, temp_bool;
- 	float temp_float;
-        if (eGetReocrdFieldsType( 0 ) == RECORD_TIME_STAMP)
-        {
-     	   vSetRecordData(0,0);
-     	   start_index ++;
-        }
- 	   for (uint8_t i = 0; i < lua_gettop( L ) ; i++ )
- 	   {
+ 	 float temp_float;
+     if (eGetReocrdFieldsType( 0 ) == RECORD_TIME_STAMP)
+     {
+     	 vSetRecordData(0,0);
+     	 start_index ++;
+     }
+ 	 for (uint8_t i = 0; i < lua_gettop( L ) ; i++ )
+ 	 {
  			   switch ( eGetReocrdFieldsType( i + start_index ) )
  			   {
  			      case RECORD_ERROR:
@@ -184,7 +184,6 @@
  		   	   	    			break;
  		   	   	    		default:
  		   	   	    			break;
-
  		   	   	    }
  		   	    	vSetRecordData(i + start_index,record);
  		   	   		break;
@@ -195,6 +194,9 @@
  	  return ( NO_RESULT );
  }
 
+ /*
+  *
+  */
  int iSetStorageFormat( lua_State *L )
  {
 

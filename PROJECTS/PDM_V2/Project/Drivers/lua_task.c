@@ -184,9 +184,6 @@ static RESULT_t eIsLuaSkriptValid(const char* pcData, uint32_t size)
 }
 
 
-
-
-
 void vRegisterHWLib( lua_State *L1 )
 {
 	lua_register(L1,"CanTable",iCanSendTable);

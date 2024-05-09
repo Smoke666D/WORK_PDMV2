@@ -18,11 +18,9 @@
 #include "lua.h"
 
 
-static PDM_TELEMETRY telemetry  = { 0U };
-static PDM_DATA      systemData  __SECTION(RAM_SECTION_CCMRAM); ;
-
-static uint8_t nullString[ERROR_STRING_LENGTH] = { 0U };
-
+static PDM_TELEMETRY telemetry   					  __SECTION(RAM_SECTION_CCMRAM);
+static PDM_DATA      systemData 					  __SECTION(RAM_SECTION_CCMRAM);
+static uint8_t 		 nullString[ERROR_STRING_LENGTH]  __SECTION(RAM_SECTION_CCMRAM);
 
 void vDATAinit ( void )
 {
@@ -41,6 +39,8 @@ void vDATAinit ( void )
   systemData.lua.major        = atoi( LUA_VERSION_MAJOR );
   systemData.lua.minor        = atoi( LUA_VERSION_MINOR );
   systemData.lua.patch        = atoi( LUA_VERSION_RELEASE );
+  memset((uint8_t * )&telemetry, 0, sizeof( PDM_TELEMETRY ) );
+  memset( nullString, 0 ,ERROR_STRING_LENGTH);
   return;
 }
 
@@ -86,19 +86,30 @@ static uint8_t uDATAget ( uint8_t adr, uint8_t size, uint8_t* out, uint8_t* data
   ( void )memcpy( out, source, length );
   return length;
 }
-
+/*
+ *
+ */
 uint32_t ulDATAgetTelemetryLength ( void )
 {
   return sizeof( PDM_TELEMETRY );
 }
+/*
+ *
+ */
 uint32_t ulDATAgetSystemLength ( void )
 {
   return sizeof( PDM_DATA );
 }
+/*
+ *
+ */
 uint8_t uDATAgetTelemetry ( uint8_t adr, uint8_t size, uint8_t* out )
 {
   return uDATAget( adr, size, out, ( uint8_t* )&telemetry, sizeof( PDM_TELEMETRY ) );
 }
+/*
+ *
+ */
 uint8_t uDATAgetErrorString ( uint8_t adr, uint8_t size, uint8_t* out )
 {
   uint8_t  len = ERROR_STRING_LENGTH;
@@ -109,7 +120,9 @@ uint8_t uDATAgetErrorString ( uint8_t adr, uint8_t size, uint8_t* out )
   }
   return uDATAget( adr, size, out, src, len );
 }
-
+/*
+ *
+ */
 uint8_t uDATAgetSystem ( uint8_t adr, uint8_t size, uint8_t* out )
 {
   return uDATAget( adr, size, out, ( uint8_t* )&systemData, sizeof( PDM_DATA ) );

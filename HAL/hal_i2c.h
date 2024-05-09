@@ -10,20 +10,26 @@
 
 #include "main.h"
 #include "system_init.h"
+#include "hal_config.h"
 
 
-#define PLATFORM  APM32
 
-#if PLATFORM == APM32
+#if MCU == APM32
 #include "apm32f4xx_i2c.h"
-#define I2C_t I2C_T *
+
 #endif
 
-typedef enum
-{
-I2C_1 = 0,
-I2C_2 = 1,
-} I2C_NAME_t;
+
+#if MCU == APM32
+#define I2C_1  I2C1
+#define I2C_2  I2C2
+#define  I2C_NAME_t I2C_T*
+#endif
+#if MCU == CH32
+#define I2C_1  I2C1
+#define I2C_2  I2C2
+#define I2C_NAME_t I2C_TypeDef *
+#endif
 
 void InitI2CDMA( I2C_NAME_t i2c);
 void I2C1_EV_IRQHandler( void );

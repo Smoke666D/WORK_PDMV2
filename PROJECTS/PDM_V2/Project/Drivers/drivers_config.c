@@ -14,7 +14,7 @@ static TIMER_Type * base_timer;
 void vHWLilBaseTimerInit(TIMER_Type * tim )
 {
 	base_timer  = tim;
-#if PLATFORM == RISC
+#if PLATFORM == CH32
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     //Таймер управляющий индикацие
     TIM_DeInit(tim );

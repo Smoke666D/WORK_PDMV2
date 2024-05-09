@@ -14,47 +14,32 @@
 #include "hw_lib_can.h"
 #include "apm32f4xx.h"
 
-static CAN_ERROR_TYPE eCanError  	__section( TASK_RAM_SECTION ) ;
-QueueHandle_t pCanRXHandle    		__section( TASK_RAM_SECTION ) ;
-QueueHandle_t pCanTXHandle   		__section( TASK_RAM_SECTION ) ;
-//EventGroupHandle_t xCANstatusEvent  __section( TASK_RAM_SECTION ) ;
+static CAN_ERROR_TYPE eCanError  		__section( TASK_RAM_SECTION ) ;
+static QueueHandle_t pCanRXHandle    	__section( TASK_RAM_SECTION ) ;
+static QueueHandle_t pCanTXHandle   	__section( TASK_RAM_SECTION ) ;
+static uint16_t boundrate_can1 			__section( TASK_RAM_SECTION ) ;
 static CANRX * MailBoxBuffer;
 static TaskHandle_t  pCanRXTaskHandle  	__SECTION(RAM_SECTION_CCMRAM);
 static TaskHandle_t  pCanTXTaskHandle  	__SECTION(RAM_SECTION_CCMRAM);
 
+
+/*
+ *
+ */
 TaskHandle_t * xGetCanRXTaskHandle()
 {
 	return  &pCanRXTaskHandle ;
 }
+/*
+ *
+ */
 TaskHandle_t * xGetCanTXTaskHandle()
 {
 	return  &pCanTXTaskHandle ;
 }
-
-
-static void vCANHWInit()
-{
-
-	GPIO_Config_T gpioConfigStruct;
-	gpioConfigStruct.mode = GPIO_MODE_AF;
-	gpioConfigStruct.pin = GPIO_PIN_0|GPIO_PIN_1;
-	gpioConfigStruct.otype = GPIO_OTYPE_PP;
-	gpioConfigStruct.pupd = GPIO_PUPD_NOPULL;
-	gpioConfigStruct.speed = GPIO_SPEED_100MHz  ;
-	GPIO_Config(GPIOG, &gpioConfigStruct);
-
-	GPIO_ConfigPinAF(GPIOG, GPIO_PIN_SOURCE_0, GPIO_AF_CAN1);
-	GPIO_ConfigPinAF(GPIOG, GPIO_PIN_SOURCE_1, GPIO_AF_CAN1);
-
-}
-
-/*EventGroupHandle_t * pCANEventGet()
-{
-
-	return (&xCANstatusEvent);
-}*/
-
-
+/*
+ *
+*/
 QueueHandle_t* pCANRXgetQueue ( void )
 {
   return ( &pCanRXHandle );
@@ -111,7 +96,8 @@ void vCanInsertToRXQueue(CAN_FRAME_TYPE * data)
 void vCANinit()
 {
 	eCanError = CAN_OFF;
-	vCANHWInit();
+	HAL_InitGpioAF(PORT_G, GPIO_PIN_0,  GPIO_AF_CAN1, MODE_OUT_PP );
+    HAL_InitGpioAF(PORT_G, GPIO_PIN_1,  GPIO_AF_CAN1 ,MODE_OUT_PP);
 	vInitMailBoxBuffer();
 	MailBoxBuffer = getMailBox();
 	//xEventGroupSetBits(xCANstatusEvent, CANT_TX0_FREE | CANT_TX1_FREE |CANT_TX2_FREE);
@@ -228,7 +214,7 @@ void CO_CANmodule_init(  uint16_t   CANbitRate)
 
 }
 
-static uint16_t boundrate_can1;
+
 /*
  *
  */

@@ -426,7 +426,7 @@ static void vHWOutInit(OUT_NAME_TYPE out_name, TimerName_t ptim, uint8_t uiChann
 			default:
 				break;
 		}
-		HAL_InitGpioAF( OutPort,  OutPin,  AF ,GPIO_OTYPE_PP );
+		HAL_InitGpioAF( OutPort,  OutPin,  AF ,MODE_OUT_PP );
 		RESET_FLAG(out_name,CONTROL_FLAGS );
 		SET_STATE_FLAG(out_name, FSM_OFF_STATE );
 		if (out_name < OUT_HPOWER_COUNT)
@@ -859,9 +859,9 @@ void AinNotifyTaskToInit()
    uint8_t ADC1_CHANNEL[9] = { ADC_CH_4,  ADC_CH_7, ADC_CH_6, ADC_CH_5,  ADC_CH_14, ADC_CH_15, ADC_CH_8,  ADC_CH_16, ADC_CH_9};
    uint8_t ADC2_CHANNEL[7] = { ADC_CH_11, ADC_CH_0, ADC_CH_1, ADC_CH_13, ADC_CH_12, ADC_CH_3,  ADC_CH_2 };
    uint8_t ADC3_CHANNEL[9] = { ADC_CH_14, ADC_CH_9, ADC_CH_7, ADC_CH_4,  ADC_CH_15, ADC_CH_8,  ADC_CH_10, ADC_CH_6, ADC_CH_5};
-   HAL_ADC_ContiniusScanCinvertioDMA( 1 ,  9 ,  ADC1_CHANNEL);
-   HAL_ADC_ContiniusScanCinvertioDMA( 2 ,  7 ,  ADC2_CHANNEL);
-   HAL_ADC_ContiniusScanCinvertioDMA( 3 ,  9 ,  ADC3_CHANNEL);
+   HAL_ADC_ContiniusScanCinvertionDMA( 1 ,  9 ,  ADC1_CHANNEL);
+   HAL_ADC_ContiniusScanCinvertionDMA( 2 ,  7 ,  ADC2_CHANNEL);
+   HAL_ADC_ContiniusScanCinvertionDMA( 3 ,  9 ,  ADC3_CHANNEL);
    HAL_ADC_TempEnable();
    HAL_ADC_VrefEnable();
    HAL_ADC_Enable(ADC_1);

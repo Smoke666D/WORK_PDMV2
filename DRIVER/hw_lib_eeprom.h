@@ -16,14 +16,14 @@
 #define EEPROM_ADRESS_TYPE uint16_t
 #define EEPROM_MAX_ADRRES 0x7FF
 
-#if  PLATFORM == APM32
+#if  MCU == APM32
 #include "apm32f4xx_i2c.h"
 #define I2C_T I2C_T
-#define  DIR_TRANSMIT    I2C_DIRECTION_TX
+#define  DIR_TRANSMIT     I2C_DIRECTION_TX
 #define  DIR_RECIEVE      I2C_DIRECTION_RX
 
 #endif
-#if  PLATFORM == RISC
+#if  MCU == CH32
 
 #define  DIR_TRANSMIT I2C_Direction_Transmitter
 #define  DIR_RECIEVE  I2C_Direction_Receiver
@@ -82,7 +82,6 @@ typedef struct
    uint8_t * ReciveBuffer;
    I2C_NAME_t dev;
    TaskHandle_t NotifyTaskHeandle;
-   uint8_t DMA_RX;
    uint8_t DMA_TX;
    EERPOM_ERROR_CODE_t (*I2C_Master_Recive_func) (  u8 , u16,  u8 * , u16 , u32 ,u8 );
    EERPOM_ERROR_CODE_t (*I2C_Master_Transmit_func)( u8 , u8 * , u16 , u32 ,u8 );

@@ -23,6 +23,9 @@ HW_LIB/hw_lib_datastorage.o: \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\list.h \
  C:/Users/i.dymov/Desktop/WORK/DRIVER/hw_lib_eeprom.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h \
  C:\Users\i.dymov\Desktop\WORK\HAL/hal_i2c.h \
@@ -99,6 +102,12 @@ c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\s
 C:/Users/i.dymov/Desktop/WORK/DRIVER/hw_lib_eeprom.h:
 
 C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
 
 c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h:
 

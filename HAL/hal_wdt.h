@@ -9,8 +9,8 @@
 #define HAL_HAL_WDT_H_
 
 #include "main.h"
+#include "hal_config.h"
 
-//#define WDT
 
 void HAL_WDTInit();
 void HAL_WDTReset();

@@ -9,10 +9,8 @@
 #define DRIVERS_DRIVERS_CONFIG_H_
 
 
-#define APM32     0
-#define RISC      1
+#include "board_define.h"
 
-#define PLATFORM  APM32
 
 
 #define USB_PULLUP_Pin GPIO_PIN_6
@@ -211,6 +209,8 @@
 #define OUT20_PIN  InCH8_20_Pin
 #define OUT20_PORT InCH8_20_GPIO_Port
 
+
+#define EEPROM_I2C  I2C_2
 /***********************************/
 //Конфигурация DIN
 /**********************************/
@@ -259,11 +259,11 @@ typedef enum {
 
 
 
-#if PLATFORM == RISC
+#if MCU == CH32
     #include "ch32v20x_tim.h"
 	#define TIMER_Type TIM_TypeDef
 #endif
-#if PLATFORM == APM32
+#if MCU == APM32
 	#include "apm32f4xx_tmr.h"
     #include "apm32f4xx_rcm.h"
 	#define TIMER_Type TMR_T

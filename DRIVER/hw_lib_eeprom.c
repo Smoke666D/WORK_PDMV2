@@ -7,25 +7,26 @@
 
 
 #include "hw_lib_eeprom.h"
+#include "drivers_config.h"
 #include "string.h"
-#include "system_init.h"
+//#include "system_init.h"
 #include "hal_wdt.h"
 //#include "FreeRTOS.h"
 //#include "event_groups.h"
 
 
 
-
-static EEPOROM  Dev 							__SECTION(RAM_SECTION_CCMRAM);
+static uint8_t sector_buffer[SECTOR_SIZE + ADDRESS_DATA] 	__SECTION(RAM_SECTION_RAM);
+static EEPOROM Dev 							         		__SECTION(RAM_SECTION_CCMRAM);
 static void vSetAddr(EEPROM_ADRESS_TYPE addr );
 
-static uint8_t sector_buffer[SECTOR_SIZE + ADDRESS_DATA] __SECTION(RAM_SECTION_RAM);
+
 
 
  void vInitEEPROM()
  {
 
-	 InitI2CDMA( I2C_2);
+	 InitI2CDMA(EEPROM_I2C);
  }
 
 EEPOROM * xGetEEPROM()
@@ -53,7 +54,6 @@ EERPOM_ERROR_CODE_t eEEPROMWr(  EEPROM_ADRESS_TYPE addr, uint8_t * data, EEPROM_
          EEPROM_ADRESS_TYPE byte_to_send = len;
          EEPROM_ADRESS_TYPE offset = 0;
          EEPROM_ADRESS_TYPE cur_addr = addr;
-         uint32_t timeout = 0;
          while  (byte_to_send > 0)
          {
              cur_len = SECTOR_SIZE - ( cur_addr % SECTOR_SIZE );

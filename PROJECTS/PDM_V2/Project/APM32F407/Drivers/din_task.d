@@ -43,6 +43,9 @@ Drivers/din_task.o: ../Drivers/din_task.c ../Drivers/din_task.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/filters.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_din.h \
@@ -137,6 +140,12 @@ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h:
 
 C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
 
 C:\Users\i.dymov\Desktop\WORK\DRIVER/filters.h:
 

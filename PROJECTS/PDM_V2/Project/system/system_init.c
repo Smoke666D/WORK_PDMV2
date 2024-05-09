@@ -55,7 +55,7 @@ static StackType_t dinTaskBuffer[DIN_TASK_STACK_SIZE]           __section( TASK_
 static StackType_t adcTaskBuffer[ADC_TASK_STACK_SIZE]           __section( TASK_RAM_SECTION );
 static StackType_t canTXTaskBuffer[CAN_TX_TASK_STACK_SIZE]      __section( TASK_RAM_SECTION );
 static StackType_t canRXTaskBuffer[CAN_RX_TASK_STACK_SIZE]      __section( TASK_RAM_SECTION );
-static StackType_t defaultTaskBuffer[DEFAULT_TASK_STACK_SIZE]      __section( TASK_RAM_SECTION );
+static StackType_t defaultTaskBuffer[DEFAULT_TASK_STACK_SIZE]   __section( TASK_RAM_SECTION );
 static StaticTask_t usbTaskControlBlock          				__section( TASK_RAM_SECTION );
 static StaticTask_t luaTaskControlBlock          			    __section( TASK_RAM_SECTION );
 static StaticTask_t dinTaskControlBlock           				__section( TASK_RAM_SECTION );
@@ -90,8 +90,6 @@ void vSYSqueueInit ( void )
 {
   *( pCANRXgetQueue() ) = xQueueCreate( CANRX_QUEUE_SIZE, sizeof( CAN_FRAME_TYPE));
   *( pCANTXgetQueue() ) = xQueueCreate( CANTX_QUEUE_SIZE, sizeof( CAN_TX_FRAME_TYPE ) );
- // *(  pEEPROMgetQueue ())  =xQueueCreate( EEPROMTX_QUEUE_SIZE, sizeof( EEPROM_SECTOR_t ) );
-//  *(  pEEPROMgetRXQueue ())  =xQueueCreate( 1, sizeof( EEPROM_SECTOR_t ) );
 }
 /*----------------------------------------------------------------------------*/
 void vSYSeventInit ( void )
