@@ -10,23 +10,15 @@
 
 
 #include "main.h"
-
+#include "hal_can.h"
 
 #define MAILBOXSIZE  14*4
 
 
-#define CAN_EXT_FLAG   0x80000000
-/* CAN masks for identifiers */
-#define CANID_MASK                              0x07FF  /*!< CAN standard ID mask */
-#define FLAG_RTR                                0x8000  /*!< RTR flag, part of identifier */
 
-/* Transmit message object */
-typedef struct {
-    uint32_t ident;
-    uint8_t DLC;
-    uint8_t data[8];
 
-} CAN_TX_FRAME_TYPE;
+
+
 
 typedef struct {
     uint16_t ident;
@@ -36,12 +28,7 @@ typedef struct {
     uint8_t new_data;
 } CANRX;
 
-typedef struct {
-	uint32_t ident;
-	uint8_t DLC;
-    uint8_t data[8];
-    uint16_t filter_id;
-} CAN_FRAME_TYPE;
+
 
 typedef enum {
 	CAN_OFF		 	= 0,

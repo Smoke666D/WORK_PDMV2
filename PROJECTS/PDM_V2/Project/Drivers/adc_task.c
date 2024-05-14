@@ -229,7 +229,7 @@ void vHWOutEnable(OUT_NAME_TYPE out_name)
 {
 	if ( out_name < OUT_COUNT )
 	{
-		vHAL_SetBit(out[out_name].CS_PORT, out[out_name].CS_Pin );
+		HAL_SetBit(out[out_name].CS_PORT, out[out_name].CS_Pin );
 	}
 }
 
@@ -240,7 +240,7 @@ void vHWOutDisable(OUT_NAME_TYPE out_name)
 {
 	if ( out_name < OUT_COUNT )
 	{
-		vHAL_ResetBit(  out[out_name].CS_PORT, out[out_name].CS_Pin);
+		HAL_ResetBit(  out[out_name].CS_PORT, out[out_name].CS_Pin);
 	}
 }
 
@@ -251,7 +251,7 @@ void vHWOutDisable(OUT_NAME_TYPE out_name)
  */
 static void vHWOutSet( OUT_NAME_TYPE out_name )
 {
-   vHAL_EnablePWMCH(out[out_name].ptim,out[out_name].channel);
+   HAL_TIMER_EnablePWMCH(out[out_name].ptim,out[out_name].channel);
    return;
 }
 
@@ -279,7 +279,7 @@ void vOutSetState(OUT_NAME_TYPE out_name, uint8_t state)
  */
 void vHWOutOFF( uint8_t ucChannel )
 {
-	vHW_L_LIB_DisablePWMCH(out[ucChannel].ptim,out[ucChannel].channel );
+	HAL_TIMER_DisablePWMCH(out[ucChannel].ptim,out[ucChannel].channel );
 	out[ucChannel].POWER_SOFT = 0;
 	return;
 }
@@ -363,7 +363,7 @@ ERROR_CODE vOutSetPWM(OUT_NAME_TYPE out_name, uint8_t PWM)
 			{
 				pulse = 1001;
 			}
-			vHW_L_LIB_SetPWMPulse( out[out_name].ptim, out[out_name].channel,  pulse );
+			HAL_TIMER_SetPWMPulse( out[out_name].ptim, out[out_name].channel,  pulse );
 			if (   IS_FLAG_RESET(out_name, FSM_ERROR_STATE) &&   IS_FLAG_RESET(out_name, FSM_OFF_STATE) ) //Если выход вклчюен и не находится в каком-то переходном процессе
 			{
 				vHWOutSet( out_name );
@@ -466,12 +466,12 @@ static void vHWOutInit(OUT_NAME_TYPE out_name, TimerName_t ptim, uint8_t uiChann
 void vOutInit( void )
 {
 	//Инициализация всех каналов таймеров PWM
-	vHW_L_LIB_PWMTimersInit(TIMER4, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 | TIM_CHANNEL_3 | TIM_CHANNEL_4);
-	vHW_L_LIB_PWMTimersInit(TIMER2, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 | TIM_CHANNEL_3 | TIM_CHANNEL_4);
-	vHW_L_LIB_PWMTimersInit(TIMER1, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 | TIM_CHANNEL_3 | TIM_CHANNEL_4);
-	vHW_L_LIB_PWMTimersInit(TIMER3, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 );
-	vHW_L_LIB_PWMTimersInit(TIMER8, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 | TIM_CHANNEL_3 | TIM_CHANNEL_4);
-	vHW_L_LIB_PWMTimersInit(TIMER12, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 );
+	HAL_TIMER_PWMTimersInit(TIMER4, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 | TIM_CHANNEL_3 | TIM_CHANNEL_4);
+	HAL_TIMER_PWMTimersInit(TIMER2, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 | TIM_CHANNEL_3 | TIM_CHANNEL_4);
+	HAL_TIMER_PWMTimersInit(TIMER1, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 | TIM_CHANNEL_3 | TIM_CHANNEL_4);
+	HAL_TIMER_PWMTimersInit(TIMER3, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 );
+	HAL_TIMER_PWMTimersInit(TIMER8, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 | TIM_CHANNEL_3 | TIM_CHANNEL_4);
+	HAL_TIMER_PWMTimersInit(TIMER12, 1000000, 1000, TIM_CHANNEL_1 | TIM_CHANNEL_2 );
 	vHWOutInit(OUT_1, TIMER4, TIM_CHANNEL_3, Cs_Dis20_1_GPIO_Port,Cs_Dis20_1_Pin, OUT1_PORT ,OUT1_PIN );
 	vHWOutInit(OUT_2, TIMER4, TIM_CHANNEL_4, Cs_Dis20_2_GPIO_Port,Cs_Dis20_2_Pin, OUT2_PORT ,OUT2_PIN  );
 	vHWOutInit(OUT_3, TIMER2, TIM_CHANNEL_1, Cs_Dis20_3_GPIO_Port,Cs_Dis20_3_Pin, OUT3_PORT ,OUT3_PIN );
@@ -797,9 +797,9 @@ void AinNotifyTaskToInit()
 	   	   case ADC_RUN1_STATE:
 	   		    vTaskDelayUntil( &xLastWakeTime, xPeriod );											//Запускаем преобразование на 3-х АЦП
 	   		    ulTaskNotifyValueClearIndexed(NULL, 1, 0xFFFF);
-	   		    HAL_ADC_StartDMA( Stream_4, (uint16_t *)getADC1Buffer(), ( ADC_FRAME_SIZE * ADC1_CHANNELS ));
-	   		    HAL_ADC_StartDMA( Stream_2, (uint16_t *)getADC2Buffer(), ( ADC_FRAME_SIZE * ADC2_CHANNELS ));
-	   		    HAL_ADC_StartDMA( Stream_0, (uint16_t *)getADC3Buffer(), ( ADC_FRAME_SIZE * ADC3_CHANNELS ));
+	   		    HAL_ADC_StartDMA( DMA2_CH4, (uint16_t *)getADC1Buffer(), ( ADC_FRAME_SIZE * ADC1_CHANNELS ));
+	   		    HAL_ADC_StartDMA( DMA2_CH2, (uint16_t *)getADC2Buffer(), ( ADC_FRAME_SIZE * ADC2_CHANNELS ));
+	   		    HAL_ADC_StartDMA( DMA2_CH0, (uint16_t *)getADC3Buffer(), ( ADC_FRAME_SIZE * ADC3_CHANNELS ));
 	   		    state = ADC_WHAIT_CONVERSION_STATE;
 	   		    break;
 	   	   case ADC_WHAIT_CONVERSION_STATE:
@@ -859,17 +859,17 @@ void AinNotifyTaskToInit()
    uint8_t ADC1_CHANNEL[9] = { ADC_CH_4,  ADC_CH_7, ADC_CH_6, ADC_CH_5,  ADC_CH_14, ADC_CH_15, ADC_CH_8,  ADC_CH_16, ADC_CH_9};
    uint8_t ADC2_CHANNEL[7] = { ADC_CH_11, ADC_CH_0, ADC_CH_1, ADC_CH_13, ADC_CH_12, ADC_CH_3,  ADC_CH_2 };
    uint8_t ADC3_CHANNEL[9] = { ADC_CH_14, ADC_CH_9, ADC_CH_7, ADC_CH_4,  ADC_CH_15, ADC_CH_8,  ADC_CH_10, ADC_CH_6, ADC_CH_5};
-   HAL_ADC_ContiniusScanCinvertionDMA( 1 ,  9 ,  ADC1_CHANNEL);
-   HAL_ADC_ContiniusScanCinvertionDMA( 2 ,  7 ,  ADC2_CHANNEL);
-   HAL_ADC_ContiniusScanCinvertionDMA( 3 ,  9 ,  ADC3_CHANNEL);
+   HAL_ADC_ContiniusScanCinvertionDMA( ADC_1 ,  9 ,  ADC1_CHANNEL);
+   HAL_ADC_ContiniusScanCinvertionDMA( ADC_2 ,  7 ,  ADC2_CHANNEL);
+   HAL_ADC_ContiniusScanCinvertionDMA( ADC_3 ,  9 ,  ADC3_CHANNEL);
    HAL_ADC_TempEnable();
    HAL_ADC_VrefEnable();
    HAL_ADC_Enable(ADC_1);
    HAL_ADC_Enable(ADC_2);
    HAL_ADC_Enable(ADC_3);
-   HAL_DMA2InitIT( Stream_4 ,  PTOM, DMA_HWORD, (uint32_t)&ADC1->REGDATA, DMA_CH_0, &ADC1_Ready);
-   HAL_DMA2InitIT( Stream_2 ,  PTOM, DMA_HWORD, (uint32_t)&ADC2->REGDATA, DMA_CH_1, &ADC2_Ready);
-   HAL_DMA2InitIT( Stream_0 ,  PTOM, DMA_HWORD, (uint32_t)&ADC3->REGDATA, DMA_CH_2, &ADC3_Ready);
+   HAL_DMAInitIT( DMA2_CH4 ,  PTOM, DMA_HWORD, (uint32_t)&ADC1->REGDATA, 0, DMA_CH_0, &ADC1_Ready);
+   HAL_DMAInitIT( DMA2_CH2 ,  PTOM, DMA_HWORD, (uint32_t)&ADC2->REGDATA, 0, DMA_CH_1, &ADC2_Ready);
+   HAL_DMAInitIT( DMA2_CH0 ,  PTOM, DMA_HWORD, (uint32_t)&ADC3->REGDATA, 0, DMA_CH_2, &ADC3_Ready);
 
  }
 

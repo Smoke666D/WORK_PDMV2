@@ -133,21 +133,14 @@ uint8_t eGrtDUT(OUT_NAME_TYPE ucCh)
 DIN_FUNCTION_ERROR_t eDinConfigWtihStruct(DIN_INPUT_NAME ucCh, DinConfig_t * config)
 {
     DIN_FUNCTION_ERROR_t eRes = DIN_WRONG_CHANNEL_NUMBER ;
-#if DIN_PARAM_CHECK == 1
-    if (( ucCh <DIN_COUNT) && ( xDinConfig[ucCh].eInputType != RPM_CONFIG ))
-    {
-#endif
-           xDinConfig[ucCh].eInputType = config->eInputType;
-           xDinConfig[ucCh].ucValue    = (xDinConfig[ucCh].eInputType == DIN_CONFIG_POSITIVE ) ? 0U : 1U;
-           xDinConfig[ucCh].ulHighCounter = config->ulHighCounter;
-           xDinConfig[ucCh].ulLowCounter = config->ulLowCounter;
-           xDinConfig[ucCh].getPortCallback = config->getPortCallback;
-           xDinConfig[ucCh].ucTempValue = xDinConfig[ucCh].ucValue;
-           xDinConfig[ucCh].ulCounter = 0;
-           eRes = DIN_CONFIG_OK;
-#if DIN_PARAM_CHECK == 1
-    }
-#endif
+    xDinConfig[ucCh].eInputType = config->eInputType;
+    xDinConfig[ucCh].ucValue    = (xDinConfig[ucCh].eInputType == DIN_CONFIG_POSITIVE ) ? 0U : 1U;
+    xDinConfig[ucCh].ulHighCounter = config->ulHighCounter;
+    xDinConfig[ucCh].ulLowCounter = config->ulLowCounter;
+    xDinConfig[ucCh].getPortCallback = config->getPortCallback;
+    xDinConfig[ucCh].ucTempValue = xDinConfig[ucCh].ucValue;
+    xDinConfig[ucCh].ulCounter = 0;
+    eRes = DIN_CONFIG_OK;
     return ( eRes );
 
 }
@@ -157,10 +150,6 @@ DIN_FUNCTION_ERROR_t eDinConfigWtihStruct(DIN_INPUT_NAME ucCh, DinConfig_t * con
  */
 uint8_t uGetDIN(DIN_INPUT_NAME ucCh)
 {
-#if DIN_PARAM_CHECK == 1
-    if ( ucCh >= DIN_COUNT)
-     return (RESET);
-#endif
     return (xDinConfig[ucCh].ucValue);
 }
 
@@ -222,6 +211,28 @@ void vAddRPMData(DIN_INPUT_NAME ucCh, uint16_t data  )
 	}
 	xDinConfig[ucCh].RPMDATA->bValidFlag =  RPM_VALID;
 }
+
+
+
+void RMPDataConvert(DIN_INPUT_NAME ucCh)
+{
+    int32_t u16temp;
+    xDinConfig[ucCh].RPMDATA->BufferData = 0;
+    for (u8 i=1;i< CC_BUFFER_SIZE;i++)
+    {
+       u16temp = xDinConfig[ucCh].RPMDATA->Data[i] -xDinConfig[ucCh].RPMDATA->Data[i-1];
+       if (u16temp <0 )
+       {
+           u16temp = ( CC_PERIOD -  xDinConfig[ucCh].RPMDATA->Data[i-1]) + xDinConfig[ucCh].RPMDATA->Data[i];
+       }
+       xDinConfig[ucCh].RPMDATA->BufferData =+ u16temp;
+    }
+    xDinConfig[ucCh].RPMDATA->BufferData = (xDinConfig[ucCh].RPMDATA->BufferData/CC_BUFFER_SIZE)<<1;
+    xDinConfig[ucCh].RPMDATA->BufferData =  MedianFilter(xDinConfig[ucCh].RPMDATA->BufferData,&RPM_MIDIAN_FILTER_STRUC[ucCh]);
+    xDinConfig[ucCh].RPMDATA->BufferData =  RunAvrageFilter(xDinConfig[ucCh].RPMDATA->BufferData,&RPM_AVER_FILTER_STRUC[ucCh] );
+    xDinConfig[ucCh].RPMDATA->bValidFlag =  RPM_VALID;
+}
+
 /*
  *
  */
@@ -242,27 +253,7 @@ static void vCheckRPM( DIN_INPUT_NAME ucCh )
    }
    return;
 }
-/*
- *
- */
-void RMPDataConvert(DIN_INPUT_NAME ucCh)
-{
-    int32_t u16temp;
-    xDinConfig[ucCh].RPMDATA->BufferData = 0;
-    for (u8 i=1;i< CC_BUFFER_SIZE;i++)
-    {
-       u16temp = xDinConfig[ucCh].RPMDATA->Data[i] -xDinConfig[ucCh].RPMDATA->Data[i-1];
-       if (u16temp <0 )
-       {
-           u16temp = ( CC_PERIOD -  xDinConfig[ucCh].RPMDATA->Data[i-1]) + xDinConfig[ucCh].RPMDATA->Data[i];
-       }
-       xDinConfig[ucCh].RPMDATA->BufferData =+ u16temp;
-    }
-    xDinConfig[ucCh].RPMDATA->BufferData = (xDinConfig[ucCh].RPMDATA->BufferData/CC_BUFFER_SIZE)<<1;
-    xDinConfig[ucCh].RPMDATA->BufferData =  MedianFilter(xDinConfig[ucCh].RPMDATA->BufferData,&RPM_MIDIAN_FILTER_STRUC[ucCh]);
-    xDinConfig[ucCh].RPMDATA->BufferData =  RunAvrageFilter(xDinConfig[ucCh].RPMDATA->BufferData,&RPM_AVER_FILTER_STRUC[ucCh] );
-    xDinConfig[ucCh].RPMDATA->bValidFlag =  RPM_VALID;
-}
+
 /*
  *
  */

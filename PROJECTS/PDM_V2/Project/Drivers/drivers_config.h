@@ -209,6 +209,9 @@
 #define OUT20_PIN  InCH8_20_Pin
 #define OUT20_PORT InCH8_20_GPIO_Port
 
+#define 			IPS_OUTS
+
+
 
 #define EEPROM_I2C  I2C_2
 /***********************************/

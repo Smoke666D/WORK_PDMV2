@@ -24,7 +24,7 @@
 
 
 #define CC_BUFFER_SIZE 21
-#define CC_PERIOD      60000
+
 
 typedef enum
 {
@@ -136,6 +136,7 @@ typedef enum {
 
 //#define  ucDinGet( a )  uGetDIN( a )
 void InitDinStcurt();
+void RMPDataConvert(DIN_INPUT_NAME ucCh);
 DIN_INPUT_TYPE xGetDinType(DIN_INPUT_NAME ucCh);
 void vRecinfigDin(  DIN_INPUT_NAME ucCh, DinConfig_t * config    );
 void vDinInitStateProcess();

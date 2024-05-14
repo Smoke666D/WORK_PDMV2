@@ -56,6 +56,8 @@ Drivers/lua_lib.o: ../Drivers/lua_lib.c ../Drivers/lua_lib.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
  ../Drivers/can_task.h ../Drivers/drivers_config.h ../Drivers/din_task.h \
  ../Drivers/adc_task.h C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_can.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/hal_can.h \
+ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_can.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_datastorage.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_eeprom.h \
  C:\Users\i.dymov\Desktop\WORK\HAL/hal_i2c.h \
@@ -188,6 +190,10 @@ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h:
 ../Drivers/adc_task.h:
 
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_can.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_can.h:
+
+c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_can.h:
 
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_datastorage.h:
 

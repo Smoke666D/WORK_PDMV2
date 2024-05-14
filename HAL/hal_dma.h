@@ -10,21 +10,34 @@
 
 
 #include "main.h"
+#include "hal_config.h"
 #include "system_init.h"
 
-typedef enum
-{
-  Stream_0,
-  Stream_1,
-  Stream_2,
-  Stream_3,
-  Stream_4,
-  Stream_5,
-  Stream_6,
-  Stream_7,
-  Stream_8,
 
-} DMA_Stram_t;
+#if MCU == APM32
+#define DMA_Stram_t DMA_Stream_T*
+#define DMA2_CH0  	DMA2_Stream0
+#define DMA2_CH1  	DMA2_Stream1
+#define DMA2_CH2  	DMA2_Stream2
+#define DMA2_CH3  	DMA2_Stream3
+#define DMA2_CH4  	DMA2_Stream4
+#define DMA2_CH5  	DMA2_Stream5
+#define DMA2_CH6  	DMA2_Stream6
+#define DMA2_CH7  	DMA2_Stream7
+#define DMA2_CH8  	DMA2_Stream8
+#endif
+#if MCU == CH32
+#define DMA_Stram_t DMA_Channel_TypeDef *
+
+#define DMA1_CH1  	DMA1_Channel1
+#define DMA1_CH2  	DMA1_Channel2
+#define DMA1_CH3  	DMA1_Channel3
+#define DMA1_CH4  	DMA1_Channel4
+#define DMA1_CH5  	DMA1_Channel5
+#define DMA1_CH6  	DMA1_Channel6
+#define DMA1_CH7  	DMA1_Channel7
+#define DMA1_CH8  	DMA1_Channel8
+#endif
 
 typedef enum
 {
@@ -59,10 +72,16 @@ typedef struct
 
 } DMA_CFG_t;
 
+
+void HAL_DMA_Enable(DMA_Stram_t stream  );
+void HAL_DMA_Disable(DMA_Stram_t stream  );
+void HAL_DMA_SetCounter( DMA_Stram_t stream, uint32_t counter );
 void HAL_ADC_StartDMA( DMA_Stram_t chanel, uint16_t * data, uint16_t size);
+#if MCU == APM32
 void DMA2_STR4_IRQHandler( void );
 void DMA2_STR2_IRQHandler( void );
 void DMA2_STR0_IRQHandler( void );
-void HAL_DMA2InitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, DMA_CHANNEL_t channel, void (*f)(void));
+#endif
+void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, uint32_t memadr, DMA_CHANNEL_t channel, void (*f)(void));
 
 #endif /* HAL_HAL_DMA_H_ */

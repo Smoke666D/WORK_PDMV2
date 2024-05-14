@@ -68,13 +68,14 @@ typedef enum
 } GPIO_MODE_t;
 
 void HAL_InitGpioLib();
+void HAL_InitGpioIn(PortName_t PORT, uint16_t Pin);
 void HAL_InitGpioAF(PortName_t PORT, uint16_t Pin, uint32_t AF , GPIO_MODE_t mode );
 void HAL_InitGpioInPUP(PortName_t PORT, uint16_t Pin);
 void HAL_InitGpioOut( PortName_t PORT, uint16_t Pin  );
-void vHAL_SetBit(  PortName_t  port, uint16_t pin );
-void vHAL_ResetBit(  PortName_t  port, uint16_t pin );
+void HAL_SetBit(  PortName_t  port, uint16_t pin );
+void HAL_ResetBit(  PortName_t  port, uint16_t pin );
 void HAL_InitGpioAIN(PortName_t PORT, uint16_t Pin );
-BitState_t xHAL_GetBit( PortName_t  port, uint16_t pin);
+BitState_t HAL_GetBit( PortName_t  port, uint16_t pin);
 BitState_t xHAL_GetOutBit( PortName_t  port, uint16_t pin);
 
 #endif /* HAL_HAL_GPIO_H_ */

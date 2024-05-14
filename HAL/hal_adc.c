@@ -20,9 +20,24 @@ static const  ADC_CHANNEL_T ADC_chennel_ref[]={  ADC_CHANNEL_0,  ADC_CHANNEL_1, 
 #endif
 
 #if MCU == CH32
-static const  ADC_CHANNEL_T ADC_chennel_ref[]={  ADC_Channel_0,  ADC_Channel_1,  ADC_Channel_2, ADC_Channel_3, ADC_Channel_4,  ADC_Channel_5,  ADC_Channel_6,  ADC_Channel_7,  ADC_Channel_8,  ADC_Channel_9,  ADC_Channel_10,
+static s16 Calibrattion_Val = 0;
+static const  uint8_t ADC_chennel_ref[]={  ADC_Channel_0,  ADC_Channel_1,  ADC_Channel_2, ADC_Channel_3, ADC_Channel_4,  ADC_Channel_5,  ADC_Channel_6,  ADC_Channel_7,  ADC_Channel_8,  ADC_Channel_9,  ADC_Channel_10,
 		ADC_Channel_11, ADC_Channel_12, ADC_Channel_13, ADC_Channel_14, ADC_Channel_15,  ADC_Channel_16,  ADC_Channel_17} ;
+
+
+
+u16 Get_ConversionVal(s16 val)
+{
+    if((val+Calibrattion_Val)<0|| val==0) return 0;
+    if((Calibrattion_Val+val)>4095||val==4095) return 4095;
+    return (val+Calibrattion_Val);
+}
+
 #endif
+
+
+
+
 
 void HAL_ADC_CommonConfig()
  {
@@ -65,6 +80,27 @@ void HAL_ADC_ContiniusScanCinvertionDMA( ADC_NUMBER_t adc, uint8_t channel_count
 
 #endif
 	 HAL_ADC_CommonConfig();
+
+
+#if MCU == APM32
+
+	 ADC_ConfigStructInit( &adcConfig );
+	 adcConfig.resolution            = ADC_RESOLUTION_12BIT;
+	 adcConfig.scanConvMode          = ENABLE;
+	 adcConfig.continuousConvMode    = ENABLE;
+	 adcConfig.dataAlign             = ADC_DATA_ALIGN_RIGHT;
+	 adcConfig.extTrigEdge           = ADC_EXT_TRIG_EDGE_NONE;
+	 adcConfig.nbrOfChannel          = channel_count;
+	 ADC_Config(adc, &adcConfig);
+	 for (u8 i=0; i< (channel_count) ;i++)
+	 {
+		 ADC_ConfigRegularChannel(adc,  ADC_chennel_ref[channel_nmber[ i  ]],  i + 1, ADC_SAMPLETIME_112CYCLES);
+	 }
+	 ADC_EnableEOCOnEachChannel( adc );
+#endif
+
+
+
 #if MCU==CH32
 	 ADC_DeInit(adc);
 	 adcConfig.ADC_Mode = ADC_Mode_Independent;
@@ -76,14 +112,7 @@ void HAL_ADC_ContiniusScanCinvertionDMA( ADC_NUMBER_t adc, uint8_t channel_count
 	 adcConfig.ADC_OutputBuffer = ADC_OutputBuffer_Disable;
 	 adcConfig.ADC_Pga = ADC_Pga_1;
 	 ADC_Init(adc, &adcConfig);
-	 for (u8 i=0; i< (channel_count) ;i++)
-	 {
-		 ADC_ConfigRegularChannel(adc,  ADC_chennel_ref[channel_nmber[ i  ]],  i + 1, ADC_SAMPLETIME_112CYCLES);
-	 }
 
-	 ADC_EnableEOCOnEachChannel( adc );
-#endif
-#if MCU == CH32
 	 for (u8 i=0; i< (channel_count) ;i++)
 	 {
 		 ADC_RegularChannelConfig(adc,ADC_chennel_ref[channel_nmber[ i  ]], i + 1,  ADC_SampleTime_239Cycles5 );
@@ -136,3 +165,14 @@ void HAL_ADCDMA_Disable(ADC_NUMBER_t adc_number)
 #endif
 }
 
+void HAL_ADC_AWDT_IT_Init( ADC_NUMBER_t adc, uint8_t channel )
+{
+#if MCU == CH32
+	 ADC_Cmd(adc, DISABLE);
+	 ADC_AnalogWatchdogThresholdsConfig(adc, 3500, 1000);
+	 ADC_AnalogWatchdogSingleChannelConfig( adc, ADC_Channel_6);
+	 ADC_AnalogWatchdogCmd( adc, ADC_AnalogWatchdog_SingleRegEnable);
+	 ADC_ITConfig( adc, ADC_IT_AWD, ENABLE);
+	 ADC_Cmd(adc, ENABLE);
+#endif
+}

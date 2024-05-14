@@ -54,7 +54,7 @@ void DinNotifyTaskToInit()
 FLAG_t fDinState (uint8_t i)
 {
 	if (i <= INPUT_12 )
-		return (FLAG_t)xHAL_GetBit( xDinPortConfig[i].PORT, xDinPortConfig[i].Pin);
+		return (FLAG_t)HAL_GetBit( xDinPortConfig[i].PORT, xDinPortConfig[i].Pin);
 	else
        return (RESET);
 }
@@ -99,8 +99,8 @@ PDM_INPUT_CONFIG_ERROR eDinConfig( uint8_t ucCh, DIN_INPUT_TYPE inType, uint32_t
 			}
 			else
 				vRecinfigDin(ucCh,&DIN_CONFIG);
-			if (  ucCh == INPUT_9 ) vHAL_TiemrDisable(TIMER10);
-			if (  ucCh == INPUT_6 ) vHAL_TiemrDisable(TIMER9);
+			if (  ucCh == INPUT_9 ) HAL_TiemrDisable(TIMER10);
+			if (  ucCh == INPUT_6 ) HAL_TiemrDisable(TIMER9);
 			eRes = CONFIG_OK;
 
 		}
@@ -112,12 +112,12 @@ PDM_INPUT_CONFIG_ERROR eDinConfig( uint8_t ucCh, DIN_INPUT_TYPE inType, uint32_t
 			    if (ucCh == INPUT_9)
 			    {
 			    	eRPMConfig(INPUT_9 ,RPM_CH1);
-			    	vHAL_InitCaptureIRQTimer( TIMER10 , 1000, 60000, TIM_CHANNEL_1);
+			    	HAL_InitCaptureIRQTimer( TIMER10 , 1000, 60000, TIM_CHANNEL_1);
 			    }
 			    else
 			    {
 			    	eRPMConfig(INPUT_6 ,RPM_CH2);
-			    	vHAL_InitCaptureIRQTimer( TIMER9 , 1000, 60000, TIM_CHANNEL_1);
+			    	HAL_InitCaptureIRQTimer( TIMER9 , 1000, 60000, TIM_CHANNEL_1);
 			    }
 				eRes = CONFIG_OK;
 			}

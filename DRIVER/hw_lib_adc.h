@@ -102,7 +102,11 @@ CAL_ERROR_CODE  eSetAinCal(AIN_NAME_t name, POINT_t * cal_point, uint8_t cal_poi
 void vABLineKoofFinde(float * k, float * b,  float x1, float x2, float y1, float y2);
 float fGetAinCalData( AIN_NAME_t name, float raw_data);
 void vAINInit();
-uint16_t ucGetRawData( uint8_t ch, uint8_t filter);
+
+#ifdef IPS_OUTS
+	uint16_t ucGetRawData( uint8_t ch, uint8_t filter);
+	void vDataConvertToFloat( void);
+#endif
 float usGetCurrentToFloat( uint16_t rawdata, LIN_COOF * xOut );
 
 /*
@@ -115,7 +119,7 @@ uint16_t usGetRawCurDataFilterd( u8 ch);
 int16_t * getADC1Buffer();
 int16_t * getADC2Buffer();
 int16_t * getADC3Buffer();
-void vDataConvertToFloat( void);
+
 
 
 

@@ -82,7 +82,7 @@ void vSYStaskInit ( void )
   xTaskCreateStatic( vCanRXTask, "CanRxTask", CAN_RX_TASK_STACK_SIZE , ( void * ) 1, 8, (StackType_t * const )canRXTaskBuffer, &canRXTaskControlBlock );
   (* xGetCanTXTaskHandle()) =
   xTaskCreateStatic( vCanTXTask, "CanTxTask", CAN_TX_TASK_STACK_SIZE , ( void * ) 1, 8, (StackType_t * const )canTXTaskBuffer, &canTXTaskControlBlock );
-  defaultTaskHandle = xTaskCreateStatic( StartDefaultTask, "DefTask", DEFAULT_TASK_STACK_SIZE , ( void * ) 1, 3, (StackType_t * const )defaultTaskBuffer, &defaultTaskControlBlock );
+  defaultTaskHandle = xTaskCreateStatic( StartDefaultTask, "DefTask", DEFAULT_TASK_STACK_SIZE , ( void * ) 1, 5, (StackType_t * const )defaultTaskBuffer, &defaultTaskControlBlock );
   return;
 }
 

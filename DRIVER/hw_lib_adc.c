@@ -7,13 +7,16 @@
 
 #include "hw_lib_adc.h"
 #include "system_init.h"
+#include "drivers_config.h"
 
 
 static AIN_DATA_t xAinData[AIN_NUMBER] 			__SECTION(RAM_SECTION_CCMRAM);
 static LIN_COOF   xKoofData[ MAX_COOF_COUNT] 	__SECTION(RAM_SECTION_CCMRAM);
 static uint16_t usCurMaxIndex 					__SECTION(RAM_SECTION_CCMRAM);
-static uint16_t muRawCurData[OUT_COUNT] 		__SECTION(RAM_SECTION_CCMRAM);
-static uint16_t muRawOldOutCurData[OUT_COUNT] 	__SECTION(RAM_SECTION_CCMRAM);
+#ifdef IPS_OUTS
+	static uint16_t muRawCurData[OUT_COUNT] 		__SECTION(RAM_SECTION_CCMRAM);
+	static uint16_t muRawOldOutCurData[OUT_COUNT] 	__SECTION(RAM_SECTION_CCMRAM);
+#endif
 static uint16_t muRawVData[AIN_NUMBER + 2]  	__SECTION(RAM_SECTION_CCMRAM);
 static uint16_t muRawOldVData[AIN_NUMBER + 2]	__SECTION(RAM_SECTION_CCMRAM);
 int16_t            ADC1_IN_Buffer[ADC_FRAME_SIZE*ADC1_CHANNELS] __SECTION(RAM_SECTION_RAM );  //ADC1 input data buffer
@@ -27,11 +30,13 @@ void vAINInit()
         xAinData[i].coof_count = 0U;
         xAinData[i].index = 0U;
     }
+#ifdef IPS_OUTS
     for (uint8_t i = 0; i < OUT_COUNT; i++)
     {
     	muRawOldOutCurData[i]  = 0;
     	muRawCurData[i] 		= 0;
     }
+#endif
     for (uint8_t i = 0; i< AIN_NUMBER + 2;i++)
     {
     	muRawVData[i] 	 = 0;
@@ -41,7 +46,7 @@ void vAINInit()
     return;
 }
 
-
+#ifdef IPS_OUTS
 uint16_t ucGetRawData( uint8_t ch, uint8_t filter)
 {
 	if (filter)
@@ -50,7 +55,7 @@ uint16_t ucGetRawData( uint8_t ch, uint8_t filter)
 	}
 	return (muRawCurData[ch]);
 }
-
+#endif
 
 /*
  * Функция преобразования данных аналогово канала по клаиборвочым коофициентам
@@ -218,16 +223,19 @@ int16_t * getADC3Buffer()
 
 void vInitADCDATA()
 {
+#ifdef IPS_OUTS
 	 for (int i = 0; i< OUT_COUNT;i++)
 	   {
 		   muRawOldOutCurData[i] = 0;
 	   }
+#endif
 	   for (int i=0; i< AIN_NUMBER + 2;i++ )
 	   {
 		   muRawOldVData[i] = 0;
 	   }
 }
 
+#ifdef IPS_OUTS
 void vDataConvertToFloat( void)
 {
 	 // Полчени из буфера ADC 1 данныех каналов каналов тока 7-8
@@ -250,6 +258,7 @@ void vDataConvertToFloat( void)
 	 }
 	return;
 }
+#endif
 
 
 /*

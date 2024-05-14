@@ -136,6 +136,37 @@ void HAL_InitGpioInPUP(PortName_t PORT, uint16_t Pin)
 	GPIO_Init( PORT, &gpioConfigStruct);
 #endif
 }
+
+
+
+/*
+ * Инициализация порта в режиме входа
+ */
+void HAL_InitGpioIn(PortName_t PORT, uint16_t Pin)
+{
+#if MCU == APM32
+	GPIO_Config_T gpioConfigStruct;
+#endif
+#if MCU == CH32
+	GPIO_InitTypeDef gpioConfigStruct;
+#endif
+	HAL_InitGpioRCC(PORT );
+#if MCU == APM32
+	gpioConfigStruct.mode = GPIO_MODE_IN;
+    gpioConfigStruct.pin = Pin;
+	gpioConfigStruct.pupd = GPIO_PUPD_NOPULL;
+    GPIO_Config(PORT, &gpioConfigStruct);
+#endif
+#if MCU == CH32
+	gpioConfigStruct.GPIO_Pin   =  Pin;
+	gpioConfigStruct.GPIO_Mode  = GPIO_Mode_IN_FLOATING ;
+	gpioConfigStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init( PORT, &gpioConfigStruct);
+#endif
+}
+
+
+
 /*
  * Иницализация порта в режиме альтернативной функции
  */
@@ -227,7 +258,7 @@ void HAL_InitGpioAF(PortName_t PORT, uint16_t Pin, uint32_t AF ,  GPIO_MODE_t mo
 /*
  * Получить бит
  */
-BitState_t xHAL_GetBit( PortName_t  port, uint16_t pin)
+BitState_t HAL_GetBit( PortName_t  port, uint16_t pin)
 {
 #if MCU == APM32
 	return (GPIO_ReadInputBit( port , pin));
@@ -240,7 +271,7 @@ BitState_t xHAL_GetBit( PortName_t  port, uint16_t pin)
 /*
  * Функция установки бита порта
  */
-void vHAL_SetBit(  PortName_t  port, uint16_t pin )
+void HAL_SetBit(  PortName_t  port, uint16_t pin )
 {
 #if MCU == APM32
 	GPIO_SetBit(port, pin);
@@ -268,7 +299,7 @@ BitState_t xHAL_GetOutBit( PortName_t  port, uint16_t pin)
 /*
  * Функция сброса бита порта
  */
-void vHAL_ResetBit(  PortName_t  port, uint16_t pin )
+void HAL_ResetBit(  PortName_t  port, uint16_t pin )
 {
 #if MCU == APM32
 	GPIO_ResetBit(port, pin);

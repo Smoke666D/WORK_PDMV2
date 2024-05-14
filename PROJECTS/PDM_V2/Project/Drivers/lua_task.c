@@ -222,7 +222,7 @@ void vLuaTask(void *argument)
 	lua_State *L = NULL;
 	lua_State *L1 = NULL;
 	vHW_L_LIB_FreeRunInit(TIMER11,100000);
-	vHAL_TiemrEneblae( TIMER11);
+	HAL_TiemrEneblae( TIMER11);
 	xEventGroupSetBits(xPDMstatusEvent,PDM_BUSY_STATE );
 	vSetInitState();
 	while(1)

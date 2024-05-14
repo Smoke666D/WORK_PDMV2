@@ -1,5 +1,5 @@
 HAL/hal_timers.o: C:/Users/i.dymov/Desktop/WORK/HAL/hal_timers.c \
- C:\Users\i.dymov\Desktop\WORK\HAL/hal_timers.h \
+ C:/Users/i.dymov/Desktop/WORK/HAL/hal_timers.h \
  c:\users\i.dymov\desktop\work\projects\pdm_v2\include\main.h \
  c:\users\i.dymov\desktop\work\libraries\device\geehy\apm32f4xx\include\apm32f4xx.h \
  c:\users\i.dymov\desktop\work\libraries\cmsis\include\core_cm4.h \
@@ -20,10 +20,12 @@ HAL/hal_timers.o: C:/Users/i.dymov/Desktop/WORK/HAL/hal_timers.c \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\mpu_wrappers.h \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\task.h \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\list.h \
+ C:/Users/i.dymov/Desktop/WORK/HAL/hal_config.h \
+ C:/Users/i.dymov/Desktop/WORK/HAL/board_define.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h
 
-C:\Users\i.dymov\Desktop\WORK\HAL/hal_timers.h:
+C:/Users/i.dymov/Desktop/WORK/HAL/hal_timers.h:
 
 c:\users\i.dymov\desktop\work\projects\pdm_v2\include\main.h:
 
@@ -64,6 +66,10 @@ c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\s
 c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\task.h:
 
 c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\list.h:
+
+C:/Users/i.dymov/Desktop/WORK/HAL/hal_config.h:
+
+C:/Users/i.dymov/Desktop/WORK/HAL/board_define.h:
 
 c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h:
 
