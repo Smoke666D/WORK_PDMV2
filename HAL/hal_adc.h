@@ -44,7 +44,7 @@ typedef enum
 	#define ADC_2  ADC2
 	#define ADC_3  ADC3
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
 	#define ADC_NUMBER_t ADC_TypeDef*
 	#define	ADC_1  ADC1
 	#define ADC_2  ADC2

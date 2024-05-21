@@ -242,12 +242,14 @@ void vLuaTask(void *argument)
 			     {
 			   		if  ((luaL_loadbuffer(L1, uFLASHgetScript(), uFLASHgetLength() , uFLASHgetScript())  || lua_pcall(L1, 0, LUA_MULTRET, 0)) == LUA_OK	)
 			   		 {
-			   		    ulTaskNotifyValueClearIndexed(NULL, 0, 0xFFFF);
+			   			ulTaskNotifyValueClearIndexed(NULL, 0, 0xFFFF);
 			   			DinNotifyTaskToInit();
 			   			AinNotifyTaskToInit();
 			   			lua_state  = LUA_WAIT_READY;
 			   		 }
 			     }
+			   	  if (lua_state == LUA_ERROR)
+			   		 vStopPDMState(lua_state );
 			   	  break;
 		          case LUA_WAIT_READY:
 		        	xTaskNotifyWait(0, 0, &ulNotifiedValue,portMAX_DELAY);

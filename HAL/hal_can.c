@@ -9,7 +9,7 @@
 
 static HAL_CAN_t CAN;
 
-#if MCU == CH32
+#if MCU == CH32V2
 void   USB_HP_CAN1_TX_IRQHandler(void) __attribute__((interrupt()));  /* USB HP and CAN1 TX */
 void   USB_LP_CAN1_RX0_IRQHandler(void) __attribute__((interrupt())); /* USB LP and CAN1RX0 */
 void   CAN1_RX1_IRQHandler(void) __attribute__((interrupt()));        /* CAN1 RX1 */
@@ -30,7 +30,7 @@ void HAL_CANSetERRCallback(void (* f) ( void ))
 	CAN.errorcallback = f;
 }
 
-void HAL_CANInt(  uint16_t   CANbitRate)
+void HAL_CANIntIT(  uint16_t   CANbitRate, uint8_t prior, uint8_t subprior)
 {
 #if MCU == APM32
 	CAN_Config_T       CAN_ConfigStructure;
@@ -71,11 +71,11 @@ void HAL_CANInt(  uint16_t   CANbitRate)
       CAN_Config(CAN1, &CAN_ConfigStructure);
 
      CAN_EnableInterrupt(CAN1, CAN_INT_TXME | CAN_INT_BOF | CAN_INT_F0MP | CAN_INT_F1MP);
-     NVIC_EnableIRQRequest(CAN1_RX0_IRQn, 5, 0);
-     NVIC_EnableIRQRequest(CAN1_RX1_IRQn, 5, 0);
-     NVIC_EnableIRQRequest(CAN1_SCE_IRQn, 5, 0);
+     NVIC_EnableIRQRequest(CAN1_RX0_IRQn, prior, subprior);
+     NVIC_EnableIRQRequest(CAN1_RX1_IRQn, prior, subprior);
+     NVIC_EnableIRQRequest(CAN1_SCE_IRQn, prior, subprior);
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
      NVIC_InitTypeDef      NVIC_InitStructure = {0};
      CAN_InitTypeDef       CAN_InitSturcture = {0};
      RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
@@ -118,7 +118,8 @@ void HAL_CANInt(  uint16_t   CANbitRate)
      CAN_ITConfig(CAN1, CAN_IT_TME | CAN_IT_BOF | CAN_IT_FMP0 | CAN_IT_FMP1 ,ENABLE);
      NVIC_InitStructure.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
      NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+     NVIC_InitStructure.NVIC_IRQChannelSubPriority = subprior;
+     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = prior;
      NVIC_Init(&NVIC_InitStructure);
 
      NVIC_InitStructure.NVIC_IRQChannel = CAN1_RX1_IRQn;
@@ -132,22 +133,22 @@ void HAL_CANInt(  uint16_t   CANbitRate)
 #endif
 }
 
-void HAL_CANToInitMode()
+uint8_t HAL_CANToInitMode()
 {
 #if MCU == APM32
-	CAN_OperatingMode(CAN1, CAN_OPERATING_MODE_INIT);
+	return (CAN_OperatingMode(CAN1, CAN_OPERATING_MODE_INIT));
 #endif
-#if MCU == CH32
-	CAN_OperatingModeRequest(CAN1,CAN_OperatingMode_Initialization);
+#if MCU == CH32V2
+	return (CAN_OperatingModeRequest(CAN1,CAN_OperatingMode_Initialization));
 #endif
 }
-void HAL_CANToOperatingMode()
+uint8_t HAL_CANToOperatingMode()
 {
 #if MCU == APM32
-		CAN_OperatingMode(CAN1, CAN_OPERATING_MODE_NORMAL);
+	return (CAN_OperatingMode(CAN1, CAN_OPERATING_MODE_NORMAL));
 #endif
-#if MCU == CH32
-	CAN_OperatingModeRequest(CAN1,CAN_OperatingMode_Normal);
+#if MCU == CH32V2
+	return ( CAN_OperatingModeRequest(CAN1,CAN_OperatingMode_Normal));
 #endif
 }
 
@@ -175,7 +176,7 @@ uint8_t HAL_CANSend(CAN_TX_FRAME_TYPE *buffer)
     }
    return CAN_TxMessage(CAN1, &pTXHeader);
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
     CanTxMsg pTXHeader          =  {0,0,CAN_Id_Standard,0,0,{0}};
     pTXHeader.DLC                = (uint32_t)buffer->DLC;
     pTXHeader.RTR                = (buffer->ident & FLAG_RTR) ? CAN_RTR_REMOTE : CAN_RTR_DATA;
@@ -196,15 +197,15 @@ void HAL_CANSetFiters(uint8_t filter_index, uint32_t f1,uint32_t f2,uint32_t f3,
 	sFilterConfig.filterActivation = ENABLE;
 	sFilterConfig.filterNumber = filter_index;
 	sFilterConfig.filterFIFO  = (FIFO  == FILTER_FIFO_0) ? CAN_FILTER_FIFO_0 : CAN_FILTER_FIFO_1  ;
-	sFilterConfig.filterIdHigh 		= f3 <<5U ;
+	sFilterConfig.filterIdHigh 		= f2 <<5U ;
     sFilterConfig.filterIdLow  		= f1 <<5U ;
 	sFilterConfig.filterMaskIdHigh =  f4 <<5U ;
-	sFilterConfig.filterMaskIdLow  =  f2 <<5U ;
+	sFilterConfig.filterMaskIdLow  =  f3 <<5U ;
 	sFilterConfig.filterMode = CAN_FILTER_MODE_IDLIST;
 	sFilterConfig.filterScale =CAN_FILTER_SCALE_16BIT;
 	CAN_ConfigFilter(& sFilterConfig);
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
 	CAN_FilterInitTypeDef  sFilterConfig;
 	sFilterConfig.CAN_FilterMode  = CAN_FilterMode_IdList;
 	sFilterConfig.CAN_FilterScale = CAN_FilterScale_16bit;
@@ -235,21 +236,25 @@ HAL_CAN_ERROR_t HAL_CANGetRXMessage( HAL_CAN_RX_FIFO_NUMBER_t fifo,  CAN_FRAME_T
    	res = HAL_CAN_OK;
    }
 #endif
-#if MCU == CH32
-    CO_CANrxMsg_t rcvMsg;
-    CAN_GetRxMessage(CAN1, (fifo == HAL_RX_FIFO0) ? CAN_FIFO0 : CAN_FIFO1,  &rcvMsg);
-    if ( rx.remoteTxReq != CAN_RTXR_REMOTE )
-    {
-      	rx_message->ident = rcvMsg.ident;
-      	rx_message->DLC   = rcvMsg.dlc;;
-      	rx_message->filter_id = 0;
-      	memcpy(rx_message->data,rcvMsg.data, 8 );
-      	res = HAL_CAN_OK;
-    }
+#if MCU == CH32V2
+   CanRxMsg rcvMsg;
+       CAN_Receive(CAN1, (fifo == HAL_RX_FIFO0) ? CAN_FIFO0 : CAN_FIFO1,  &rcvMsg);
+
+
+       //if ( rcvMsg.RTR != CAN_RTR_Remote )
+       //{
+         	rx_message->ident = (rcvMsg.StdId & CAN_SFID_MASK) | ((rcvMsg.RTR == CAN_RTR_Remote) ? FLAG_RTR : 0x00)   ;
+         	rx_message->DLC   = rcvMsg.DLC;;
+         	rx_message->filter_id = 0;
+         	memcpy(rx_message->data,rcvMsg.Data, 8 );
+         	res = HAL_CAN_OK;
+      // }
 #endif
    return (res);
 
 }
+
+
 
 
 #if MCU == APM32
@@ -294,7 +299,7 @@ void CAN1_TX_IRQHandler (void)
 
 #endif
 
-#if MCU == CH32
+#if MCU == CH32V2
 void   USB_HP_CAN1_TX_IRQHandler(void)
 {
 

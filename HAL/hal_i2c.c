@@ -23,7 +23,7 @@ static EERPOM_ERROR_CODE_t I2C_Master_TransmitIT(  u8 DevAdrees,  u8 * data, u16
 void InitI2CDMA( I2C_NAME_t i2c)
 {
 
-#if	MCU == CH32
+#if	MCU == CH32V2
 	NVIC_InitTypeDef      NVIC_InitStructure = {0};
 	if ( i2c == I2C_1)
 	{
@@ -74,7 +74,7 @@ void InitI2CDMA( I2C_NAME_t i2c)
 #endif
 
 
-#if MCU == CH32
+#if MCU == CH32V2
 
    pEEPROM->I2C_Master_Recive_func = I2C_Master_ReviceIT;
    pEEPROM->I2C_Master_Transmit_func =  I2C_Master_TransmitIT;
@@ -192,7 +192,7 @@ static EERPOM_ERROR_CODE_t I2C_Master_ReviceIT(  u8 DevAdrees, u16 data_addres, 
 {
 
 	EERPOM_ERROR_CODE_t res = EEPROM_ACCESS_ERROR;
-#if MCU == CH32
+#if MCU == CH32V2
 	if ( pEEPROM->BusyFlag == 0 )
 	{
 		pEEPROM->BusyFlag = 1;
@@ -219,7 +219,7 @@ static EERPOM_ERROR_CODE_t I2C_Master_ReviceIT(  u8 DevAdrees, u16 data_addres, 
 static EERPOM_ERROR_CODE_t I2C_Master_TransmitIT(  u8 DevAdrees,   u8 * data, u16 data_size, u32 timeout,uint8_t TNI  )
 {
 	EERPOM_ERROR_CODE_t res = EEPROM_ACCESS_ERROR;
-#if MCU == CH32
+#if MCU == CH32V2
 	if ( pEEPROM->BusyFlag == 0 )
 	{
 		pEEPROM->BusyFlag = 1;
@@ -316,7 +316,7 @@ static void I2C_FSM()
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-#if MCU == CH32
+#if MCU == CH32V2
     uint16_t int_flags =   I2C_ReadRegister( pEEPROM->dev,  I2C_Register_STAR1 );
 
 
@@ -471,7 +471,7 @@ void I2C_ERROR_FSM()
 	    return;
 	 }
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
 	 I2C_ReadRegister(pEEPROM->dev,  I2C_Register_STAR2);
 		 uint16_t int_flags =  I2C_ReadRegister(pEEPROM->dev,  I2C_Register_STAR1);
 		 if ( ( int_flags & I2C_FLAG_AF) & 0xFFFF )

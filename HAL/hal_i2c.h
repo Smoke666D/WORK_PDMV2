@@ -25,7 +25,7 @@
 #define I2C_2  I2C2
 #define  I2C_NAME_t I2C_T*
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
 #define I2C_1  I2C1
 #define I2C_2  I2C2
 #define I2C_NAME_t I2C_TypeDef *

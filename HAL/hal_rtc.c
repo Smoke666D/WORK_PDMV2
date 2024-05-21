@@ -40,7 +40,7 @@ void vRTCInit()
 
 void HAL_RTC_IT_Init(  void (* rtc_it_callback) ( void ))
 {
-#if MCU == CH32
+#if MCU == CH32V2
 	  NVIC_InitTypeDef      NVIC_InitStructure = {0};
 	  uint8_t temp = 0;
 	  RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
@@ -81,13 +81,13 @@ void HAL_RTC_IT_Init(  void (* rtc_it_callback) ( void ))
 
 void RTC_IRQHandler ( void )
 {
-#if MCU== CH32
+#if MCU== CH32V2
     if (RTC_GetITStatus(RTC_FLAG_SEC) == SET)
     {
 #endif
         func();
     	// vIncrementSystemCounters();
-#if MCU == CH32
+#if MCU == CH32V2
         RTC_ClearITPendingBit(RTC_FLAG_SEC);
     }
 #endif

@@ -867,9 +867,9 @@ void AinNotifyTaskToInit()
    HAL_ADC_Enable(ADC_1);
    HAL_ADC_Enable(ADC_2);
    HAL_ADC_Enable(ADC_3);
-   HAL_DMAInitIT( DMA2_CH4 ,  PTOM, DMA_HWORD, (uint32_t)&ADC1->REGDATA, 0, DMA_CH_0, &ADC1_Ready);
-   HAL_DMAInitIT( DMA2_CH2 ,  PTOM, DMA_HWORD, (uint32_t)&ADC2->REGDATA, 0, DMA_CH_1, &ADC2_Ready);
-   HAL_DMAInitIT( DMA2_CH0 ,  PTOM, DMA_HWORD, (uint32_t)&ADC3->REGDATA, 0, DMA_CH_2, &ADC3_Ready);
+   HAL_DMAInitIT( DMA2_CH4 ,  PTOM, DMA_HWORD, (uint32_t)&ADC1->REGDATA, 0, DMA_CH_0,6,0, &ADC1_Ready);
+   HAL_DMAInitIT( DMA2_CH2 ,  PTOM, DMA_HWORD, (uint32_t)&ADC2->REGDATA, 0, DMA_CH_1,6,0, &ADC2_Ready);
+   HAL_DMAInitIT( DMA2_CH0 ,  PTOM, DMA_HWORD, (uint32_t)&ADC3->REGDATA, 0, DMA_CH_2,6,0, &ADC3_Ready);
 
  }
 

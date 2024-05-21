@@ -45,7 +45,7 @@ typedef enum
   HAL_BIT_RESET = BIT_RESET,
   HAL_BIT_SET   = BIT_SET,
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
   HAL_BIT_RESET = Bit_RESET,
   HAL_BIT_SET   = Bit_SET,
 #endif
@@ -59,7 +59,7 @@ typedef enum
 	MODE_OUT_PP = GPIO_OTYPE_PP,   /*!< GPIO push-pull mode */
 	MODE_OUT_OD = GPIO_OTYPE_OD,
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
 	MODE_OUT_PP =  GPIO_Mode_AF_PP,   /*!< GPIO push-pull mode */
 	MODE_OUT_OD =  GPIO_Mode_AF_OD ,
 	MODE_IN_PU  =  GPIO_Mode_IPU,

@@ -23,7 +23,7 @@
 #define  DIR_RECIEVE      I2C_DIRECTION_RX
 
 #endif
-#if  MCU == CH32
+#if  MCU == CH32V2
 
 #define  DIR_TRANSMIT I2C_Direction_Transmitter
 #define  DIR_RECIEVE  I2C_Direction_Receiver

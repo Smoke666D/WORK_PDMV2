@@ -14,14 +14,14 @@
  */
 
 #define APM32     0
-#define CH32      1
+#define CH32V2      1
 
 
 #include "board_define.h"
 #if MCU == APM32
 #include "apm32f4xx_gpio.h"
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
 #include "ch32v20x_gpio.h"
 #endif
 
@@ -40,7 +40,7 @@
 #define   PortName_t   GPIO_T*
 #endif
 
-#if MCU == CH32
+#if MCU == CH32V2
 #define   PORT_A  GPIOA
 #define   PORT_B  GPIOB
 #define   PORT_C  GPIOC
@@ -72,7 +72,7 @@ typedef enum
 	GPIO_15 = GPIO_PIN_15,
 	GPIO_ALL = GPIO_PIN_ALL
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
 	 GPIO_0 = GPIO_Pin_0,
 	 GPIO_1 = GPIO_Pin_1,
 	 GPIO_2 = GPIO_Pin_2,
@@ -94,5 +94,7 @@ typedef enum
 #endif
 } PinName_t;
 
+#define HAL_SET   1
+#define HAL_RESET 0
 
 #endif /* HAL_HAL_CONFIG_H_ */

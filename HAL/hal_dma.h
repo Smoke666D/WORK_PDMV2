@@ -26,7 +26,7 @@
 #define DMA2_CH7  	DMA2_Stream7
 #define DMA2_CH8  	DMA2_Stream8
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
 #define DMA_Stram_t DMA_Channel_TypeDef *
 
 #define DMA1_CH1  	DMA1_Channel1
@@ -82,6 +82,6 @@ void DMA2_STR4_IRQHandler( void );
 void DMA2_STR2_IRQHandler( void );
 void DMA2_STR0_IRQHandler( void );
 #endif
-void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, uint32_t memadr, DMA_CHANNEL_t channel, void (*f)(void));
+void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, uint32_t memadr, DMA_CHANNEL_t channel, uint8_t prior, uint8_t subprior, void (*f)(void));
 
 #endif /* HAL_HAL_DMA_H_ */

@@ -262,7 +262,7 @@ typedef enum {
 
 
 
-#if MCU == CH32
+#if MCU == CH32V2
     #include "ch32v20x_tim.h"
 	#define TIMER_Type TIM_TypeDef
 #endif

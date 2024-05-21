@@ -60,7 +60,7 @@ typedef enum {
 #define TimerRef_t TMR_T*
 #define TIMERS_COUNT  14
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
 #define TimerRef_t TIM_TypeDef *
 #define TIMERS_COUNT  5
 #endif

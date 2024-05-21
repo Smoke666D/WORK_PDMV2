@@ -20,7 +20,7 @@
 #include "apm32f4xx_can.h"
 #include "apm32f4xx_rcm.h"
 #endif
-#if MCU == CH32
+#if MCU == CH32V2
 #include "ch32v20x_can.h"
 #include "ch32v20x_rcc.h"
 #endif
@@ -44,6 +44,9 @@ typedef struct {
     uint8_t data[8];
 
 } CAN_TX_FRAME_TYPE;
+
+
+
 
 typedef struct {
 	uint32_t ident;
@@ -85,9 +88,9 @@ typedef struct
 void HAL_CANSetTXCallback(void (* f) ( void ));
 void HAL_CANSetRXCallback(void (* f) ( HAL_CAN_RX_FIFO_NUMBER_t));
 void HAL_CANSetERRCallback(void (* f) ( void ));
-void HAL_CANInt(  uint16_t   CANbitRate);
-void HAL_CANToInitMode();
-void HAL_CANToOperatingMode();
+void HAL_CANIntIT(  uint16_t   CANbitRate, uint8_t prior, uint8_t subprior);
+uint8_t HAL_CANToInitMode();
+uint8_t HAL_CANToOperatingMode();
 uint8_t HAL_CANSend(CAN_TX_FRAME_TYPE *buffer);
 HAL_CAN_ERROR_t HAL_CANGetRXMessage( HAL_CAN_RX_FIFO_NUMBER_t fifo,  CAN_FRAME_TYPE * rx_message );
 void HAL_CANSetFiters(uint8_t filter_index, uint32_t f1,uint32_t f2,uint32_t f3,uint32_t f4, HAL_CAN_FILTER_FIFO_t FIFO);
