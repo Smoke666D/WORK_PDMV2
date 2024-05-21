@@ -218,7 +218,7 @@
  		 uint8_t record_format_count = 0;
  		 for (uint8_t i = 0; i < arg_number -1; i++)
  		 {
- 			 d[i] = lua_tointeger( L, i + 2 );
+ 			 d[i] = lua_tointeger( L, i + 3 );
  			 record_format_count++;
 
  		 }
