@@ -578,7 +578,7 @@ int iCanSetConfig(lua_State *L)
 	if (lua_gettop(L) == TWO_ARGUMENTS)
 	{
 		uint8_t ucCanNumber =(uint8_t) lua_tointeger( L, FIRST_ARGUMENT); //First argument it's channel number
-		//vCANBoudInit( (uint16_t)lua_tointeger( L, SECOND_ARGUMENT) );
+		vCANBoudInit( (uint16_t)lua_tointeger( L, SECOND_ARGUMENT) );
 	}
 	return ( NO_RESULT );
 }

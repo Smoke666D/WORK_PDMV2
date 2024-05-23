@@ -38,7 +38,7 @@ STORAGE_ERROR eWriteNewDescriptor( EEPROM_DISCRIPTOR desc);
 
 
 
-/*
+static uint8_t data[100];
 
 void vTestEEPROM()
 {
@@ -73,7 +73,7 @@ void vTestEEPROM()
 		eEEPROMWr( 0, data, 100, 2);
 }
 
-*/
+
 /*
  * Функция инициализации хранилища данных
  */

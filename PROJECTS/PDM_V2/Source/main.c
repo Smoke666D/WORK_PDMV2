@@ -47,8 +47,8 @@ void vInitGPIO()
 	HAL_InitGpioAIN(PORT_G, GPIO_PIN_0  | GPIO_PIN_8 | GPIO_PIN_12| GPIO_PIN_13 | GPIO_PIN_14| GPIO_PIN_15);
 	HAL_InitGpioAIN(PORT_E, GPIO_PIN_10 | GPIO_PIN_12 |GPIO_PIN_15 );
 	HAL_InitGpioAIN(PORT_F, GPIO_PIN_2 | GPIO_PIN_11| GPIO_PIN_12);
-	HAL_InitGpioAF(PORT_G, GPIO_PIN_0,  GPIO_AF_CAN1, MODE_OUT_PP );
-	HAL_InitGpioAF(PORT_G, GPIO_PIN_1,  GPIO_AF_CAN1 ,MODE_OUT_PP);
+	HAL_InitGpioAF(PORT_D, GPIO_PIN_0,  GPIO_AF_CAN1, MODE_OUT_PP );
+	HAL_InitGpioAF(PORT_D, GPIO_PIN_1,  GPIO_AF_CAN1 ,MODE_OUT_PP);
 }
 /*!
  * @brief       Main program
@@ -59,7 +59,7 @@ void vInitGPIO()
  */
 int main(void)
 {
-	SystemCoreClockUpdate();
+	//SystemCoreClockUpdate();
 	NVIC_ConfigPriorityGroup(NVIC_PRIORITY_GROUP_3);
 	HAL_InitGpioLib();
 	vInitGPIO();

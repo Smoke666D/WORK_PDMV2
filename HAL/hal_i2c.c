@@ -251,6 +251,7 @@ static void vDMAI2CEnable(void )
    RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_DMA1);
    NVIC_EnableIRQRequest(DMA1_STR3_IRQn, 6, 0);
    DMA_Disable(DMA1_Stream3);
+   DMA_Disable(DMA1_Stream7);
    dmaConfig.bufferSize = 0;
    dmaConfig.memoryDataSize = DMA_MEMORY_DATA_SIZE_BYTE;
    dmaConfig.peripheralDataSize = DMA_MEMORY_DATA_SIZE_BYTE;
@@ -272,7 +273,7 @@ static void vDMAI2CEnable(void )
    DMA_ClearStatusFlag(DMA1_Stream3, DMA_FLAG_TEIFLG3 | DMA_FLAG_DMEIFLG3 );
    DMA_EnableInterrupt(DMA1_Stream3, DMA_INT_TCIFLG );
    NVIC_EnableIRQRequest(DMA1_STR7_IRQn, 6, 0);
-   DMA_Disable(DMA1_Stream7);
+
    dmaConfig.dir = DMA_DIR_MEMORYTOPERIPHERAL;
    DMA_Config(DMA1_Stream7, &dmaConfig);
    DMA_ClearIntFlag(DMA1_Stream7, DMA_INT_TCIFLG7 | DMA_INT_TEIFLG7 );
@@ -445,6 +446,13 @@ static void I2C_FSM()
     	{
     		pEEPROM->direciorn =   DIR_RECIEVE;
     		I2C_EnableGenerateStart(  pEEPROM->dev  );
+    	}
+    	else
+    	{
+    		I2C_EnableGenerateStop( pEEPROM->dev);
+    		xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
+    		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+
     	}
 
     	return;

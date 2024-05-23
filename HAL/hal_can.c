@@ -38,11 +38,10 @@ void HAL_CANIntIT(  uint16_t   CANbitRate, uint8_t prior, uint8_t subprior)
     //Конфигурация драйвера
 	CAN_ConfigStructure.mode             = CAN_MODE_NORMAL;
 	CAN_ConfigStructure.autoBusOffManage = ENABLE;
-	CAN_ConfigStructure.autoBusOffManage = DISABLE;
 	CAN_ConfigStructure.autoWakeUpMode   = DISABLE;
-	CAN_ConfigStructure.nonAutoRetran    = ENABLE;
+	CAN_ConfigStructure.nonAutoRetran    = DISABLE;
 	CAN_ConfigStructure.rxFIFOLockMode   = DISABLE;
-	CAN_ConfigStructure.txFIFOPriority   = DISABLE;
+	CAN_ConfigStructure.txFIFOPriority   = ENABLE;
 
     /* Configure CAN timing */
       switch (CANbitRate)
@@ -70,10 +69,12 @@ void HAL_CANIntIT(  uint16_t   CANbitRate, uint8_t prior, uint8_t subprior)
       CAN_ConfigStructure.timeSegment2 = CAN_TIME_SEGMENT2_5;
       CAN_Config(CAN1, &CAN_ConfigStructure);
 
-     CAN_EnableInterrupt(CAN1, CAN_INT_TXME | CAN_INT_BOF | CAN_INT_F0MP | CAN_INT_F1MP);
+
+     CAN_EnableInterrupt(CAN1, CAN_INT_TXME |  CAN_INT_F0MP | CAN_INT_F1MP  );
      NVIC_EnableIRQRequest(CAN1_RX0_IRQn, prior, subprior);
      NVIC_EnableIRQRequest(CAN1_RX1_IRQn, prior, subprior);
      NVIC_EnableIRQRequest(CAN1_SCE_IRQn, prior, subprior);
+     NVIC_EnableIRQRequest(CAN1_TX_IRQn, prior, subprior);
 #endif
 #if MCU == CH32V2
      NVIC_InitTypeDef      NVIC_InitStructure = {0};
@@ -173,7 +174,9 @@ uint8_t HAL_CANSend(CAN_TX_FRAME_TYPE *buffer)
     	pTXHeader.remoteTxReq   = (buffer->ident & FLAG_RTR) ? CAN_RTXR_REMOTE : CAN_RTXR_DATA;
         pTXHeader.stdID         = buffer->ident & CANID_MASK;
 
+
     }
+   memcpy(pTXHeader.data,buffer->data,buffer->DLC);
    return CAN_TxMessage(CAN1, &pTXHeader);
 #endif
 #if MCU == CH32V2
@@ -197,10 +200,10 @@ void HAL_CANSetFiters(uint8_t filter_index, uint32_t f1,uint32_t f2,uint32_t f3,
 	sFilterConfig.filterActivation = ENABLE;
 	sFilterConfig.filterNumber = filter_index;
 	sFilterConfig.filterFIFO  = (FIFO  == FILTER_FIFO_0) ? CAN_FILTER_FIFO_0 : CAN_FILTER_FIFO_1  ;
-	sFilterConfig.filterIdHigh 		= f2 <<5U ;
+	sFilterConfig.filterIdHigh 		= f3 <<5U ;
     sFilterConfig.filterIdLow  		= f1 <<5U ;
 	sFilterConfig.filterMaskIdHigh =  f4 <<5U ;
-	sFilterConfig.filterMaskIdLow  =  f3 <<5U ;
+	sFilterConfig.filterMaskIdLow  =  f2 <<5U ;
 	sFilterConfig.filterMode = CAN_FILTER_MODE_IDLIST;
 	sFilterConfig.filterScale =CAN_FILTER_SCALE_16BIT;
 	CAN_ConfigFilter(& sFilterConfig);
@@ -260,7 +263,19 @@ HAL_CAN_ERROR_t HAL_CANGetRXMessage( HAL_CAN_RX_FIFO_NUMBER_t fifo,  CAN_FRAME_T
 #if MCU == APM32
 void CAN1_SCE_IRQHandler(void)
 {
-	CAN_ClearIntFlag(CAN1, CAN_INT_BOF );
+	//CAN_ClearIntFlag(CAN1, CAN_INT_BOF );
+	if (CAN1->TXSTS & (CAN_TSR_ALST0 | CAN_TSR_TERR0 ) )
+	{
+		CAN1->TXSTS |= CAN_TSR_ABRQ0;
+	}
+	if (CAN1->TXSTS & (CAN_TSR_ALST1 | CAN_TSR_TERR1 ))
+	{
+		CAN1->TXSTS |= CAN_TSR_ABRQ1;
+	}
+	if (CAN1->TXSTS & (CAN_TSR_ALST2 |  CAN_TSR_TERR2))
+	{
+		CAN1->TXSTS |= CAN_TSR_ABRQ2;
+	}
 	CAN.errorcallback();
 
 }
@@ -281,7 +296,7 @@ void CAN1_TX_IRQHandler (void)
 	  if ( CAN_ReadStatusFlag(CAN1,CAN_FLAG_REQC0) == SET )
 	    {
 		  CAN_ClearStatusFlag (CAN1, CAN_FLAG_REQC0);
-		 // xEventGroupSetBitsFromISR(xCANstatusEvent, CANT_TX0_FREE, &xHigherPriorityTaskWoken );
+		  //xEventGroupSetBitsFromISR(xCANstatusEvent, CANT_TX0_FREE, &xHigherPriorityTaskWoken );
 	    }
 	    if ( CAN_ReadStatusFlag(CAN1,CAN_FLAG_REQC1) == SET )
 	    {

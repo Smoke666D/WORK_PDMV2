@@ -73,7 +73,7 @@ void vSYStaskInit ( void )
   (* xGetADCTaskHandle()) =
   xTaskCreateStatic( vADCTask, "ADCTask", ADC_TASK_STACK_SIZE, ( void * ) 1, 12, (StackType_t * const )adcTaskBuffer, &adcTaskControlBlock );
   (* xGetDinTaskHandle())  =
-  xTaskCreateStatic( vDinTask, "DinTask", DIN_TASK_STACK_SIZE, ( void * ) 1, 11, (StackType_t * const )dinTaskBuffer,  &dinTaskControlBlock );
+  xTaskCreateStatic( vDinTask, "DinTask", DIN_TASK_STACK_SIZE, ( void * ) 1, 9, (StackType_t * const )dinTaskBuffer,  &dinTaskControlBlock );
   (* xGetLUATaskHandle()) =
   xTaskCreateStatic( vLuaTask, "LuaTask", LUA_TASK_STACK_SIZE, ( void * ) 1, 9, (StackType_t * const )luaTaskBuffer, &luaTaskControlBlock );
   (* osUSBgetTaskHandle()) =

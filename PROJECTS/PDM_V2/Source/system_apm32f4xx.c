@@ -58,8 +58,8 @@
 /* SYSCLK = PLL_VCO / PLL_C */
 #define PLL_C      2
 #else
-#define APB1_PSC 0x04
-#define APB2_PSC 0x02
+#define APB1_PSC 0x05
+#define APB2_PSC 0x04
 /* PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_B) * PLL_A */
 #define PLL_B      8
 /* USB OTG FS, SDIO and RNG Clock =  PLL_VCO / PLL_D */
@@ -79,7 +79,7 @@
  * @brief    APM32F4xx_System_Private_Variables
  */
 
-uint32_t SystemCoreClock = 100000000;
+uint32_t SystemCoreClock = 168000000;
 
 __I uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 

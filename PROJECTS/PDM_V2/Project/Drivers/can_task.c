@@ -91,7 +91,7 @@ void vCANinit()
 	HAL_CANSetERRCallback( &vReinit);
 	HAL_CANSetRXCallback(&prv_read_can_received_msg);
 	HAL_CANSetTXCallback(&MessageIsSend);
-	xTaskNotify(pCanTXTaskHandle, 3, eSetValueWithOverwrite);
+	//xTaskNotify(pCanTXTaskHandle, 3, eSetValueWithOverwrite);
 	return;
 }
 
@@ -104,26 +104,11 @@ void vCanTXTask(void *argument)
 	uint8_t mailboxnumber;
 	while(1)
 	{
-		//xEventGroupWaitBits(xCANstatusEvent, CANT_TX0_FREE | CANT_TX1_FREE | CANT_TX2_FREE , pdFALSE, pdFALSE, portMAX_DELAY );
-		ulTaskNotifyTake(pdTRUE,portMAX_DELAY);
 		xQueuePeek( pCanTXHandle, &TXPacket, portMAX_DELAY);
-		mailboxnumber = HAL_CANSend(&TXPacket);
-		if (mailboxnumber != 3 )
+		if (HAL_CANSend(&TXPacket) != 3 )
 		{
 			xQueueReceive( pCanTXHandle, &TXPacket, 1);
 			eCanError = CAN_NORMAL;
-			/*switch (mailboxnumber)
-			{
-				case 0:
-					xEventGroupClearBits(xCANstatusEvent, CANT_TX0_FREE );
-					break;
-				case 1:
-					xEventGroupClearBits(xCANstatusEvent, CANT_TX1_FREE);
-					break;
-				case 2:
-					xEventGroupClearBits(xCANstatusEvent, CANT_TX2_FREE);
-					break;
-			}*/
 		}
 	}
 }
@@ -137,18 +122,21 @@ void vCanTXTask(void *argument)
 void vCANBoudInit( uint16_t boudrate )
 {
 
-	HAL_CANToInitMode();
+    HAL_CANToInitMode();
 	boundrate_can1 = boudrate;
 	HAL_CANIntIT( boundrate_can1,5,0);
 	HAL_CANToOperatingMode();
+
     return;
 }
 
 static void vReinit()
 {
-	xQueueReset(pCanTXHandle);
-	xQueueReset(pCanRXHandle);
-	vCANBoudInit(boundrate_can1);
+
+
+	//xQueueReset(pCanTXHandle);
+	//xQueueReset(pCanRXHandle);
+	//vCANBoudInit(boundrate_can1);
 }
 
 
@@ -158,7 +146,8 @@ static void vReinit()
 static void MessageIsSend()
 {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-	vTaskNotifyGiveFromISR(pCanTXTaskHandle,&xHigherPriorityTaskWoken);
+	//xTaskNotifyFromISR(pCanTXTaskHandle,0,eIncrement,&xHigherPriorityTaskWoken);
+    vTaskNotifyGiveFromISR(pCanTXTaskHandle,&xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 

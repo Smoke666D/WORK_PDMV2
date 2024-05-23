@@ -238,8 +238,8 @@ void HAL_InitGpioAF(PortName_t PORT, uint16_t Pin, uint32_t AF ,  GPIO_MODE_t mo
 	gpioConfigStruct.mode = GPIO_MODE_AF;
     gpioConfigStruct.pin = Pin;
     gpioConfigStruct.otype = mode;//GPIO_OTYPE_PP;
-	gpioConfigStruct.pupd  = GPIO_PUPD_NOPULL;
-	gpioConfigStruct.speed = GPIO_SPEED_50MHz  ;
+	gpioConfigStruct.pupd  =  GPIO_PUPD_NOPULL;
+	gpioConfigStruct.speed = GPIO_SPEED_100MHz  ;
     GPIO_Config(PORT, &gpioConfigStruct);
 #endif
 #if MCU == CH32V2
