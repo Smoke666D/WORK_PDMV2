@@ -18,8 +18,7 @@ static EERPOM_ERROR_CODE_t I2C_Master_ReviceDMA(  u8 DevAdrees, u16 data_addres,
 static EERPOM_ERROR_CODE_t I2C_Master_TransmitDMA(  u8 DevAdrees,  u8 * data, u16 data_size, u32 timeout,uint8_t TNI  );
 static EERPOM_ERROR_CODE_t I2C_Master_ReviceIT(  u8 DevAdrees, u16 data_addres,  u8 * data, u16 data_size, u32 timeout,uint8_t TNI  );
 static EERPOM_ERROR_CODE_t I2C_Master_TransmitIT(  u8 DevAdrees, u16 data_addres, u8 * data, u16 data_size, u32 timeout,uint8_t TNI  );
-static EERPOM_ERROR_CODE_t I2C_Master_RevicePending( u8 DevAdrees, u16 data_addres,  u8 * data, u16 data_size, u32 timeout,uint8_t TNI  );
-static EERPOM_ERROR_CODE_t I2C_Master_TransmitPendign(  u8 DevAdrees, u16 data_addres,  u8 * data, u16 data_size, u32 timeout,uint8_t TNI  );
+
 
 void InitI2CDMA( I2C_NAME_t i2c)
 {
@@ -59,7 +58,7 @@ void InitI2CDMA( I2C_NAME_t i2c)
 
     }
     I2C_Config_T I2C_InitTSturcture;
-    I2C_InitTSturcture.clockSpeed 	= 100000;
+    I2C_InitTSturcture.clockSpeed 	= 400000;
     I2C_InitTSturcture.mode 		= I2C_MODE_I2C;
     I2C_InitTSturcture.dutyCycle 	= I2C_DUTYCYCLE_16_9;
     I2C_InitTSturcture.ack 			= I2C_ACK_ENABLE;
@@ -76,8 +75,8 @@ void InitI2CDMA( I2C_NAME_t i2c)
    pEEPROM->I2C_Master_Transmit_func =  I2C_Master_TransmitDMA;
 #endif
 #if MODE_I2C == MODE_IT
-   pEEPROM->I2C_Master_Recive_func = I2C_Master_RevicePending;
-   pEEPROM->I2C_Master_Transmit_func =  I2C_Master_TransmitPendign;
+   pEEPROM->I2C_Master_Recive_func =    I2C_Master_ReviceIT;
+   pEEPROM->I2C_Master_Transmit_func =  I2C_Master_TransmitIT;
 
 #endif
 #if MCU == CH32V2
@@ -130,80 +129,52 @@ void InitI2CDMA( I2C_NAME_t i2c)
 }
 
 
-static EERPOM_ERROR_CODE_t I2C_Master_RevicePending( u8 DevAdrees, u16 data_addres,  u8 * data, u16 data_size, u32 timeout,uint8_t TNI  )
+static EERPOM_ERROR_CODE_t I2C_Master_ReviceIT( u8 DevAdrees, u16 data_addres,  u8 * data, u16 data_size, u32 timeout,uint8_t TNI  )
 {
+	EERPOM_ERROR_CODE_t res = EEPROM_ACCESS_ERROR;
+	pEEPROM->BusyFlag		 = 1;
+	pEEPROM->ucTaskNatificationIndex = TNI;
+	pEEPROM->Index          = 0;
+    pEEPROM->DataLength     = data_size;
+	pEEPROM->ReciveBuffer   = data;
+	pEEPROM->DevAdrres      = DevAdrees;
+	pEEPROM->direciorn      = 5;
+	pEEPROM->data_address   = data_addres;
+	pEEPROM->DMA_TX 		= 0;
+	pEEPROM->NotifyTaskHeandle = xTaskGetCurrentTaskHandle();
+	pEEPROM->I2C_State = I2C_MASTER_RECIVE_START;
+	while (I2C_ReadStatusFlag(pEEPROM->dev, I2C_FLAG_BUSBSY) == SET);
+	I2C_EnableAcknowledge(  pEEPROM->dev);
+	I2C_EnableGenerateStart(pEEPROM->dev);
+	I2C_EnableInterrupt( pEEPROM->dev ,  I2C_INT_EVT | I2C_INT_BUF );
+	uint32_t exit_code = ulTaskNotifyTakeIndexed( pEEPROM->ucTaskNatificationIndex, 0xFFFFFFFF, timeout );
+	I2C_DisableInterrupt(pEEPROM->dev, I2C_INT_EVT | I2C_INT_BUF | I2C_INT_ERR);
+	res = (exit_code == 0x01  )? (EEPROM_OK) : (EEPROM_WRITE_ERROR) ;
+	pEEPROM->BusyFlag = 0;
+    return (res);
 
-	 pEEPROM->BusyFlag = 1;
-     pEEPROM->ucTaskNatificationIndex = TNI;
-     pEEPROM->Index          = data_addres;
-	 pEEPROM->DataLength     = data_size;
-	 pEEPROM->ReciveBuffer   = data;
-	 pEEPROM->DevAdrres      = DevAdrees;
-
-
-	  while (I2C_ReadStatusFlag(pEEPROM->dev, I2C_FLAG_BUSBSY) == SET);
-	  I2C_DisableInterrupt(pEEPROM->dev, I2C_INT_EVT | I2C_INT_BUF | I2C_INT_ERR);
-	  /* Send START condition */
-	  I2C_EnableGenerateStart(pEEPROM->dev);
-	  while (!I2C_ReadEventStatus(pEEPROM->dev, I2C_EVENT_MASTER_MODE_SELECT)) ;
-	  I2C_Tx7BitAddress(  pEEPROM->dev, pEEPROM->DevAdrres |  GET_ADDR_MSB(data_addres), I2C_DIRECTION_TX );
-	  while (!I2C_ReadEventStatus(pEEPROM->dev, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
-	  I2C_TxData( pEEPROM->dev , data_addres & 0xFF );
-	  while (!I2C_ReadEventStatus(pEEPROM->dev, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
-	  I2C_EnableGenerateStart(pEEPROM->dev);
-	  while (!I2C_ReadEventStatus(pEEPROM->dev, I2C_EVENT_MASTER_MODE_SELECT)) ;
-	  I2C_Tx7BitAddress(  pEEPROM->dev, DevAdrees , I2C_DIRECTION_RX );
-	  while (!I2C_ReadEventStatus(pEEPROM->dev, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED ));
-	  I2C_EnableAcknowledge(  pEEPROM->dev);
-	  for (int i=0; i < pEEPROM->DataLength ;i++)
-	  {
-		  while (!I2C_ReadEventStatus(pEEPROM->dev,I2C_EVENT_MASTER_BYTE_RECEIVED ));
-		  if (i == (data_size -1))
-		  {
-			  I2C_DisableAcknowledge(pEEPROM->dev);
-		      pEEPROM->ReciveBuffer[i] = I2C_RxData( pEEPROM->dev);
-		  }
-		  else
-		  {
-
-			  pEEPROM->ReciveBuffer[i] = I2C_RxData( pEEPROM->dev);
-		  }
-	  }
-	  I2C_EnableGenerateStop(  pEEPROM->dev );
 
 }
 
-static EERPOM_ERROR_CODE_t I2C_Master_TransmitPendign(  u8 DevAdrees, u16 data_addres,  u8 * data, u16 data_size, u32 timeout,uint8_t TNI  )
+static EERPOM_ERROR_CODE_t I2C_Master_TransmitIT(  u8 DevAdrees, u16 data_addres,  u8 * data, u16 data_size, u32 timeout,uint8_t TNI  )
 {
-
-	 pEEPROM->BusyFlag = 1;
-	  pEEPROM->ucTaskNatificationIndex = TNI;
-	  pEEPROM->Index          = data_addres;
-		 pEEPROM->DataLength     = data_size;
-		 pEEPROM->ReciveBuffer   = data;
-		 pEEPROM->DevAdrres      = DevAdrees;
-
-
+	EERPOM_ERROR_CODE_t res = EEPROM_ACCESS_ERROR;
+	pEEPROM->BusyFlag = 1;
+	pEEPROM->ucTaskNatificationIndex = TNI;
+	pEEPROM->Index          = 0;
+	pEEPROM->DataLength     = data_size;
+    pEEPROM->ReciveBuffer   = data;
+	pEEPROM->DevAdrres      = DevAdrees;
+    pEEPROM->data_address   = data_addres;
+    pEEPROM->NotifyTaskHeandle = xTaskGetCurrentTaskHandle();
+    pEEPROM->I2C_State = I2C_MASTER_TRANSMIT_START;
 	while (I2C_ReadStatusFlag(pEEPROM->dev, I2C_FLAG_BUSBSY) == SET);
-	I2C_DisableInterrupt(pEEPROM->dev, I2C_INT_EVT | I2C_INT_BUF | I2C_INT_ERR); /* Send START condition */
     I2C_EnableGenerateStart(pEEPROM->dev);
-	while (!I2C_ReadEventStatus(pEEPROM->dev, I2C_EVENT_MASTER_MODE_SELECT)) ;
-    I2C_Tx7BitAddress(  pEEPROM->dev, pEEPROM->DevAdrres |  GET_ADDR_MSB(data_addres), I2C_DIRECTION_TX );
-	while (!I2C_ReadEventStatus(pEEPROM->dev, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
-    I2C_TxData( pEEPROM->dev , data_addres & 0xFF );
-    while (!I2C_ReadEventStatus(pEEPROM->dev, I2C_EVENT_MASTER_BYTE_TRANSMITTING));
-	for (int i=0;i<data_size; i++ )
-	{
-
-		I2C_TxData(pEEPROM->dev,data[i]);
-		if (i!=data_size-1)
-		{
-			while (!I2C_ReadEventStatus(pEEPROM->dev, I2C_EVENT_MASTER_BYTE_TRANSMITTING));
-		}
-	}
-	while (!I2C_ReadEventStatus(pEEPROM->dev, I2C_EVENT_MASTER_BYTE_TRANSMITTED)) ;
-	I2C_EnableGenerateStop(  pEEPROM->dev );
-	return (EEPROM_OK) ;
+    I2C_EnableInterrupt( pEEPROM->dev ,  I2C_INT_EVT | I2C_INT_BUF | I2C_INT_ERR);
+	uint32_t exit_code = ulTaskNotifyTakeIndexed( pEEPROM->ucTaskNatificationIndex, 0xFFFFFFFF, timeout);
+	I2C_DisableInterrupt(pEEPROM->dev, I2C_INT_EVT | I2C_INT_BUF | I2C_INT_ERR);
+	res = (exit_code > 0  )? (EEPROM_OK) : (EEPROM_READ_ERROR);
+	return (res) ;
 
 
 }
@@ -273,77 +244,7 @@ static EERPOM_ERROR_CODE_t I2C_Master_TransmitDMA(  u8 DevAdrees,   u8 * data, u
 }
 
 
-static EERPOM_ERROR_CODE_t I2C_Master_ReviceIT(  u8 DevAdrees, u16 data_addres,  u8 * data, u16 data_size, u32 timeout,uint8_t TNI  )
-{
-	EERPOM_ERROR_CODE_t res = EEPROM_ACCESS_ERROR;
-	if ( pEEPROM->BusyFlag == 0 )
-	{
-		pEEPROM->BusyFlag = 1;
-		pEEPROM->ucTaskNatificationIndex = TNI;
-	    pEEPROM->Index          = 0;
-		pEEPROM->DataLength     = data_size;
-		pEEPROM->ReciveBuffer   = data;
-		pEEPROM->DevAdrres      = DevAdrees;
-		pEEPROM->direciorn      = 0;
-		pEEPROM->data_address   = data_addres;
-		pEEPROM->DMA_TX 		= 0;
-		pEEPROM->NotifyTaskHeandle = xTaskGetCurrentTaskHandle();
-#if MCU == CH32V2
-        I2C_ITConfig( pEEPROM->dev  , I2C_IT_EVT | I2C_IT_ERR | I2C_IT_BUF , ENABLE);
-	    I2C_AcknowledgeConfig(  pEEPROM->dev, ENABLE);
-	    I2C_GenerateSTART(  pEEPROM->dev, ENABLE);
-	  }
-#endif
-#if MCU == APM32
-	    while (I2C_ReadStatusFlag(pEEPROM->dev, I2C_FLAG_BUSBSY) == SET);
-	 	I2C_EnableInterrupt( pEEPROM->dev ,  I2C_INT_EVT | I2C_INT_BUF | I2C_INT_ERR);
-	 	I2C_EnableAcknowledge(  pEEPROM->dev);
-	 	I2C_EnableGenerateStart(  pEEPROM->dev);
-#endif
-	    uint32_t exit_code = ulTaskNotifyTakeIndexed( pEEPROM->ucTaskNatificationIndex, 0xFFFFFFFF, timeout );
-	    res = (exit_code == 0x01  )? (EEPROM_OK) : (EEPROM_WRITE_ERROR) ;
-	    pEEPROM->BusyFlag = 0;
-	}
-	  return (res);
-}
 
-
-static EERPOM_ERROR_CODE_t I2C_Master_TransmitIT(  u8 DevAdrees,  u16 data_addres,  u8 * data, u16 data_size, u32 timeout,uint8_t TNI  )
-{
-	EERPOM_ERROR_CODE_t res = EEPROM_ACCESS_ERROR;
-
-	if ( pEEPROM->BusyFlag == 0 )
-	{
-		pEEPROM->BusyFlag = 1;
-		pEEPROM->ucTaskNatificationIndex = TNI;
-		pEEPROM->Index          = 0;
-		pEEPROM->DataLength     = data_size;
-		pEEPROM->ReciveBuffer   = data;
-		pEEPROM->DevAdrres      = DevAdrees;
-		pEEPROM->data_address   = data_addres;
-		pEEPROM->direciorn      = 0;
-		pEEPROM->DMA_TX = 1;
-        pEEPROM->NotifyTaskHeandle = xTaskGetCurrentTaskHandle();
-#if MCU == CH32V2
-
-        I2C_AcknowledgeConfig(  pEEPROM->dev, DISABLE);
-        I2C_ITConfig( pEEPROM->dev  , I2C_IT_EVT | I2C_IT_ERR | I2C_IT_BUF , ENABLE);
-        I2C_GenerateSTART(  pEEPROM->dev, ENABLE);
-#endif
-
-#if MCU == APM32
-        while (I2C_ReadStatusFlag(pEEPROM->dev, I2C_FLAG_BUSBSY) == SET);
-	 	I2C_EnableInterrupt( pEEPROM->dev ,  I2C_INT_EVT | I2C_INT_BUF | I2C_INT_ERR);
-	 	I2C_DisableAcknowledge(  pEEPROM->dev);
-	 	I2C_EnableGenerateStart(  pEEPROM->dev);
-#endif
-        uint32_t exit_code = ulTaskNotifyTakeIndexed( pEEPROM->ucTaskNatificationIndex, 0xFFFFFFFF, timeout );
-        res = (exit_code == 0x01  )? (EEPROM_OK) : (EEPROM_WRITE_ERROR) ;
-        pEEPROM->BusyFlag = 0;
-	  }
-
-	  return (res);
-}
 
 
 static void vDMAI2CEnable(void )
@@ -503,76 +404,115 @@ static void I2C_FSM()
 #endif
 
 #if MCU == APM32
+
+#if MODE_I2C == MODE_IT
      uint16_t int_flags =   I2C_ReadRegister( pEEPROM->dev,  I2C_REGISTER_STS1 );
-     //EV5 STATE
-     if (pEEPROM->direciorn == 0 )
+     switch(pEEPROM->I2C_State)
      {
-    	 if ( (int_flags  & (I2C_INT_FLAG_START & 0xFF) ) )
-    	 {
-    		 I2C_Tx7BitAddress(  pEEPROM->dev, pEEPROM->DevAdrres |  GET_ADDR_MSB(pEEPROM->data_address), I2C_DIRECTION_TX );
-    		 return;
-    	 }
-    	 if ( int_flags  & ((I2C_INT_FLAG_ADDR )  & 0xFF)  )
-    	 {
-    		 I2C_ReadRegister( pEEPROM->dev,  I2C_REGISTER_STS2 );
-    		 I2C_TxData( pEEPROM->dev , (pEEPROM->data_address & 0xFF) );
-    		 return;
-    	 }
-    	 if ( (pEEPROM->DMA_TX == 0) &&  ( int_flags  & ((I2C_INT_FLAG_TXBE  | I2C_INT_FLAG_BTC )  & 0xFF)  ))
-    	 {
-    	      pEEPROM->direciorn =   1;
-    	      I2C_EnableGenerateStart(pEEPROM->dev);
-    	      return;
-    	 }
-    	 if ( (pEEPROM->DMA_TX == 1) && ( int_flags  & (I2C_INT_FLAG_TXBE   & 0xFF)  ))
-    	 {
-    		 if (pEEPROM->Index < pEEPROM->DataLength )
-    		 {
-    			 I2C_TxData( pEEPROM->dev, pEEPROM->ReciveBuffer[pEEPROM->Index] );
-    		     pEEPROM->Index++;
-    		 }
-    		 else
-    		 {
-    			pEEPROM->DMA_TX  = 2;
-    		 }
-    	 }
-    	 if ( (pEEPROM->DMA_TX == 2) && ( int_flags  & ((I2C_INT_FLAG_TXBE  | I2C_INT_FLAG_BTC)   & 0xFF)  ))
-    	 {
-    	      I2C_EnableGenerateStop(  pEEPROM->dev );
-    	      xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
-    	      portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-    		 return;
-    	 }
-     }
-     else
-     {
-    	 if ( (int_flags  & (I2C_INT_FLAG_START & 0xFF) ) )
-    	 {
-    	    I2C_Tx7BitAddress(  pEEPROM->dev, pEEPROM->DevAdrres, I2C_DIRECTION_RX);
-    	    return;
-    	 }
-    	 if ( int_flags  & (I2C_INT_FLAG_ADDR  & 0xFF) )
-    	 {
-    	    I2C_ReadRegister(pEEPROM->dev,  I2C_REGISTER_STS2 );
-    	 }
-    	 if (( int_flags  & ((I2C_INT_FLAG_RXBNE  )   & 0xFF) ) )
-    	 {
-    		 if ( pEEPROM->Index < (pEEPROM->DataLength-1))
-    		             {
-    		                 I2C_EnableAcknowledge(pEEPROM->dev);
-    		                 pEEPROM->ReciveBuffer[pEEPROM->Index] = I2C_RxData( pEEPROM->dev);
-    		                 pEEPROM->Index++;
-    		             }
-    		             else
-    		             {
-    		            	 I2C_DisableAcknowledge(pEEPROM->dev);
-    		                 pEEPROM->ReciveBuffer[pEEPROM->Index] = I2C_RxData( pEEPROM->dev);
-    		                 I2C_EnableGenerateStop(  pEEPROM->dev );
-    		                 xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
-    		                 portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-    		             }
-    		             return;
-    	 }
+     case  I2C_MASTER_RECIVE_START:
+    	 	 if (int_flags & 0x0001)
+    	 	 {
+    	 		 	 I2C_Tx7BitAddress(  pEEPROM->dev, pEEPROM->DevAdrres |  GET_ADDR_MSB(pEEPROM->data_address), I2C_DIRECTION_TX );
+    	 		 	 pEEPROM->I2C_State = I2C_MASTER_RECIVE_WRITE_ADDR;
+    	 	 }
+    	 	 break;
+     	 case I2C_MASTER_RECIVE_WRITE_ADDR:
+     		 if (int_flags & 0x0002)
+     		 {
+     			 I2C_ReadRegister( pEEPROM->dev,  I2C_REGISTER_STS2 );
+     			 I2C_TxData( pEEPROM->dev , (pEEPROM->data_address & 0xFF) );
+     			 pEEPROM->I2C_State = I2C_MASTER_RECIVE_DA_WRITE;
+     		 }
+     		 break;
+     	 case I2C_MASTER_RECIVE_DA_WRITE:
+     		 if (int_flags & 0x0080)
+     		 {
+     			 I2C_EnableGenerateStart(pEEPROM->dev);
+     			 pEEPROM->I2C_State = I2C_MASTER_RECIVE_ADDR;
+     		 }
+     		 break;
+         case I2C_MASTER_RECIVE_ADDR:
+        	 if (int_flags & 0x0001)
+        	 {
+        		 I2C_Tx7BitAddress(  pEEPROM->dev, pEEPROM->DevAdrres , I2C_DIRECTION_RX );
+        		 pEEPROM->I2C_State = I2C_MASTER_RECIVE_MODE;
+        	 }
+        	 break;
+
+         case I2C_MASTER_RECIVE_MODE:
+        	 if (int_flags & 0x0002)
+        	 {
+        		 I2C_ReadRegister( pEEPROM->dev,  I2C_REGISTER_STS2 );
+        		 pEEPROM->I2C_State = I2C_MASTER_RECIEVE;
+        	 }
+        	 break;
+     	 case I2C_MASTER_RECIEVE:
+     		 if (int_flags & 0x0040)
+     		 {
+     			if (pEEPROM->Index < (pEEPROM->DataLength-1))
+     			{
+     			    pEEPROM->ReciveBuffer[pEEPROM->Index++] = I2C_RxData( pEEPROM->dev);
+     			}
+     			else
+     			{
+     				I2C_DisableAcknowledge(pEEPROM->dev);
+     				pEEPROM->ReciveBuffer[pEEPROM->Index++] = I2C_RxData( pEEPROM->dev);
+     				I2C_EnableGenerateStop(  pEEPROM->dev );
+     			    xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex, 0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
+     				portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+     				pEEPROM->I2C_State = I2C_IDLE;
+     			}
+     		 }
+     		 break;
+     	 case  I2C_MASTER_TRANSMIT_START:
+
+     		if (int_flags & 0x0001)
+     		{
+     			 I2C_Tx7BitAddress(  pEEPROM->dev, pEEPROM->DevAdrres |  GET_ADDR_MSB(pEEPROM->data_address), I2C_DIRECTION_TX );
+     			 pEEPROM->I2C_State = I2C_MASTER_TRANSMIT_ADDR;
+     		}
+     		 break;
+     	 case I2C_MASTER_TRANSMIT_ADDR:
+     		if  ( int_flags & 0x0400)
+     		 {
+     		     I2C_ClearIntFlag( pEEPROM->dev,I2C_INT_FLAG_AE);
+     		     I2C_EnableGenerateStart(  pEEPROM->dev );
+     		     pEEPROM->I2C_State = I2C_MASTER_TRANSMIT_START;
+     		  }
+     		 else
+
+     		if (int_flags & 0x0002)
+     		{
+     			 I2C_ReadRegister( pEEPROM->dev,  I2C_REGISTER_STS2 );
+     			 I2C_TxData( pEEPROM->dev , (pEEPROM->data_address & 0xFF) );
+     			 pEEPROM->I2C_State = I2C_MASTER_TRANSMIT_NEXT;
+     		}
+     		 break;
+     	 case I2C_MASTER_TRANSMIT_NEXT:
+     		 if (int_flags & 0x0080)
+     		 {
+     			if (pEEPROM->Index < pEEPROM->DataLength )
+     			{
+     			   I2C_TxData( pEEPROM->dev, pEEPROM->ReciveBuffer[pEEPROM->Index] );
+     			   pEEPROM->Index++;
+     			}
+     			else
+     				 pEEPROM->I2C_State = I2C_MASTER_TRANSMIT_LAST;
+     		 }
+     		 break;
+     	 case  I2C_MASTER_TRANSMIT_LAST:
+     		 if (int_flags & 0x0004)
+     		 {
+     			 I2C_EnableGenerateStop(  pEEPROM->dev );
+     			 xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex, 0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
+     			 portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+     			 pEEPROM->I2C_State = I2C_IDLE;
+     		 }
+     		 break;
+     	 default:
+     		 break;
+
+
 
      }
 
@@ -580,7 +520,7 @@ static void I2C_FSM()
 
 
 
-     #if MODE_I2C == MODE_IT
+
       //EV6
 
 
@@ -641,15 +581,15 @@ void I2C_ERROR_FSM()
 {
 	 BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 #if MCU == APM32
-	 I2C_ReadRegister( pEEPROM->dev,  I2C_REGISTER_STS2 );
+
 	 uint16_t int_flags =  I2C_ReadRegister( pEEPROM->dev,  I2C_REGISTER_STS1 );
-	 if ( ( int_flags & I2C_INT_FLAG_AE) == ( I2C_INT_FLAG_AE & 0xFFFF ) )
+	 if  ( int_flags & 0x0400)
 	 {
 	    I2C_ClearIntFlag( pEEPROM->dev,I2C_INT_FLAG_AE);
-	    I2C_EnableGenerateStop( pEEPROM->dev );
-
-	    xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x02, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
-	    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+	    //I2C_EnableGenerateStop( pEEPROM->dev );
+	    I2C_EnableGenerateStart(pEEPROM->dev);
+	    //xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x02, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
+	    //portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 	    return;
 	 }
 #endif
@@ -679,7 +619,7 @@ void I2C1_EV_IRQHandler( void )
 }
 void I2C1_ER_IRQHandler ( void )
 {
-	I2C_ERROR_FSM();
+	I2C_FSM();
 }
 void  I2C2_EV_IRQHandler( void )
 {
@@ -687,6 +627,6 @@ void  I2C2_EV_IRQHandler( void )
 }
 void I2C2_ER_IRQHandler ( void )
 {
-	I2C_ERROR_FSM();
+	I2C_FSM();
 }
 

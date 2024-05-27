@@ -70,6 +70,8 @@ typedef struct
 
 } EEPROM_SECTOR_t;
 
+
+
 typedef struct
 {
    uint8_t ucTaskNatificationIndex;
@@ -84,6 +86,7 @@ typedef struct
    I2C_NAME_t dev;
    TaskHandle_t NotifyTaskHeandle;
    uint8_t DMA_TX;
+   I2C_STATE_t I2C_State;
    EERPOM_ERROR_CODE_t (*I2C_Master_Recive_func) (  u8 , u16,  u8 * , u16 , u32 ,u8 );
    EERPOM_ERROR_CODE_t (*I2C_Master_Transmit_func)( u8 , u16,  u8 * , u16 , u32 ,u8 );
 } EEPOROM;

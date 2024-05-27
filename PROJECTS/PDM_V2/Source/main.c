@@ -69,8 +69,8 @@ int main(void)
 	vSYSeventInit ( );
 	vSYStaskInit ( );
     /* User create task */
-	 vCANinit();
-	 vInitEEPROM();
+	vCANinit();
+	vInitEEPROM();
     /* Startup FreeRTOS */
     vTaskStartScheduler();
     while(1);

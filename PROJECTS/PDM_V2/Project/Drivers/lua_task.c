@@ -85,16 +85,16 @@ void vSetInitState()
 }
 void vSetRunState()
 {
-	xEventGroupClearBits(xPDMstatusEvent, PDM_STOP_STATE );
+
 	lua_state = LUA_RUN;
-	xEventGroupSetBits(xPDMstatusEvent,PDM_RUN_STATE );
+	xEventGroupSetBits(xPDMstatusEvent, PDM_RUN_STATE );
 
 }
 void vStopPDMState( LUA_STATE_t state)
 {
 	xEventGroupClearBits(xPDMstatusEvent, PDM_RUN_STATE );
 	lua_state = state;
-	xEventGroupSetBits(xPDMstatusEvent,PDM_STOP_STATE );
+
 
 }
 
@@ -120,13 +120,11 @@ static int iSetRandomRestart(lua_State *L)
  */
 void vLUAstopPDM()
 {
-	EventBits_t state = xEventGroupGetBits(xPDMstatusEvent);
-	if ( ((state & PDM_BUSY_STATE) == PDM_BUSY_STATE ) &&  ((state & PDM_STOP_STATE) == 0))
+	EventBits_t state = xEventGroupWaitBits(xPDMstatusEvent, PDM_STOP_STATE | PDM_RUN_STATE, pdFALSE,pdFALSE, portMAX_DELAY );
+	if ( state & PDM_RUN_STATE)
 	{
-		xEventGroupWaitBits(xPDMstatusEvent, PDM_RUN_STATE, pdFALSE,pdTRUE, portMAX_DELAY );
 		xTaskNotifyGiveIndexed(pLuaTaskHandle, 1);
 		xEventGroupWaitBits(xPDMstatusEvent, PDM_STOP_STATE, pdFALSE,pdTRUE, portMAX_DELAY );
-		xEventGroupSetBits(xPDMstatusEvent,PDM_BUSY_STATE );
 	}
 	return;
 }
@@ -135,18 +133,18 @@ void vLUAstopPDM()
  */
 void vLUArestartPDM()
 {
-	EventBits_t CurState = xEventGroupGetBits(xPDMstatusEvent);
-	if ( ( CurState & (PDM_BUSY_STATE | PDM_STOP_STATE) ) == (  PDM_BUSY_STATE | PDM_STOP_STATE  ))
+	EventBits_t CurState  = xEventGroupWaitBits(xPDMstatusEvent, PDM_STOP_STATE | PDM_RUN_STATE, pdFALSE,pdFALSE, portMAX_DELAY );
+	if ( ( CurState &  PDM_STOP_STATE) )
 	{
 		xTaskNotifyGiveIndexed(pLuaTaskHandle, 1);
-		xEventGroupSetBits(xPDMstatusEvent,PDM_BUSY_STATE );
+		xEventGroupSetBits(xPDMstatusEvent,PDM_RUN_STATE );
 	}
-	if ( ( CurState & (PDM_BUSY_STATE | PDM_RUN_STATE) ) == (  PDM_BUSY_STATE | PDM_RUN_STATE  ))
+	if (  CurState & ( PDM_RUN_STATE) )
 	{
 		xTaskNotifyGiveIndexed(pLuaTaskHandle, 1);
 		xEventGroupWaitBits(xPDMstatusEvent, PDM_STOP_STATE, pdFALSE,pdTRUE, portMAX_DELAY );
 		xTaskNotifyGiveIndexed(pLuaTaskHandle, 1);
-		xEventGroupSetBits(xPDMstatusEvent,PDM_BUSY_STATE );
+		xEventGroupSetBits(xPDMstatusEvent,PDM_RUN_STATE );
 	}
 
 	return;
@@ -232,7 +230,7 @@ void vLuaTask(void *argument)
 		 {
 		       case LUA_INIT:
 		         vAINInit();
-		         //vTestEEPROM();
+		       //  vTestEEPROM();
 			   	 L  = luaL_newstate();
 			   	 L1 = lua_newthread(L);
 			   	 luaL_openlibs(L1); // open standard libraries
@@ -307,6 +305,7 @@ void vLuaTask(void *argument)
 			   	 case LUA_STOP:
 			   	   DinNotifyTaskToStop();
 			   	   AinNotifyTaskToStop();
+			   	   xEventGroupSetBits(xPDMstatusEvent, PDM_STOP_STATE );
 			   	   ulTaskNotifyTakeIndexed(1,pdTRUE, portMAX_DELAY);
 			   	   lua_close(L);
 			   	   vSetInitState();
