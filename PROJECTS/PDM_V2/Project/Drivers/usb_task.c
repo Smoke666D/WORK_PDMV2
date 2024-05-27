@@ -51,7 +51,7 @@ TaskHandle_t * osUSBgetTaskHandle ( void )
 /*----------------------- Constant ------------------------------------------------------------------*/
 /*----------------------- Variables -----------------------------------------------------------------*/
 static uint8_t      usbPlug                       = 0U;
-static uint8_t      outputBuffer[USB_REPORT_SIZE] = { 0U };
+static uint8_t      outputBuffer[USB_REPORT_SIZE]    __SECTION(RAM_SECTION_RAM) = { 0U } ;
 static uint8_t      inputBuffer[USB_REPORT_SIZE]  = { 0U };
 //static osThreadId_t usbHandle                     = NULL;
 //static PIN_TYPE*    usbPullUpPin                  = NULL;
@@ -506,10 +506,11 @@ void vUSBreceiveHandler ( uint8_t *buffer, uint16_t len)
   return;
 }
 
+
 /*---------------------------------------------------------------------------------------------------*/
 void vUSBtask ( void *argument )
 {
-  USB_REPORT report = {.buf = inputBuffer};
+	USB_REPORT report = {.buf = inputBuffer};
   vDATAinit();
   USB_DeviceInit();
   for(;;)

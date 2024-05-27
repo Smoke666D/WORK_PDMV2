@@ -128,7 +128,7 @@ typedef struct {
 	uint32_t            record_mask;
 	//uint16_t			access_code;
 	uint8_t 			record_byte_size;
-	STRORAGE_ACCESS_TYPE_t access;
+
 } EEPROM_DISCRIPTOR;
 
 typedef struct {

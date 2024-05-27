@@ -20,6 +20,12 @@
 #endif
 
 
+#define MODE_DMA 1
+#define MODE_IT  2
+
+#define MODE_I2C  MODE_IT
+
+
 #if MCU == APM32
 #define I2C_1  I2C1
 #define I2C_2  I2C2

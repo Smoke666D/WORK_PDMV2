@@ -47,9 +47,9 @@
 
 /*   алгоритм получания данных для старшего байта адреса  */
 #define BYTE_SHIFT          8U
-#define MSB_SHIFT           15
+#define MSB_SHIFT           0x07
 #define MSB_MASK            0x0E
-#define GET_ADDR_MSB( ADDR) (( ADDR >>8 ) & MSB_MASK )
+#define GET_ADDR_MSB( ADDR) (( ADDR >>MSB_SHIFT ) & MSB_MASK )
 
 typedef enum {
     EEPROM_OK,
@@ -77,6 +77,7 @@ typedef struct
    uint8_t direciorn;
    uint8_t ADDR[2];
    uint8_t DevAdrres;
+   uint16_t data_address;
    uint8_t DataLength;
    uint8_t Index;
    uint8_t * ReciveBuffer;
@@ -84,7 +85,7 @@ typedef struct
    TaskHandle_t NotifyTaskHeandle;
    uint8_t DMA_TX;
    EERPOM_ERROR_CODE_t (*I2C_Master_Recive_func) (  u8 , u16,  u8 * , u16 , u32 ,u8 );
-   EERPOM_ERROR_CODE_t (*I2C_Master_Transmit_func)( u8 , u8 * , u16 , u32 ,u8 );
+   EERPOM_ERROR_CODE_t (*I2C_Master_Transmit_func)( u8 , u16,  u8 * , u16 , u32 ,u8 );
 } EEPOROM;
 
 

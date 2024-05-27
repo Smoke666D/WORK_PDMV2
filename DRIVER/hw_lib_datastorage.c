@@ -44,27 +44,22 @@ void vTestEEPROM()
 {
 
 
+	memset(data,0,100);
+	eEEPROMRd(0, data, 50 ,2);
+	for (u8 i = 0; i< 100; i++)
+	{
+		data[i] = i+10;
+	}
+	eEEPROMWr(0, data, 50, 2);
+	memset(data,0,100);
 
-	eEEPROMRd( 0, data, 14 ,2);
-	for (u8 i = 0; i< 100; i++)
-	{
-		data[i] = i+4;
-	}
-	eEEPROMWr( 0, data, 100, 2);
-	for (u8 i = 0; i< 100; i++)
-	{
-			data[i] = 0;
-	}
-	eEEPROMRd( 0, data, 100 ,2);
+	eEEPROMRd(0, data, 50 ,2);
 	for (u8 i = 0; i< 100; i++)
     {
 		data[i] = i;
     }
 	eEEPROMWr( 0, data, 100, 2);
-	for (u8 i = 0; i< 100; i++)
-		    {
-						data[i] = 0;
-		     }
+	memset(data,0,100);
 	eEEPROMRd( 0, data, 100 ,2);
 		for (u8 i = 0; i< 100; i++)
 		{
@@ -81,7 +76,6 @@ EERPOM_ERROR_CODE_t eIntiDataStorage( ACCESS_CHECK_t access_check )
 {
 
 	EERPOM_ERROR_CODE_t res = EEPROM_OK;
-	DataStorageDiscriptor.access = ( access_check == ACCESS_CHECK_ENABLE )? ACCESS_DENIED : ACCESS_ALLOWED;
 	( void )memset(datacash,0U,REGISTER_OFFSET );
 	res =  eEEPROMRd(VALIDE_CODE_ADDR, datacash, REGISTER_OFFSET ,2  );
 	if ( res== EEPROM_OK )
@@ -414,25 +408,25 @@ return (temp_time);
 
 uint16_t usGetEEPROMSize()
 {
-	return ( (DataStorageDiscriptor.access == ACCESS_ALLOWED) ? (EEPROM_SIZE) : 0 );
+	return ( EEPROM_SIZE);
 }
 
 
 
 int eAccessToken( uint16_t token)
 {
-	if (DataStorageDiscriptor.token == 0)
+	/*if (DataStorageDiscriptor.token == 0)
 	{
 		SET_SHORT( ACCESS_TOKEN_ADDR,  token);
 		DataStorageDiscriptor.token = token;
 		eEEPROMWr(ACCESS_TOKEN_ADDR, &datacash[ACCESS_TOKEN_ADDR],2, 2);
-		DataStorageDiscriptor.access = ACCESS_ALLOWED;
+
 	}
 	else
 	{
-		DataStorageDiscriptor.access  = /*(DataStorageDiscriptor.token == token) ?*/ ACCESS_ALLOWED /*: ACCESS_DENIED*/;
-	}
-	return  (DataStorageDiscriptor.access );
+		DataStorageDiscriptor.access  = /*(DataStorageDiscriptor.token == token) ? ACCESS_ALLOWED : ACCESS_DENIED;
+	}*/
+	return  (ACCESS_ALLOWED);
 }
 
 /*
@@ -443,15 +437,15 @@ int eAccessToken( uint16_t token)
  */
 uint16_t usEEPROMReadToExternData(EEPROM_ADRESS_TYPE addr, uint8_t * data, uint8_t len )
 {
-	if (DataStorageDiscriptor.access == ACCESS_ALLOWED)
-	{
+
+
 		USB_access = 1;
 		uint16_t remain = usGetEEPROMSize() - addr;
 		uint8_t  length = ( remain > len ) ? len : ( uint8_t )remain;
 		eEEPROMRd( addr , data,  length , 2);
 	    USB_access = 0;
 		return ( length );
-	}
+
 	return ( 0 );
 }
 /*
@@ -459,8 +453,7 @@ uint16_t usEEPROMReadToExternData(EEPROM_ADRESS_TYPE addr, uint8_t * data, uint8
  */
 EERPOM_ERROR_CODE_t eEEPROMWriteExternData ( uint32_t adr, const uint8_t* data, uint32_t length )
 {
-	if ( DataStorageDiscriptor.access == ACCESS_ALLOWED)
-	{
+
 		if ( length + adr  <= EEPROM_MAX_ADRRES )
 		{
 			USB_access = 1;
@@ -472,7 +465,7 @@ EERPOM_ERROR_CODE_t eEEPROMWriteExternData ( uint32_t adr, const uint8_t* data, 
 		{
 			return (EEPROM_NOT_VALIDE_ADRESS) ;
 		}
-	}
+
 	return ( EEPROM_ACCESS_ERROR );
 }
 
@@ -485,7 +478,6 @@ static void eResetDataStorage(uint32_t start_addr)
 {
 
 	 ( void )memset(data_buffer,0U,SECTOR_SIZE);
-	 DataStorageDiscriptor.access = ACCESS_ALLOWED;
 	 for ( uint16_t i= start_addr; i < EEPROM_SIZE; i = i + SECTOR_SIZE )
 	 {
 		 eEEPROMWriteExternData(i, data_buffer, SECTOR_SIZE );
