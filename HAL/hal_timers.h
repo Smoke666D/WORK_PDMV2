@@ -1,7 +1,7 @@
 /*
  * hal_timers.h
  *
- *  Created on: 9 апр. 2024 г.
+ *  Created on: 9 閭攲瑜�. 2024 璋�.
  *      Author: i.dymov
  */
 
@@ -35,7 +35,6 @@
 typedef enum {
 	FREE_RUN_TIMER,
 	PWM_TIMER,
-
 } TimerType_t;
 
 typedef enum {
@@ -62,18 +61,20 @@ typedef enum {
 #endif
 #if MCU == CH32V2
 #define TimerRef_t TIM_TypeDef *
-#define TIMERS_COUNT  5
+#define TIMERS_COUNT  4
 #endif
 
 typedef struct
 {
 	uint16_t Period;
 	uint16_t Div;
+	uint16_t ClockDiv;
 	TimerRef_t timers;
 	void (* callback_function)();
+	void (* event_callback_function)(u8, u16);
 } TimerConfif_t;
 
-void HAL_TIMER_InitIt( TimerName_t TimerName, uint32_t freq_in_hz, uint32_t Period, void (*f)() );
+void HAL_TIMER_InitIt( TimerName_t TimerName, uint32_t freq_in_hz, uint32_t Period, void (*f)() ,uint8_t prior, uint8_t subprior );
 u32 HAL_GetTimerCounterRegAdres(TimerName_t TimerName , uint8_t ch );
 void vHW_L_LIB_FreeRunEneblae( TimerName_t TimerName );
 void vHW_L_LIB_FreeRunInit( TimerName_t TimerName, uint32_t freq_in_hz  );
@@ -89,6 +90,8 @@ void HAL_TIMER_SetPWMPulse( TimerName_t TimerName , uint8_t channel, uint32_t pu
 void HAL_InitCaptureIRQTimer( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel );
 uint16_t vHAL_CaptureTimerInteruptCallback(TimerName_t TimerName , uint16_t TimInterupt  );
 void HW_TIMER_BaseTimerInit(TimerName_t TimerName  );
-void HAL_InitCaptureDMATimer( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel );
-
+void HAL_TimeInitCaptureIT( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel,uint8_t prior, uint8_t subprior, void (*f)( u8 ,u16) );
+void HAL_TimeInitCaptureDMA( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel );
 #endif /* HAL_HAL_TIMERS_H_ */
+
+

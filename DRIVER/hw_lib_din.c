@@ -7,6 +7,7 @@
 
 #include "hw_lib_din.h"
 #include "system_init.h"
+#include "hal_timers.h"
 
 static DinConfig_t 				 xDinConfig[ DIN_COUNT] __SECTION(RAM_SECTION_CCMRAM);
 static median_filter_data_t      RPM_MIDIAN_FILTER_STRUC[RPM_CHANNEL_COUNT];

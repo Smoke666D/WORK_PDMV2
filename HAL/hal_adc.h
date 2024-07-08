@@ -11,6 +11,13 @@
 
 #include "main.h"
 #include "hal_config.h"
+#include "hal_dma.h"
+
+typedef enum
+{
+    ADC_1 = 0,
+    ADC_2 = 1,
+} ADC_NUMBER_t;
 
 typedef enum
 {
@@ -36,19 +43,38 @@ typedef enum
 } ADC_CH_T;
 
 
+typedef struct
+{
+  void (*awdt_callback)(void);
 
+} ADC_t;
 
 #if MCU == APM32
-	#define ADC_NUMBER_t ADC_T*
-	#define	ADC_1  ADC1
-	#define ADC_2  ADC2
-	#define ADC_3  ADC3
+    #define ADC_NUMBER_t ADC_T*
+    #define ADC_1  ADC1
+    #define ADC_2  ADC2
+    #define ADC_3  ADC3
 #endif
 #if MCU == CH32V2
-	#define ADC_NUMBER_t ADC_TypeDef*
-	#define	ADC_1  ADC1
-	#define ADC_2  ADC2
+
+
    u16 Get_ConversionVal(s16 val);
+   /* ADC ADON mask */
+   #define CTLR2_ADON_Set                   ((uint32_t)0x00000001)
+   #define CTLR2_ADON_Reset                 ((uint32_t)0xFFFFFFFE)
+   /* ADC DMA mask */
+   #define CTLR2_DMA_Set                    ((uint32_t)0x00000100)
+   #define CTLR2_DMA_Reset                  ((uint32_t)0xFFFFFEFF)
+   /* ADC Software start mask */
+   #define CTLR2_EXTTRIG_SWSTART_Set        ((uint32_t)0x00500000)
+   #define CTLR2_EXTTRIG_SWSTART_Reset      ((uint32_t)0xFFAFFFFF)
+   /* ADC RSTCAL mask */
+   #define CTLR2_RSTCAL_Set                 ((uint32_t)0x00000008)
+   /* ADC CAL mask */
+   #define CTLR2_CAL_Set                    ((uint32_t)0x00000004)
+   /* ADC EXTTRIG mask */
+   #define CTLR2_EXTTRIG_Set                ((uint32_t)0x00100000)
+   #define CTLR2_EXTTRIG_Reset              ((uint32_t)0xFFEFFFFF)
 #endif
 
 
@@ -58,6 +84,6 @@ void HAL_ADC_TempEnable();
 void HAL_ADC_VrefEnable();
 void HAL_ADC_Enable(ADC_NUMBER_t adc_number);
 void HAL_ADCDMA_Disable(ADC_NUMBER_t adc_number);
-void HAL_ADC_AWDT_IT_Init( ADC_NUMBER_t adc, uint8_t channel );
-
+void HAL_ADC_AWDT_IT_Init( ADC_NUMBER_t adc, uint8_t channel,u16 low, u16 high, void (*f)(void ) , uint8_t prior, uint8_t subprior );
+void HAL_ADC_StartDMA( DMA_Stram_t chanel, uint16_t * data, uint16_t size);
 #endif /* HAL_HAL_ADC_H_ */

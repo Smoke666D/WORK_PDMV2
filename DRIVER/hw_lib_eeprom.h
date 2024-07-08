@@ -80,8 +80,8 @@ typedef struct
    uint8_t ADDR[2];
    uint8_t DevAdrres;
    uint16_t data_address;
-   uint8_t DataLength;
-   uint8_t Index;
+   uint16_t DataLength;
+   uint16_t Index;
    uint8_t * ReciveBuffer;
    I2C_NAME_t dev;
    TaskHandle_t NotifyTaskHeandle;
@@ -93,7 +93,7 @@ typedef struct
 
 
 
-void vInitEEPROM();
+void vInitEEPROM(uint8_t prior, uint8_t subprior);
 EEPOROM * xGetEEPROM();
 EERPOM_ERROR_CODE_t eEEPROMWr(  EEPROM_ADRESS_TYPE addr, uint8_t * data, EEPROM_ADRESS_TYPE len , uint8_t NotifyIndex );
 EERPOM_ERROR_CODE_t eEEPROMRd(  EEPROM_ADRESS_TYPE addr, uint8_t * data,   EEPROM_ADRESS_TYPE len , uint8_t NotifyIndex );

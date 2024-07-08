@@ -12,6 +12,7 @@
 
 void vRTCInit();
 void RTC_IRQHandler ( void );
-void HAL_RTC_IT_Init(  void (* rtc_it_callback) ( void ));
+void HAL_RTC_IT_Init(  void (* rtc_it_callback) ( void ), uint8_t prior, uint8_t subprior );
+
 
 #endif /* HAL_HAL_RTC_H_ */

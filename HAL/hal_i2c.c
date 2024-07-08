@@ -11,6 +11,13 @@
 #if MCU == APM32
 #include "apm32f4xx_dma.h"
 #endif
+#if MCU == CH32V2
+void   I2C1_EV_IRQHandler(void) __attribute__((interrupt()));  /* USB HP and CAN1 TX */
+void   I2C1_ER_IRQHandler(void) __attribute__((interrupt())); /* USB LP and CAN1RX0 */
+void    I2C2_EV_IRQHandler(void) __attribute__((interrupt()));        /* CAN1 RX1 */
+void   I2C2_ER_IRQHandler(void) __attribute__((interrupt()));       /* CAN1 SCE */
+#endif
+
 
 EEPOROM *   pEEPROM 			__SECTION(RAM_SECTION_CCMRAM);
 static void vDMAI2CEnable( void );
@@ -20,22 +27,19 @@ static EERPOM_ERROR_CODE_t I2C_Master_ReviceIT(  u8 DevAdrees, u16 data_addres, 
 static EERPOM_ERROR_CODE_t I2C_Master_TransmitIT(  u8 DevAdrees, u16 data_addres, u8 * data, u16 data_size, u32 timeout,uint8_t TNI  );
 
 
-void InitI2CDMA( I2C_NAME_t i2c)
+void InitI2CDMA( I2C_NAME_t i2c, uint8_t prior, uint8_t subprior)
 {
 
 #if	MCU == CH32V2
 	NVIC_InitTypeDef      NVIC_InitStructure = {0};
 	if ( i2c == I2C_1)
 	{
-		HAL_InitGpioAF(  I2C1_Port , I2C1_SCL_Pin  | I2C1_SDA_Pin , 0, MODE_OUT_PP );
 		RCC_APB1PeriphClockCmd( RCC_APB1Periph_I2C1, ENABLE );
 	}
 	else
 	if (i2c == I2C_2)
 	{
-	    HAL_InitGpioAF(  I2C1_Port , I2C1_SCL_Pin  | I2C1_SDA_Pin , 0, MODE_OUT_PP );
 	    RCC_APB1PeriphClockCmd( RCC_APB1Periph_I2C2, ENABLE );
-
 	}
     I2C_InitTypeDef I2C_InitTSturcture={0};
     I2C_InitTSturcture.I2C_ClockSpeed = 100000;
@@ -85,8 +89,8 @@ void InitI2CDMA( I2C_NAME_t i2c)
    if (i2c == I2C_1)
        {
 	   	   NVIC_InitStructure.NVIC_IRQChannel =  I2C1_EV_IRQn ;
-	       NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;
-	       NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	       NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = prior;
+	       NVIC_InitStructure.NVIC_IRQChannelSubPriority =  subprior;
 	       NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	       NVIC_Init(&NVIC_InitStructure);
 	       NVIC_InitStructure.NVIC_IRQChannel =  I2C1_ER_IRQn;
@@ -97,8 +101,8 @@ void InitI2CDMA( I2C_NAME_t i2c)
        if (i2c == I2C_2)
        {
     	   NVIC_InitStructure.NVIC_IRQChannel =  I2C2_EV_IRQn ;
-    	   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;
-    	   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    	   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = prior;
+    	   NVIC_InitStructure.NVIC_IRQChannelSubPriority =  subprior;
     	   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     	   NVIC_Init(&NVIC_InitStructure);
     	   NVIC_InitStructure.NVIC_IRQChannel =  I2C2_ER_IRQn;
@@ -110,23 +114,24 @@ void InitI2CDMA( I2C_NAME_t i2c)
 #if MCU == APM32
     if (i2c == I2C_1)
     {
-    		NVIC_EnableIRQRequest(I2C1_EV_IRQn, 5, 5);
-    		NVIC_EnableIRQRequest(I2C1_ER_IRQn, 5, 5);
+    		NVIC_EnableIRQRequest(I2C1_EV_IRQn, prior, subprior);
+    		NVIC_EnableIRQRequest(I2C1_ER_IRQn, prior, subprior);
     }
     else
     if (i2c == I2C_2)
     {
-    		NVIC_EnableIRQRequest(I2C2_EV_IRQn, 5, 5);
-    	    NVIC_EnableIRQRequest(I2C2_ER_IRQn, 5, 5);
+    		NVIC_EnableIRQRequest(I2C2_EV_IRQn, prior, subprior);
+    	    NVIC_EnableIRQRequest(I2C2_ER_IRQn, prior, subprior);
     }
     I2C_DisableDualAddress(pEEPROM->dev);
     I2C_Enable(pEEPROM->dev);
-
+#if MODE_I2D == MODE_DMA
     	vDMAI2CEnable();
-
+#endif
 #endif
 
 }
+
 
 
 static EERPOM_ERROR_CODE_t I2C_Master_ReviceIT( u8 DevAdrees, u16 data_addres,  u8 * data, u16 data_size, u32 timeout,uint8_t TNI  )
@@ -138,17 +143,26 @@ static EERPOM_ERROR_CODE_t I2C_Master_ReviceIT( u8 DevAdrees, u16 data_addres,  
     pEEPROM->DataLength     = data_size;
 	pEEPROM->ReciveBuffer   = data;
 	pEEPROM->DevAdrres      = DevAdrees;
-	pEEPROM->direciorn      = 5;
 	pEEPROM->data_address   = data_addres;
-	pEEPROM->DMA_TX 		= 0;
 	pEEPROM->NotifyTaskHeandle = xTaskGetCurrentTaskHandle();
 	pEEPROM->I2C_State = I2C_MASTER_RECIVE_START;
+#if MCU == APM32
 	while (I2C_ReadStatusFlag(pEEPROM->dev, I2C_FLAG_BUSBSY) == SET);
 	I2C_EnableAcknowledge(  pEEPROM->dev);
 	I2C_EnableGenerateStart(pEEPROM->dev);
 	I2C_EnableInterrupt( pEEPROM->dev ,  I2C_INT_EVT | I2C_INT_BUF );
 	uint32_t exit_code = ulTaskNotifyTakeIndexed( pEEPROM->ucTaskNatificationIndex, 0xFFFFFFFF, timeout );
 	I2C_DisableInterrupt(pEEPROM->dev, I2C_INT_EVT | I2C_INT_BUF | I2C_INT_ERR);
+#endif
+#if MCU == CH32V2
+	I2C_ITConfig(pEEPROM->dev, I2C_IT_BUF | I2C_IT_EVT | I2C_IT_ERR, DISABLE );
+	while( I2C_GetFlagStatus( pEEPROM->dev, I2C_FLAG_BUSY ) != RESET );
+	I2C_AcknowledgeConfig(pEEPROM->dev,ENABLE);
+	I2C_GenerateSTART( pEEPROM->dev,ENABLE);
+    I2C_ITConfig(pEEPROM->dev, I2C_IT_BUF | I2C_IT_EVT | I2C_IT_ERR, ENABLE );
+	uint32_t exit_code = ulTaskNotifyTakeIndexed( pEEPROM->ucTaskNatificationIndex, 0xFFFFFFFF, timeout );
+    I2C_ITConfig(pEEPROM->dev, I2C_IT_BUF | I2C_IT_EVT | I2C_IT_ERR, DISABLE );
+#endif
 	res = (exit_code == 0x01  )? (EEPROM_OK) : (EEPROM_WRITE_ERROR) ;
 	pEEPROM->BusyFlag = 0;
     return (res);
@@ -168,15 +182,25 @@ static EERPOM_ERROR_CODE_t I2C_Master_TransmitIT(  u8 DevAdrees, u16 data_addres
     pEEPROM->data_address   = data_addres;
     pEEPROM->NotifyTaskHeandle = xTaskGetCurrentTaskHandle();
     pEEPROM->I2C_State = I2C_MASTER_TRANSMIT_START;
+#if MCU == APM32
 	while (I2C_ReadStatusFlag(pEEPROM->dev, I2C_FLAG_BUSBSY) == SET);
     I2C_EnableGenerateStart(pEEPROM->dev);
     I2C_EnableInterrupt( pEEPROM->dev ,  I2C_INT_EVT | I2C_INT_BUF | I2C_INT_ERR);
 	uint32_t exit_code = ulTaskNotifyTakeIndexed( pEEPROM->ucTaskNatificationIndex, 0xFFFFFFFF, timeout);
 	I2C_DisableInterrupt(pEEPROM->dev, I2C_INT_EVT | I2C_INT_BUF | I2C_INT_ERR);
+#endif
+#if MCU == CH32V2
+#if MCU == CH32V2
+	I2C_ITConfig(pEEPROM->dev, I2C_IT_BUF | I2C_IT_EVT | I2C_IT_ERR, DISABLE );
+    while( I2C_GetFlagStatus( pEEPROM->dev, I2C_FLAG_BUSY ) != RESET );
+    I2C_GenerateSTART( pEEPROM->dev,ENABLE);
+    I2C_ITConfig(pEEPROM->dev, I2C_IT_BUF | I2C_IT_EVT | I2C_IT_ERR, ENABLE );
+    uint32_t exit_code = ulTaskNotifyTakeIndexed( pEEPROM->ucTaskNatificationIndex, 0xFFFFFFFF, timeout );
+    I2C_ITConfig(pEEPROM->dev, I2C_IT_BUF | I2C_IT_EVT | I2C_IT_ERR, DISABLE );
+#endif
+#endif
 	res = (exit_code > 0  )? (EEPROM_OK) : (EEPROM_READ_ERROR);
 	return (res) ;
-
-
 }
 
 static EERPOM_ERROR_CODE_t I2C_Master_ReviceDMA(  u8 DevAdrees, u16 data_addres,  u8 * data, u16 data_size, u32 timeout,uint8_t TNI  )
@@ -321,85 +345,130 @@ static void I2C_FSM()
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
+
 #if MCU == CH32V2
     uint16_t int_flags =   I2C_ReadRegister( pEEPROM->dev,  I2C_Register_STAR1 );
-
-
-    //EV5 STATE
-     if ( (int_flags  & (I2C_FLAG_SB & 0xFF) ) )
-     {
-         if (pEEPROM->direciorn  == DIR_TRANSMIT )
-        	   I2C_Send7bitAddress(  pEEPROM->dev, pEEPROM->DevAdrres |  GET_ADDR_MSB(pEEPROM->Index), pEEPROM->direciorn );
-         else
-        	   I2C_Send7bitAddress(  pEEPROM->dev, pEEPROM->DevAdrres, pEEPROM->direciorn );
-    	 return;
-     }
-     //EV6
-        if ( ( int_flags  & (I2C_FLAG_ADDR   & 0xFF) )  &&  ( pEEPROM->direciorn == DIR_TRANSMIT  ) )
+        switch(pEEPROM->I2C_State)
         {
+             case  I2C_MASTER_RECIVE_START:
+                 if (int_flags & 0x0001)
+                 {
+                     I2C_Send7bitAddress(  pEEPROM->dev, pEEPROM->DevAdrres, I2C_Direction_Transmitter );
+                     pEEPROM->I2C_State = I2C_MASTER_RECIVE_WRITE_ADDR;
+                 }
+                 break;
+              case I2C_MASTER_RECIVE_WRITE_ADDR:
+                 if (int_flags & 0x0002)
+                 {
+                       I2C_ReadRegister( pEEPROM->dev,  I2C_Register_STAR2 );
+                       I2C_SendData( pEEPROM->dev , (pEEPROM->data_address >>  8) & 0x1F );
+                       pEEPROM->I2C_State = I2C_MASTER_RECIVE_WRITE_ADDR2;
+                 }
+                 break;
+              case  I2C_MASTER_RECIVE_WRITE_ADDR2:
+                  if (int_flags & 0x0080)
+                  {
+                      I2C_SendData( pEEPROM->dev , pEEPROM->data_address & 0xFF );
+                      pEEPROM->I2C_State = I2C_MASTER_RECIVE_DA_WRITE;
+                  }
+                  break;
+              case I2C_MASTER_RECIVE_DA_WRITE:
+                  if (int_flags & 0x0080)
+                  {
+                      I2C_GenerateSTART(  pEEPROM->dev, ENABLE);
+                      pEEPROM->I2C_State = I2C_MASTER_RECIVE_ADDR;
+                   }
+                   break;
+              case I2C_MASTER_RECIVE_ADDR:
+                  if (int_flags & 0x0001)
+                  {
+                      I2C_Send7bitAddress(  pEEPROM->dev, pEEPROM->DevAdrres, I2C_Direction_Receiver);
+                      pEEPROM->I2C_State = I2C_MASTER_RECIVE_MODE;
+                  }
+                  break;
+             case I2C_MASTER_RECIVE_MODE:
+                  if (int_flags & 0x0002)
+                  {
+                      I2C_ReadRegister( pEEPROM->dev,  I2C_Register_STAR2 );
+                      pEEPROM->I2C_State = I2C_MASTER_RECIEVE;
+                   }
+                   break;
+            case I2C_MASTER_RECIEVE:
+                   if (int_flags & 0x0040)
+                   {
+                       if (pEEPROM->Index < (pEEPROM->DataLength-1))
+                       {
+                            pEEPROM->ReciveBuffer[pEEPROM->Index++] = I2C_ReceiveData( pEEPROM->dev);
+                       }
+                       else
+                       {
+                            I2C_AcknowledgeConfig(pEEPROM->dev, DISABLE );
+                            pEEPROM->ReciveBuffer[pEEPROM->Index++] = I2C_ReceiveData( pEEPROM->dev);
+                            I2C_GenerateSTOP( pEEPROM->dev, ENABLE );
+                            xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex, 0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
+                            portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+                            pEEPROM->I2C_State = I2C_IDLE;
+                        }
+                     }
+                     break;
+                 case  I2C_MASTER_TRANSMIT_START:
 
-        	if (pEEPROM->DMA_TX == 0)
-        	{
-        		 I2C_ReadRegister( pEEPROM->dev,  I2C_Register_STAR2 );
-        		 I2C_SendData(pEEPROM->dev, (u8)(pEEPROM->Index & 0x00FF));
-        	}
-        	else
-        	{
-        		I2C_ReadRegister( pEEPROM->dev,  I2C_Register_STAR2 );
-        		I2C_SendData( pEEPROM->dev, pEEPROM->ReciveBuffer[pEEPROM->Index] );
-        		pEEPROM->Index++;
-        	}
-    	    return;
-        }
-        if ( ( int_flags  & (I2C_FLAG_ADDR  & 0xFF) )  &&  ( pEEPROM->direciorn == DIR_RECIEVE ) )
-        {
-        	  I2C_ReadRegister(pEEPROM->dev,  I2C_Register_STAR2);
-        	  return;
-        }
-        if (( int_flags  & ((I2C_FLAG_TXE )   & 0xFF) )  && (pEEPROM->DMA_TX == 1))
-        {
-        	if (pEEPROM->Index < pEEPROM->DataLength )
-        	 {
-        	     I2C_SendData( pEEPROM->dev, pEEPROM->ReciveBuffer[pEEPROM->Index] );
-        	     pEEPROM->Index++;
-        	     return;
-        	 }
+                    if (int_flags & 0x0001)
+                    {
+                        I2C_Send7bitAddress(  pEEPROM->dev, pEEPROM->DevAdrres, I2C_Direction_Transmitter );
+                         pEEPROM->I2C_State = I2C_MASTER_TRANSMIT_ADDR;
+                    }
+                     break;
+                 case I2C_MASTER_TRANSMIT_ADDR:
+                    if  ( int_flags & 0x0400)
+                     {
+                        I2C_ClearFlag( pEEPROM->dev,I2C_FLAG_AF);
+                         I2C_GenerateSTART( pEEPROM->dev,ENABLE);
+                         pEEPROM->I2C_State = I2C_MASTER_TRANSMIT_START;
+                      }
+                     else
 
-        }
+                    if (int_flags & 0x0002)
+                    {
+                        I2C_ReadRegister( pEEPROM->dev,  I2C_Register_STAR2 );
+                        I2C_SendData( pEEPROM->dev , (pEEPROM->data_address >>  8) & 0x1F );
+                        pEEPROM->I2C_State = I2C_MASTER_TRANSMIT_ADDR2;
+                    }
+                     break;
 
-        if (( int_flags  & ((I2C_FLAG_TXE  | I2C_FLAG_BTF )   & 0xFF) ) )
-        {
-          	if (pEEPROM->DMA_TX == 0)
-          	{
-          		pEEPROM->direciorn =   DIR_RECIEVE;
-          		I2C_GenerateSTART(  pEEPROM->dev, ENABLE);
-          	}
-          	else
-          	{
-          		I2C_GenerateSTOP( pEEPROM->dev, ENABLE );
-          		xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
-          		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+                 case I2C_MASTER_TRANSMIT_ADDR2:
+                     if (int_flags & 0x0080)
+                     {
+                         I2C_SendData( pEEPROM->dev , pEEPROM->data_address & 0xFF );
+                         pEEPROM->I2C_State = I2C_MASTER_TRANSMIT_NEXT;
+                     }
 
-          	}
-          	return;
-        }
-        if (( int_flags  & ((I2C_FLAG_RXNE | I2C_FLAG_BTF   )   & 0xFF) ) )
-        {
-        	 if ( pEEPROM->Index < (pEEPROM->DataLength-1))
-        	 {
-        	     I2C_AcknowledgeConfig(pEEPROM->dev, ENABLE );
-        	     pEEPROM->ReciveBuffer[pEEPROM->Index++] = I2C_ReceiveData( pEEPROM->dev);
-        	 }
-        	 else
-        	 {
-        		  I2C_AcknowledgeConfig(pEEPROM->dev, DISABLE );
-        		  pEEPROM->ReciveBuffer[pEEPROM->Index++] = I2C_ReceiveData( pEEPROM->dev);
-        	      I2C_GenerateSTOP( pEEPROM->dev, ENABLE );
-        	      xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
-        	      portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-        	 }
-             return;
-        }
+                     break;
+                 case I2C_MASTER_TRANSMIT_NEXT:
+                     if (int_flags & 0x0080)
+                     {
+                        if (pEEPROM->Index < pEEPROM->DataLength )
+                        {
+                            I2C_SendData( pEEPROM->dev, pEEPROM->ReciveBuffer[pEEPROM->Index] );
+                           pEEPROM->Index++;
+                        }
+                        else
+                             pEEPROM->I2C_State = I2C_MASTER_TRANSMIT_LAST;
+                     }
+                     break;
+                 case  I2C_MASTER_TRANSMIT_LAST:
+                     if (int_flags & 0x0004)
+                     {
+                         I2C_GenerateSTOP( pEEPROM->dev, ENABLE );
+                         xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex, 0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
+                         portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+                         pEEPROM->I2C_State = I2C_IDLE;
+                     }
+                     break;
+                 default:
+                     break;
+             }
+
 
 #endif
 
@@ -577,39 +646,7 @@ static void I2C_FSM()
 #endif
 }
 
-void I2C_ERROR_FSM()
-{
-	 BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-#if MCU == APM32
 
-	 uint16_t int_flags =  I2C_ReadRegister( pEEPROM->dev,  I2C_REGISTER_STS1 );
-	 if  ( int_flags & 0x0400)
-	 {
-	    I2C_ClearIntFlag( pEEPROM->dev,I2C_INT_FLAG_AE);
-	    //I2C_EnableGenerateStop( pEEPROM->dev );
-	    I2C_EnableGenerateStart(pEEPROM->dev);
-	    //xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x02, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
-	    //portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-	    return;
-	 }
-#endif
-#if MCU == CH32V2
-	 I2C_ReadRegister(pEEPROM->dev,  I2C_Register_STAR2);
-		 uint16_t int_flags =  I2C_ReadRegister(pEEPROM->dev,  I2C_Register_STAR1);
-		 if ( ( int_flags & I2C_FLAG_AF) & 0xFFFF )
-		 {
-			 I2C_ClearITPendingBit( pEEPROM->dev,I2C_IT_AF);
-			 I2C_GenerateSTOP( pEEPROM->dev, ENABLE );
-		    xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x02, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
-		    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-		    return;
-		 }
-
-
-
-#endif
-
-}
 
 
 

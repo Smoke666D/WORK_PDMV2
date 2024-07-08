@@ -11,7 +11,6 @@
 #include "main.h"
 #include "string.h"
 #include "drivers_config.h"
-
 #include "filters.h"
 
 #define DIN_PARAM_CHECK 0
@@ -136,6 +135,7 @@ typedef enum {
 
 //#define  ucDinGet( a )  uGetDIN( a )
 void InitDinStcurt();
+uint8_t uGetDIN(DIN_INPUT_NAME ucCh);
 void RMPDataConvert(DIN_INPUT_NAME ucCh);
 DIN_INPUT_TYPE xGetDinType(DIN_INPUT_NAME ucCh);
 void vRecinfigDin(  DIN_INPUT_NAME ucCh, DinConfig_t * config    );

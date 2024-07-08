@@ -15,18 +15,16 @@
 //#include "event_groups.h"
 
 
-
-static uint8_t sector_buffer[SECTOR_SIZE + ADDRESS_DATA] 	__SECTION(RAM_SECTION_RAM);
 static EEPOROM Dev 							         		__SECTION(RAM_SECTION_RAM);
-static void vSetAddr(EEPROM_ADRESS_TYPE addr );
 
 
 
 
- void vInitEEPROM()
+
+ void vInitEEPROM(uint8_t prior, uint8_t subprior)
  {
 
-	 InitI2CDMA(EEPROM_I2C);
+	 InitI2CDMA(EEPROM_I2C,prior,subprior);
  }
 
 EEPOROM * xGetEEPROM()
@@ -43,9 +41,6 @@ EERPOM_ERROR_CODE_t eEEPROMWr(  EEPROM_ADRESS_TYPE addr, uint8_t * data, EEPROM_
    {
      if (len == sizeof(uint8_t))
      {
-         // sector_buffer[0] =  (addr >> 8) & 0xFF ;
-         // sector_buffer[0] =  addr & 0xFF ;
-         //sector_buffer[ADDRESS_DATA] = *data;
          res =  Dev.I2C_Master_Transmit_func( Device_ADD ,  addr  , data, ADDRESS_DATA + sizeof(uint8_t) , EEPROM_TIME_OUT , NotifyIndex )  ;
      }
      else
@@ -58,9 +53,6 @@ EERPOM_ERROR_CODE_t eEEPROMWr(  EEPROM_ADRESS_TYPE addr, uint8_t * data, EEPROM_
          {
              cur_len = SECTOR_SIZE - ( cur_addr % SECTOR_SIZE );
              if ( cur_len > byte_to_send )  cur_len = byte_to_send;
-             //memcpy( &sector_buffer[ADDRESS_DATA], &data[offset], cur_len );
-             //sector_buffer[0] =  (cur_addr >> 8) & 0xFF ;
-             //sector_buffer[0] =  cur_addr & 0xFF ;
              for (int i =0; i<6;i++)
              {
                 res = Dev.I2C_Master_Transmit_func( Device_ADD , cur_addr  , &data[offset],  cur_len  , 10, NotifyIndex );
@@ -86,11 +78,7 @@ EERPOM_ERROR_CODE_t eEEPROMRd(  EEPROM_ADRESS_TYPE addr, uint8_t * data,   EEPRO
      return (  EEPROM_NOT_VALIDE_ADRESS );
 }
 
-static void vSetAddr(EEPROM_ADRESS_TYPE addr )
-{
-     // Dev.ADDR[0] = (addr >> 8) & 0xFF ;
-      Dev.ADDR[0] =  addr & 0xFF;
-}
+
 
 uint8_t bReadEEPROM( EEPROM_ADRESS_TYPE addr, uint8_t NotifyIndex )
 {

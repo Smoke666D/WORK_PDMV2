@@ -63,12 +63,20 @@ uint16_t ucGetRawData( uint8_t ch, uint8_t filter)
 static float fConvertCalData( AIN_NAME_t name, float in_data )
 {
     float out_data = 0;
-    for (uint16_t i =  xAinData[ name ].index; i < (xAinData[ name ].index + xAinData[ name ].coof_count ); i++ )
+    uint16_t i;
+    uint16_t max_index = xAinData[ name ].index + xAinData[ name ].coof_count;
+
+    for ( i =  xAinData[ name ].index; i < max_index  ; i++ )
     {
         if ( (i ==  (xAinData[ name ].index + xAinData[ name ].coof_count)) || (in_data <= xKoofData[i].data ) )
         {
             out_data = xKoofData[i].k * in_data + xKoofData[i].b;
+            break;
         }
+    }
+    if (i == max_index  )
+    {
+        out_data = xKoofData[max_index -1].k * xKoofData[max_index-1 ].data  + xKoofData[max_index-1 ].b;
     }
     return ( out_data );
 }

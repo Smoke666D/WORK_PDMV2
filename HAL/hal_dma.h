@@ -1,13 +1,12 @@
 /*
  * hal_dma.h
  *
- *  Created on: 25 апр. 2024 г.
+ *  Created on: 25
  *      Author: i.dymov
  */
 
 #ifndef HAL_HAL_DMA_H_
 #define HAL_HAL_DMA_H_
-
 
 #include "main.h"
 #include "hal_config.h"
@@ -27,16 +26,17 @@
 #define DMA2_CH8  	DMA2_Stream8
 #endif
 #if MCU == CH32V2
-#define DMA_Stram_t DMA_Channel_TypeDef *
-
-#define DMA1_CH1  	DMA1_Channel1
-#define DMA1_CH2  	DMA1_Channel2
-#define DMA1_CH3  	DMA1_Channel3
-#define DMA1_CH4  	DMA1_Channel4
-#define DMA1_CH5  	DMA1_Channel5
-#define DMA1_CH6  	DMA1_Channel6
-#define DMA1_CH7  	DMA1_Channel7
-#define DMA1_CH8  	DMA1_Channel8
+typedef enum
+{
+    DMA1_CH1 =0,
+    DMA1_CH2 =1,
+    DMA1_CH3 =2,
+    DMA1_CH4 =3,
+    DMA1_CH5 =4,
+    DMA1_CH6 =5,
+    DMA1_CH7 =6,
+}
+DMA_Stram_t;
 #endif
 
 typedef enum
@@ -72,11 +72,11 @@ typedef struct
 
 } DMA_CFG_t;
 
-
+void HAL_DMA_SetCouterAndEnable(DMA_Stram_t stream, uint32_t counter );
 void HAL_DMA_Enable(DMA_Stram_t stream  );
 void HAL_DMA_Disable(DMA_Stram_t stream  );
 void HAL_DMA_SetCounter( DMA_Stram_t stream, uint32_t counter );
-void HAL_ADC_StartDMA( DMA_Stram_t chanel, uint16_t * data, uint16_t size);
+void HAL_DMA_ITENABLE( DMA_Stram_t stream, uint32_t it );
 #if MCU == APM32
 void DMA2_STR4_IRQHandler( void );
 void DMA2_STR2_IRQHandler( void );

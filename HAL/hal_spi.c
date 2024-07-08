@@ -1,34 +1,52 @@
 /*
  * HAL_SPI.c
  *
- *  Created on: 14 мая 2024 г.
+ *  Created on: 14 屑邪褟 2024 谐.
  *      Author: i.dymov
  */
 
 
 #include "hal_spi.h"
 
+#if MCU == CH32V2
+
+SPI_TypeDef * SPI[] ={SPI1,SPI2};
+
+#endif
 
 
-void HAL_SPI_InitDMA(HAL_SPI_t spi , SPI_DATA_Size_t data_size , SPI_NSS_t nss)
+void HAL_SPI_InitDMA(HAL_SPI_t spi , SPI_DATA_Size_t data_size )
 {
 #if MCU == CH32V2
-	SPI_InitTypeDef  SPI_InitStructure = {0};
-	if ( spi == SPI1 )  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
-	if ( spi == SPI2 )  RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-	SPI_I2S_DeInit(spi);
-	SPI_InitStructure.SPI_Direction = SPI_Direction_1Line_Tx;//SPI_Direction_2Lines_FullDuplex;
-	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
-	SPI_InitStructure.SPI_DataSize = ( data_size == SPI_8bit) ? SPI_DataSize_8b : SPI_DataSize_16b;
-    SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
-    SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
-    SPI_InitStructure.SPI_NSS = (nss == SPI_SOFT_NSS) ? SPI_NSS_Soft : SPI_NSS_Hard ;
-	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
-    SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB ;
-    SPI_InitStructure.SPI_CRCPolynomial = 0;
-    SPI_Init(spi, &SPI_InitStructure);
-    SPI_I2S_DMACmd(spi, SPI_I2S_DMAReq_Tx, ENABLE);
-    SPI_Cmd(spi, ENABLE);
+    SPI_TypeDef * SPI_;
+    if ( spi == HAL_SPI1)
+    {
+    	SPI_ = SPI1;
+    	RCC->APB2PRSTR |= RCC_APB2Periph_SPI1;
+    	RCC->APB2PRSTR &= ~RCC_APB2Periph_SPI1;
+    	RCC->APB2PCENR |= RCC_APB2Periph_SPI1;
+   }
+   else
+   {
+    	 SPI_ = SPI2;
+    	 RCC->APB1PRSTR |= RCC_APB1Periph_SPI2;
+    	 RCC->APB1PRSTR &= ~RCC_APB1Periph_SPI2;
+    	 RCC->APB1PCENR |= RCC_APB1Periph_SPI2;
+   }
+	u16 SPI_DataSize = ( data_size == SPI_8bit) ? SPI_DataSize_8b : SPI_DataSize_16b;
+    uint16_t tmpreg = 0;
+    tmpreg = SPI_->CTLR1;
+    tmpreg &= CTLR1_CLEAR_Mask;
+    tmpreg |= (uint16_t)((uint32_t)SPI_Direction_1Line_Tx | SPI_Mode_Master |
+                             SPI_DataSize | SPI_CPOL_Low |
+                             SPI_CPHA_1Edge | SPI_NSS_Soft |
+                             SPI_BaudRatePrescaler_4 | SPI_FirstBit_MSB );
+
+    SPI_->CTLR1 = tmpreg;
+    SPI_->I2SCFGR &= SPI_Mode_Master;
+    SPI_->CRCR = 0;
+    SPI_->CTLR2 |= SPI_I2S_DMAReq_Tx;
+    SPI_->CTLR1 |= CTLR1_SPE_Set;
 #endif
 
 }
@@ -36,9 +54,7 @@ void HAL_SPI_InitDMA(HAL_SPI_t spi , SPI_DATA_Size_t data_size , SPI_NSS_t nss)
 void HAL_SPI_RXOveleyClear(HAL_SPI_t spi )
 {
 #if MCU == CH32V2
-	SPI_I2S_ClearFlag(spi,SPI_I2S_FLAG_OVR);
-
-
+    SPI[spi]->STATR = (uint16_t)~SPI_I2S_FLAG_OVR;
 #endif
 
 }
@@ -46,6 +62,6 @@ void HAL_SPI_RXOveleyClear(HAL_SPI_t spi )
 uint8_t HAL_SPI_GetBusy(HAL_SPI_t spi )
 {
 #if MCU == CH32V2
-	return ((SPI_I2S_GetFlagStatus(spi,SPI_I2S_FLAG_BSY) == SET) ? HAL_SET : HAL_RESET);
+	return (((SPI[spi]->STATR & SPI_I2S_FLAG_BSY) == SET) ? HAL_SET : HAL_RESET);
 #endif
 }

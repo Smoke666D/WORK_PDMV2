@@ -61,7 +61,7 @@ int main(void)
 {
 	//SystemCoreClockUpdate();
 	NVIC_ConfigPriorityGroup(NVIC_PRIORITY_GROUP_3);
-	HAL_InitGpioLib();
+	//HAL_InitGpioLib();
 	vInitGPIO();
     vRTCInit();
 	vHWLilBaseTimerInit(TMR13);
@@ -70,7 +70,7 @@ int main(void)
 	vSYStaskInit ( );
     /* User create task */
 	vCANinit();
-	vInitEEPROM();
+	vInitEEPROM(5,5);
     /* Startup FreeRTOS */
     vTaskStartScheduler();
     while(1);
