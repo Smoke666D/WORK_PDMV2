@@ -73,25 +73,41 @@ typedef struct
 	void (* callback_function)();
 	void (* event_callback_function)(u8, u16);
 } TimerConfif_t;
-
-void HAL_TIMER_InitIt( TimerName_t TimerName, uint32_t freq_in_hz, uint32_t Period, void (*f)() ,uint8_t prior, uint8_t subprior );
+#if MCU == CH32V2
 u32 HAL_GetTimerCounterRegAdres(TimerName_t TimerName , uint8_t ch );
+void HAL_TIMER_EnablePWMCH(TimerName_t TimerName  );
+void HAL_TimeInitCaptureDMA( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel );
+void HAL_TIMER_InitIt( TimerName_t TimerName, uint32_t freq_in_hz, uint32_t Period, void (*f)() ,uint8_t prior, uint8_t subprior );
+#endif
+
+
 void vHW_L_LIB_FreeRunEneblae( TimerName_t TimerName );
-void vHW_L_LIB_FreeRunInit( TimerName_t TimerName, uint32_t freq_in_hz  );
-uint32_t uGetFreeRuningTimer(TimerName_t TimerName );
+
+
 void HAL_TiemrEneblae( TimerName_t TimerName );
 void HAL_TiemrDisable( TimerName_t TimerName );
-void vHAL_EnableTimerIRQ(TimerName_t TimerName,uint8_t priority, uint16_t interupt, uint8_t INT_FLAG );
-void vHAL_SetTimerFreq( TimerName_t TimerName, uint32_t freq_in_hz  );
-void HAL_TIMER_EnablePWMCH(TimerName_t TimerName , uint8_t channel );
-void HAL_TIMER_DisablePWMCH(TimerName_t TimerName , uint8_t channel );
+
+
+
+
 void HAL_TIMER_PWMTimersInit(TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel);
 void HAL_TIMER_SetPWMPulse( TimerName_t TimerName , uint8_t channel, uint32_t pulse );
-void HAL_InitCaptureIRQTimer( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel );
-uint16_t vHAL_CaptureTimerInteruptCallback(TimerName_t TimerName , uint16_t TimInterupt  );
+
+
 void HW_TIMER_BaseTimerInit(TimerName_t TimerName  );
 void HAL_TimeInitCaptureIT( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel,uint8_t prior, uint8_t subprior, void (*f)( u8 ,u16) );
-void HAL_TimeInitCaptureDMA( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel );
+
+#if MCU == APM32
+void vHW_L_LIB_FreeRunInit( TimerName_t TimerName, uint32_t freq_in_hz  );
+void vHAL_SetTimerFreq( TimerName_t TimerName, uint32_t freq_in_hz  );
+void vHAL_EnableTimerIRQ(TimerName_t TimerName,uint8_t priority, uint16_t interupt, uint8_t INT_FLAG );
+void HAL_InitCaptureIRQTimer( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel );
+uint16_t vHAL_CaptureTimerInteruptCallback(TimerName_t TimerName , uint16_t TimInterupt  );
+void HAL_TIMER_DisablePWMCH(TimerName_t TimerName , uint8_t channel );
+void HAL_TIMER_EnablePWMCH(TimerName_t TimerName , uint8_t channel );
+uint32_t uGetFreeRuningTimer(TimerName_t TimerName );
+#endif
 #endif /* HAL_HAL_TIMERS_H_ */
+
 
 

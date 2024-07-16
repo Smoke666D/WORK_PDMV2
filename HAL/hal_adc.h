@@ -1,7 +1,7 @@
 /*
  * hal_adc.h
  *
- *  Created on: 11 апр. 2024 г.
+ *  Created on: 11 邪锌褉. 2024 谐.
  *      Author: i.dymov
  */
 
@@ -78,12 +78,18 @@ typedef struct
 #endif
 
 
-void HAL_ADC_CommonConfig();
+
 void HAL_ADC_ContiniusScanCinvertionDMA( ADC_NUMBER_t adc, uint8_t channel_count, uint8_t * channel_nmber);
-void HAL_ADC_TempEnable();
-void HAL_ADC_VrefEnable();
+
+#if MCU == CH32V2
+void HAL_ADC_StartDMA( DMA_Stram_t chanel,  uint16_t size);
+#endif
+#if MCU == APM32
+void HAL_ADC_CommonConfig();
 void HAL_ADC_Enable(ADC_NUMBER_t adc_number);
 void HAL_ADCDMA_Disable(ADC_NUMBER_t adc_number);
-void HAL_ADC_AWDT_IT_Init( ADC_NUMBER_t adc, uint8_t channel,u16 low, u16 high, void (*f)(void ) , uint8_t prior, uint8_t subprior );
+void HAL_ADC_TempEnable();
+void HAL_ADC_VrefEnable();
 void HAL_ADC_StartDMA( DMA_Stram_t chanel, uint16_t * data, uint16_t size);
+#endif
 #endif /* HAL_HAL_ADC_H_ */

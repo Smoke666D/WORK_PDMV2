@@ -72,16 +72,19 @@ typedef struct
 
 } DMA_CFG_t;
 
+#if MCU == CH32V2
+void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, uint32_t memadr,  uint8_t prior, uint8_t subprior, void (*f)(void));
 void HAL_DMA_SetCouterAndEnable(DMA_Stram_t stream, uint32_t counter );
 void HAL_DMA_Enable(DMA_Stram_t stream  );
 void HAL_DMA_Disable(DMA_Stram_t stream  );
 void HAL_DMA_SetCounter( DMA_Stram_t stream, uint32_t counter );
 void HAL_DMA_ITENABLE( DMA_Stram_t stream, uint32_t it );
+#endif
 #if MCU == APM32
 void DMA2_STR4_IRQHandler( void );
 void DMA2_STR2_IRQHandler( void );
 void DMA2_STR0_IRQHandler( void );
-#endif
 void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, uint32_t memadr, DMA_CHANNEL_t channel, uint8_t prior, uint8_t subprior, void (*f)(void));
+#endif
 
 #endif /* HAL_HAL_DMA_H_ */
