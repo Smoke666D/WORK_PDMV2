@@ -15,7 +15,7 @@
 
 #define APM32     0
 #define CH32V2      1
-
+#define CH32V3     2
 
 #include "board_define.h"
 #if MCU == APM32
@@ -28,16 +28,19 @@
 #define  MAX_GPIO_PORT 7
 
 #if MCU == APM32
+typedef enum
+{
+  PORT_A = 0,
+  PORT_B = 1,
+  PORT_C = 2,
+  PORT_D = 3,
+  PORT_E = 4,
+  PORT_F = 5,
+  PORT_G = 6,
+  PORT_H = 7,
+} PortName_t ;
 
-#define   PORT_A  GPIOA
-#define   PORT_B  GPIOB
-#define   PORT_C  GPIOC
-#define   PORT_D  GPIOD
-#define   PORT_E  GPIOE
-#define   PORT_F  GPIOF
-#define   PORT_G  GPIOG
-#define   PORT_H  GPIOH
-#define   PortName_t   GPIO_T*
+
 #endif
 
 #if MCU == CH32V2

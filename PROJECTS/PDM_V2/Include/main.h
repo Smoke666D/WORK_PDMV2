@@ -47,6 +47,7 @@
   @{
   */
 
+void SoftwareReset();
 #ifdef __cplusplus
 }
 #endif

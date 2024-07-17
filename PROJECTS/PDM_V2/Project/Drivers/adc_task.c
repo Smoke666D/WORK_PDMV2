@@ -859,6 +859,7 @@ void AinNotifyTaskToInit()
    uint8_t ADC1_CHANNEL[9] = { ADC_CH_4,  ADC_CH_7, ADC_CH_6, ADC_CH_5,  ADC_CH_14, ADC_CH_15, ADC_CH_8,  ADC_CH_16, ADC_CH_9};
    uint8_t ADC2_CHANNEL[7] = { ADC_CH_11, ADC_CH_0, ADC_CH_1, ADC_CH_13, ADC_CH_12, ADC_CH_3,  ADC_CH_2 };
    uint8_t ADC3_CHANNEL[9] = { ADC_CH_14, ADC_CH_9, ADC_CH_7, ADC_CH_4,  ADC_CH_15, ADC_CH_8,  ADC_CH_10, ADC_CH_6, ADC_CH_5};
+   HAL_ADC_CommonConfig();
    HAL_ADC_ContiniusScanCinvertionDMA( ADC_1 ,  9 ,  ADC1_CHANNEL);
    HAL_ADC_ContiniusScanCinvertionDMA( ADC_2 ,  7 ,  ADC2_CHANNEL);
    HAL_ADC_ContiniusScanCinvertionDMA( ADC_3 ,  9 ,  ADC3_CHANNEL);

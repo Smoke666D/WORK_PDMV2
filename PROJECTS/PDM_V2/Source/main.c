@@ -61,7 +61,6 @@ int main(void)
 {
 	//SystemCoreClockUpdate();
 	NVIC_ConfigPriorityGroup(NVIC_PRIORITY_GROUP_3);
-	HAL_InitGpioLib();
 	vInitGPIO();
     vRTCInit();
 	vHWLilBaseTimerInit(TMR13);
@@ -76,7 +75,11 @@ int main(void)
     while(1);
 }
 
+void SoftwareReset()
+{
+	__NVIC_SystemReset();
 
+}
 
 
 

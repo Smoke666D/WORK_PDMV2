@@ -53,7 +53,7 @@ void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t d
 	   IRQn_Type  irq;
 	   DMA_CHANNEL_T ch;
 	  /* Enable DMA clock */
-	   RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_DMA2);
+	   RCM->AHB1CLKEN |= RCM_AHB1_PERIPH_DMA2;
 	   switch (direction)
 	   {
 	   	   case MTOP:

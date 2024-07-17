@@ -17,8 +17,58 @@ static FLASH_LOCK flashLock = FLASH_LOCKED;
 static void eFLASHlock ( void )
 {
   flashLock = FLASH_LOCKED;
-  FMC_Lock();
+  FMC->CTRL |= FMC_CTRL_LOCK; //FLASH LOCK
+
 }
+
+
+FMC_STATUS_T HAL_FMC_ReadStatus(void)
+{
+    if ((FMC->STS & FMC_FLAG_BUSY) == FMC_FLAG_BUSY)
+    {
+        return ( FMC_BUSY);
+    }
+    if ((FMC->STS & (FMC_FLAG_ERRWRP | FMC_FLAG_ERROP | 0xE0) ) != RESET)
+    {
+        return ( FMC_ERROR_OPERATION );
+    }
+    return (FMC_COMPLETE);
+}
+
+
+FMC_STATUS_T HAL_FMC_WaitForLastOperation(void)
+{
+    __IO FMC_STATUS_T status = FMC_COMPLETE;
+
+    status = HAL_FMC_ReadStatus();
+
+    while (status == FMC_BUSY)
+    {
+        status = HAL_FMC_ReadStatus();
+    }
+
+    return status;
+}
+
+FMC_STATUS_T HAL_FMC_ProgramByte(uint32_t address, uint8_t data)
+{
+    FMC_STATUS_T status = FMC_COMPLETE;
+    status = HAL_FMC_WaitForLastOperation();
+
+    if (status == FMC_COMPLETE)
+    {
+        FMC->CTRL &= 0xFFFFFCFF;
+        FMC->CTRL |= FMC_PSIZE_BYTE;
+        FMC->CTRL |= FMC_CTRL_PG;
+        *(__IO uint8_t*)address = data;
+        status = HAL_FMC_WaitForLastOperation();
+        FMC->CTRL &= (~FMC_CTRL_PG);
+    }
+
+    return status;
+}
+
+
 FLASH_STATE eFLASHwriteScript ( uint32_t adr, const uint8_t* data, uint32_t length )
 {
   FLASH_STATE       res       = FLASH_OK;
@@ -42,7 +92,7 @@ FLASH_STATE eFLASHwriteScript ( uint32_t adr, const uint8_t* data, uint32_t leng
         for ( uint32_t i=0U; i<length; i++ )
         {
           curentAdr = FLASH_STORAGE_ADR + adr + ( i * sizeof( uint8_t ) );
-          if ( FMC_ProgramByte(  curentAdr, data[i] ) != FMC_COMPLETE )
+          if ( HAL_FMC_ProgramByte(  curentAdr, data[i] ) != FMC_COMPLETE )
           {
             res = FLASH_ERROR_WRITING;
             break;

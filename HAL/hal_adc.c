@@ -12,7 +12,7 @@
 	#include "apm32f4xx_dma.h"
 #endif
 
-static uint8_t ADC_INIT = 0;
+
 
 #if MCU == APM32
 static const  ADC_CHANNEL_T ADC_chennel_ref[]={  ADC_CHANNEL_0,  ADC_CHANNEL_1,  ADC_CHANNEL_2, ADC_CHANNEL_3, ADC_CHANNEL_4,  ADC_CHANNEL_5,  ADC_CHANNEL_6,  ADC_CHANNEL_7,  ADC_CHANNEL_8,  ADC_CHANNEL_9,  ADC_CHANNEL_10,
@@ -42,16 +42,12 @@ u16 Get_ConversionVal(s16 val)
 void HAL_ADC_CommonConfig()
  {
 #if MCU == APM32
-	 ADC_CommonConfig_T      adcCommonConfig;
-	 if (ADC_INIT==0)
-	 {
-		 ADC_Reset();
-		 ADC_CommonConfigStructInit(&adcCommonConfig);
-		 adcCommonConfig.mode            = ADC_MODE_INDEPENDENT;
-		 adcCommonConfig.prescaler       = ADC_PRESCALER_DIV8;
-		 ADC_CommonConfig(&adcCommonConfig);
-		 ADC_INIT = 1;
-	 }
+    RCM->APB2RST |=RCM_APB2_PERIPH_ADC;			//Сброс АЦП
+    RCM->APB2RST &= (uint32_t)~RCM_APB2_PERIPH_ADC;
+	ADC->CCTRL_B.ADCMSEL = ADC_MODE_INDEPENDENT;
+	ADC->CCTRL_B.ADCPRE = ADC_PRESCALER_DIV8;
+	ADC->CCTRL_B.DMAMODE = ADC_ACCESS_MODE_DISABLED;
+	ADC->CCTRL_B.SMPDEL2 = ADC_TWO_SAMPLING_5CYCLES;;
 #endif
 #if MCU == CH32V2
 	 RCC_ADCCLKConfig(RCC_PCLK2_Div8);
@@ -62,14 +58,16 @@ void HAL_ADC_CommonConfig()
 void HAL_ADC_ContiniusScanCinvertionDMA( ADC_NUMBER_t adc, uint8_t channel_count, uint8_t *  channel_nmber)
  {
 #if MCU == APM32
-	ADC_Config_T  adcConfig;
+
+
 	if ( adc == ADC_1)
-	    RCM_EnableAPB2PeriphClock( RCM_APB2_PERIPH_ADC1 );
+		RCM->APB2CLKEN |=RCM_APB2_PERIPH_ADC1 ;
 	else
 	if (adc == ADC_2)
-	   RCM_EnableAPB2PeriphClock( RCM_APB2_PERIPH_ADC2 );
+		RCM->APB2CLKEN |= RCM_APB2_PERIPH_ADC2 ;
 	else
-	   RCM_EnableAPB2PeriphClock( RCM_APB2_PERIPH_ADC3 );
+		RCM->APB2CLKEN |=RCM_APB2_PERIPH_ADC3 ;
+
 #endif
 #if MCU == CH32V2
 	ADC_InitTypeDef  adcConfig;
@@ -79,19 +77,28 @@ void HAL_ADC_ContiniusScanCinvertionDMA( ADC_NUMBER_t adc, uint8_t channel_count
 			 RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);
 
 #endif
-	 HAL_ADC_CommonConfig();
+
 
 
 #if MCU == APM32
 
-	 ADC_ConfigStructInit( &adcConfig );
-	 adcConfig.resolution            = ADC_RESOLUTION_12BIT;
-	 adcConfig.scanConvMode          = ENABLE;
-	 adcConfig.continuousConvMode    = ENABLE;
-	 adcConfig.dataAlign             = ADC_DATA_ALIGN_RIGHT;
-	 adcConfig.extTrigEdge           = ADC_EXT_TRIG_EDGE_NONE;
-	 adcConfig.nbrOfChannel          = channel_count;
-	 ADC_Config(adc, &adcConfig);
+	// ADC_ConfigStructInit( &adcConfig );
+	// adcConfig.resolution            = ADC_RESOLUTION_12BIT;
+	// adcConfig.scanConvMode          = ENABLE;
+	// adcConfig.continuousConvMode    = ENABLE;
+	// adcConfig.dataAlign             = ADC_DATA_ALIGN_RIGHT;
+	// adcConfig.extTrigEdge           = ADC_EXT_TRIG_EDGE_NONE;
+	// adcConfig.nbrOfChannel          = channel_count;
+	// ADC_Config(adc, &adcConfig);
+
+	adc->CTRL1_B.RESSEL = ADC_RESOLUTION_12BIT;
+	adc->CTRL1_B.SCANEN = ENABLE;
+	adc->CTRL2_B.REGEXTTRGEN = ADC_EXT_TRIG_EDGE_NONE;
+	adc->CTRL2_B.REGEXTTRGSEL = ADC_EXT_TRIG_CONV_TMR1_CC1;
+	adc->CTRL2_B.DALIGNCFG = ADC_DATA_ALIGN_RIGHT;
+	adc->CTRL2_B.CONTCEN = ENABLE;
+
+	adc->REGSEQ1_B.REGSEQLEN = channel_count - 1;
 	 for (u8 i=0; i< (channel_count) ;i++)
 	 {
 		 ADC_ConfigRegularChannel(adc,  ADC_chennel_ref[channel_nmber[ i  ]],  i + 1, ADC_SAMPLETIME_112CYCLES);
@@ -135,33 +142,34 @@ void HAL_ADC_ContiniusScanCinvertionDMA( ADC_NUMBER_t adc, uint8_t channel_count
 void HAL_ADC_TempEnable()
 {
 #if MCU == APM32
-	 ADC_EnableTempSensorVrefint();
+	ADC->CCTRL_B.TSVREFEN = BIT_SET;  //ADC trmp sensor Enable
 #endif
 }
 
 void HAL_ADC_VrefEnable()
 {
 #if MCU == APM32
-	  ADC_EnableVbat();
+	ADC->CCTRL_B.VBATEN = BIT_SET;  //ADC Enable Vbat
 #endif
 }
 
 
 
 
-void HAL_ADC_Enable(ADC_NUMBER_t adc_number)
+void HAL_ADC_Enable(ADC_NUMBER_t adc)
 {
 #if MCU == APM32
-	ADC_Enable(adc_number);
+	adc->CTRL2_B.ADCEN = BIT_SET;
+
 #endif
 }
 
 
-void HAL_ADCDMA_Disable(ADC_NUMBER_t adc_number)
+inline void HAL_ADCDMA_Disable(ADC_NUMBER_t adc)
 {
 #if MCU == APM32
-	ADC_Disable(adc_number);
-	ADC_DisableDMA(adc_number);
+	adc->CTRL2_B.ADCEN = BIT_RESET;
+	adc->CTRL2_B.DMAEN = BIT_RESET;
 #endif
 }
 

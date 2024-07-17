@@ -146,7 +146,7 @@ void vLUArestartPDM()
 		xTaskNotifyGiveIndexed(pLuaTaskHandle, 1);
 		xEventGroupSetBits(xPDMstatusEvent,PDM_RUN_STATE );
 	}
-
+	//SoftwareReset();
 	return;
 }
 
