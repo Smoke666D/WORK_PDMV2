@@ -17,9 +17,7 @@
 
 static PDM_OUTPUT_TYPE out[OUT_COUNT]  	 				__SECTION(RAM_SECTION_CCMRAM);
 static TaskHandle_t  pTaskHandle  						__SECTION(RAM_SECTION_CCMRAM);
-static EventGroupHandle_t  * pxPDMstatusEvent 		    __SECTION(RAM_SECTION_CCMRAM);
-static TaskHandle_t  pTaskToNotifykHandle  				__SECTION(RAM_SECTION_CCMRAM);
-static ADC_Task_State_t state 							__SECTION(RAM_SECTION_CCMRAM);
+
 
 static const KAL_DATA CurSensData[OUT_COUNT][KOOF_COUNT] ={   {{K002O20,V002O20},{K01O20,V01O20},{K10O20,V10O20},{K15O20,V15O20}},
 										{{K002O20,V002O20},{K01O20,V01O20},{K10O20,V10O20},{K15O20,V15O20}},
@@ -771,25 +769,20 @@ void AinNotifyTaskToInit()
  {
    /* USER CODE BEGIN vADCTask */
    uint32_t ulNotifiedValue;
-   state = ADC_IDLE_STATE;
    ADC_InputPortInit();
    ADC_Init();
-   pxPDMstatusEvent   = osLUAetPDMstatusHandle();
    TickType_t xLastWakeTime;
    const TickType_t xPeriod = pdMS_TO_TICKS( 1 );
    xLastWakeTime = xTaskGetTickCount();
    for(;;)
    {
 	   xTaskNotifyWait(0,0x00,&ulNotifiedValue,0);
-
 	   if ( ulNotifiedValue == TASK_RUN_NOTIFY )
 	   {
-		         vTaskDelayUntil( &xLastWakeTime, xPeriod );							//Запускаем преобразование на 3-х АЦП
-	   		    ulTaskNotifyValueClearIndexed(NULL, 1, 0xFFFF);
+		        vTaskDelayUntil( &xLastWakeTime, xPeriod );							//Запускаем преобразование на 3-х АЦП
 	   		    HAL_ADC_StartDMA( DMA2_CH4, (uint16_t *)getADC1Buffer(), ( ADC_FRAME_SIZE * ADC1_CHANNELS ));
 	   		    HAL_ADC_StartDMA( DMA2_CH2, (uint16_t *)getADC2Buffer(), ( ADC_FRAME_SIZE * ADC2_CHANNELS ));
 	   		    HAL_ADC_StartDMA( DMA2_CH0, (uint16_t *)getADC3Buffer(), ( ADC_FRAME_SIZE * ADC3_CHANNELS ));
-
 	   		    xTaskNotifyWaitIndexed( 1, 0, 0  ,&ulNotifiedValue,portMAX_DELAY);					//Ждем пока из обработчиков прерваний DMA прилетят уведомления об окончании преобразований
 	   		    if(  ulNotifiedValue >= 3 )
 	   		    {
@@ -802,7 +795,6 @@ void AinNotifyTaskToInit()
 	   		    	HAL_ADC_Enable(ADC_2);
 	   		    	HAL_ADC_Enable(ADC_3);
 	   		    	ulTaskNotifyValueClearIndexed(NULL, 1, 0xFFFF);
-	   		    	state = ADC_RUN2_STATE;
 	   		    }
 	   }
 	   else

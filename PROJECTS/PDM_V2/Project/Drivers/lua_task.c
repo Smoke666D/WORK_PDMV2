@@ -33,11 +33,9 @@
 #include "string.h"
 
 
-static EventGroupHandle_t xPDMstatusEvent 	__SECTION(RAM_SECTION_CCMRAM);
 static LUA_STATE_t lua_state 				__SECTION(RAM_SECTION_CCMRAM);
 static char * pcLuaErrorString 				__SECTION(RAM_SECTION_CCMRAM);
 static uint32_t ulWorkCicleIn10us			__SECTION(RAM_SECTION_CCMRAM);
-int res 									__SECTION(RAM_SECTION_CCMRAM);
 static TaskHandle_t  pLuaTaskHandle  	    __SECTION(RAM_SECTION_CCMRAM);
 
 
@@ -45,13 +43,7 @@ TaskHandle_t * xGetLUATaskHandle()
 {
 	return  &pLuaTaskHandle;
 }
-/*
- *
- */
-EventGroupHandle_t* osLUAetPDMstatusHandle ( void )
-{
-  return ( &xPDMstatusEvent );
-}
+
 
 /*
  *
@@ -73,29 +65,6 @@ uint32_t ulLUAgetWorkCicle ( void )
 LUA_STATE_t eLUAgetSTATE ( void )
 {
   return ( lua_state );
-}
-/*
- *
- */
-
-void vSetInitState()
-{
-	xEventGroupClearBits(xPDMstatusEvent,PDM_RUN_STATE | PDM_STOP_STATE );
-	lua_state = LUA_INIT;
-}
-void vSetRunState()
-{
-
-	lua_state = LUA_RUN;
-	xEventGroupSetBits(xPDMstatusEvent, PDM_RUN_STATE );
-
-}
-void vStopPDMState( LUA_STATE_t state)
-{
-	xEventGroupClearBits(xPDMstatusEvent, PDM_RUN_STATE );
-	lua_state = state;
-
-
 }
 
 
@@ -207,16 +176,14 @@ static void vSafeModeOutState()
 
 void vLuaTask(void *argument)
 {
-	uint32_t ulNVRestart;
-	uint32_t ulNotifiedValue;
+
 	uint32_t OutStatus1   = 0;
     uint32_t OutStatus2   = 0;
 	lua_State *L = NULL;
 	lua_State *L1 = NULL;
 	vHW_L_LIB_FreeRunInit(TIMER11,100000);
 	HAL_TiemrEneblae( TIMER11);
-	xEventGroupSetBits(xPDMstatusEvent,PDM_BUSY_STATE );
-	vSetInitState();
+	lua_state = LUA_INIT;
 	while(1)
 	{
 		 vTaskDelay( 1 );
@@ -293,12 +260,10 @@ void vLuaTask(void *argument)
 			   			eSafeModeIsEnable = IS_ENABLE;
 			   	    }
 			   	   break;
-			   	case LUA_RESTART:
-			   		   	   lua_close(L);
-			   		   	   lua_state = LUA_INIT;
-			   		   	   break;
-			   	 default:
-			   	   break;
+			   	default:
+			   	      lua_close(L);
+			   		  lua_state = LUA_INIT;
+			   		  break;
 			  }
 
 	}

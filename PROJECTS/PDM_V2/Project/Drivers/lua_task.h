@@ -61,7 +61,6 @@ uint32_t ulLUAgetWorkCicle ( void );
 LUA_STATE_t eLUAgetSTATE ( void );
 void vLUAstopPDM();
 void vLUArestartPDM();
-EventGroupHandle_t* osLUAetPDMstatusHandle ( void );
 TaskHandle_t * xGetLUATaskHandle();
 void vLuaTask(void *argument);
 

@@ -63,7 +63,7 @@ static StaticTask_t adcTaskControlBlock           				__section( TASK_RAM_SECTIO
 static StaticTask_t canTXTaskControlBlock            			__section( TASK_RAM_SECTION );
 static StaticTask_t canRXTaskControlBlock            			__section( TASK_RAM_SECTION );
 static StaticTask_t defaultTaskControlBlock            			__section( TASK_RAM_SECTION );
-static StaticEventGroup_t xLuaStateEventGroup 					__section( TASK_RAM_SECTION );
+//static StaticEventGroup_t xLuaStateEventGroup 					__section( TASK_RAM_SECTION );
 
 
 void vSYStaskInit ( void )
@@ -94,7 +94,7 @@ void vSYSqueueInit ( void )
 /*----------------------------------------------------------------------------*/
 void vSYSeventInit ( void )
 {
-  *(osLUAetPDMstatusHandle () ) = xEventGroupCreateStatic(&xLuaStateEventGroup );
+  //*(osLUAetPDMstatusHandle () ) = xEventGroupCreateStatic(&xLuaStateEventGroup );
 }
 
 static void StartDefaultTask(void *argument)

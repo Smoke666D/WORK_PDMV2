@@ -26,8 +26,7 @@ const  PIN_CONFIG xDinPortConfig[]           = {{Din1_Pin,Din1_Port},
  *  Статические переменные объкта
  */
 static TaskHandle_t  pTaskHandle  			__SECTION(RAM_SECTION_CCMRAM);
-static TaskHandle_t  pTaskToNotifykHandle   __SECTION(RAM_SECTION_CCMRAM);
-static OS_TAKS_STATE state 					__SECTION(RAM_SECTION_CCMRAM);
+
 
 /*
  *  Функции управления процессом
@@ -166,7 +165,6 @@ void vDINInit()
 void vDinTask(void *argument)
 {
     uint32_t ulNotifiedValue;
-    state = TASK_IDLE_STATE;
     InitDinStcurt();
     TickType_t xLastWakeTime;
     const TickType_t xPeriod = pdMS_TO_TICKS( 1 );
@@ -182,8 +180,9 @@ void vDinTask(void *argument)
 		else
 		{
 			xTaskNotifyWait(0,0x00,&ulNotifiedValue,portMAX_DELAY);
+			vDinInitStateProcess();
 		}
 
-				    //vDinInitStateProcess();
+
 	}
 }
