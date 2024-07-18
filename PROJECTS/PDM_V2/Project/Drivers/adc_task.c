@@ -756,13 +756,13 @@ void ADC_InputPortInit()
 
 void AinNotifyTaskToStop()
 {
-	xTaskNotify(pTaskHandle, TASK_STOP_NOTIFY , eSetValueWithOverwrite);
+	ulTaskNotifyValueClear(pTaskHandle, TASK_RUN_NOTIFY);
 }
 
 void AinNotifyTaskToInit()
 {
-	pTaskToNotifykHandle = xTaskGetCurrentTaskHandle();
-	xTaskNotify(pTaskHandle, TASK_INIT_NOTIFY , eSetValueWithOverwrite);
+
+	xTaskNotify(pTaskHandle, TASK_RUN_NOTIFY , eSetValueWithOverwrite);
 }
 
 
@@ -780,29 +780,16 @@ void AinNotifyTaskToInit()
    xLastWakeTime = xTaskGetTickCount();
    for(;;)
    {
-       switch (state)
+	   xTaskNotifyWait(0,0x00,&ulNotifiedValue,0);
+
+	   if ( ulNotifiedValue == TASK_RUN_NOTIFY )
 	   {
-	   	   case ADC_IDLE_STATE:
-	   		    xTaskNotifyWait(0,0xFF ,&ulNotifiedValue,portMAX_DELAY);							//Состояние инициализации
-	   			if ((ulNotifiedValue & TASK_INIT_NOTIFY) !=0)										//Ждем уведомления от другого процесса, что можно начинать работу
-	   			{
-	   			   vOutInit();
-	   			   state = ADC_INIT_STATE;
-	   			}
-	   		   break;
-	   	   case ADC_INIT_STATE:
-	   		    xTaskNotify(pTaskToNotifykHandle, AIN_DRIVER_READY , eIncrement);					//Уведомляем вызвавший процесс, что драйвер запущен
-	   			state = ADC_RUN1_STATE;
-	   		   break;
-	   	   case ADC_RUN1_STATE:
-	   		    vTaskDelayUntil( &xLastWakeTime, xPeriod );											//Запускаем преобразование на 3-х АЦП
+		         vTaskDelayUntil( &xLastWakeTime, xPeriod );							//Запускаем преобразование на 3-х АЦП
 	   		    ulTaskNotifyValueClearIndexed(NULL, 1, 0xFFFF);
 	   		    HAL_ADC_StartDMA( DMA2_CH4, (uint16_t *)getADC1Buffer(), ( ADC_FRAME_SIZE * ADC1_CHANNELS ));
 	   		    HAL_ADC_StartDMA( DMA2_CH2, (uint16_t *)getADC2Buffer(), ( ADC_FRAME_SIZE * ADC2_CHANNELS ));
 	   		    HAL_ADC_StartDMA( DMA2_CH0, (uint16_t *)getADC3Buffer(), ( ADC_FRAME_SIZE * ADC3_CHANNELS ));
-	   		    state = ADC_WHAIT_CONVERSION_STATE;
-	   		    break;
-	   	   case ADC_WHAIT_CONVERSION_STATE:
+
 	   		    xTaskNotifyWaitIndexed( 1, 0, 0  ,&ulNotifiedValue,portMAX_DELAY);					//Ждем пока из обработчиков прерваний DMA прилетят уведомления об окончании преобразований
 	   		    if(  ulNotifiedValue >= 3 )
 	   		    {
@@ -817,20 +804,10 @@ void AinNotifyTaskToInit()
 	   		    	ulTaskNotifyValueClearIndexed(NULL, 1, 0xFFFF);
 	   		    	state = ADC_RUN2_STATE;
 	   		    }
-	   		    break;
-	   	   case ADC_RUN2_STATE:
-	   		  if ( xTaskNotifyWait(0xFFFF,0xFFFF,&ulNotifiedValue,0) == pdTRUE)
-	   		  {
-	   			  	   for (uint8_t i = 0; i<OUT_COUNT; i++ )
-	   			  	   {
-	   			  	   	   vHWOutOFF( i );
-	   			  	   	   vHWOutDisable( i );
-	   			  	   	}
-	   			  	   	state = ADC_IDLE_STATE;
-	   			}
-	   		    else
-	   		     state = ADC_RUN1_STATE;
-	   		    break;
+	   }
+	   else
+	   {
+		   xTaskNotifyWait(0,0x00,&ulNotifiedValue,portMAX_DELAY);
 	   }
    }
    /* USER CODE END vADCTask */

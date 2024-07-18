@@ -120,12 +120,7 @@ static int iSetRandomRestart(lua_State *L)
  */
 void vLUAstopPDM()
 {
-	EventBits_t state = xEventGroupWaitBits(xPDMstatusEvent, PDM_STOP_STATE | PDM_RUN_STATE, pdFALSE,pdFALSE, portMAX_DELAY );
-	if ( state & PDM_RUN_STATE)
-	{
-		xTaskNotifyGiveIndexed(pLuaTaskHandle, 1);
-		xEventGroupWaitBits(xPDMstatusEvent, PDM_STOP_STATE, pdFALSE,pdTRUE, portMAX_DELAY );
-	}
+	lua_state = LUA_STOP;
 	return;
 }
 /*
@@ -133,20 +128,7 @@ void vLUAstopPDM()
  */
 void vLUArestartPDM()
 {
-	EventBits_t CurState  = xEventGroupWaitBits(xPDMstatusEvent, PDM_STOP_STATE | PDM_RUN_STATE, pdFALSE,pdFALSE, portMAX_DELAY );
-	if ( ( CurState &  PDM_STOP_STATE) )
-	{
-		xTaskNotifyGiveIndexed(pLuaTaskHandle, 1);
-		xEventGroupSetBits(xPDMstatusEvent,PDM_RUN_STATE );
-	}
-	if (  CurState & ( PDM_RUN_STATE) )
-	{
-		xTaskNotifyGiveIndexed(pLuaTaskHandle, 1);
-		xEventGroupWaitBits(xPDMstatusEvent, PDM_STOP_STATE, pdFALSE,pdTRUE, portMAX_DELAY );
-		xTaskNotifyGiveIndexed(pLuaTaskHandle, 1);
-		xEventGroupSetBits(xPDMstatusEvent,PDM_RUN_STATE );
-	}
-
+	lua_state = LUA_RESTART;
 	return;
 }
 
@@ -181,6 +163,7 @@ static RESULT_t eIsLuaSkriptValid(const char* pcData, uint32_t size)
 	return ( ucRes );
 }
 
+static ENABLE_t eSafeModeIsEnable 			__SECTION(RAM_SECTION_CCMRAM)= IS_DISABLE;
 
 void vRegisterHWLib( lua_State *L1 )
 {
@@ -211,6 +194,17 @@ void vRegisterHWLib( lua_State *L1 )
 	lua_register(L1,"ConfigStorage",iSetStorageFormat);
 }
 
+
+static void vSafeModeOutState()
+{
+	 for (uint8_t i = 0; i<OUT_COUNT; i++ )
+	 {
+		 vHWOutOFF( i );
+		 vHWOutDisable( i );
+     }
+	 return;
+}
+
 void vLuaTask(void *argument)
 {
 	uint32_t ulNVRestart;
@@ -230,39 +224,27 @@ void vLuaTask(void *argument)
 		 {
 		       case LUA_INIT:
 		         vAINInit();
+		         eSafeModeIsEnable = IS_DISABLE;
 		       //  vTestEEPROM();
 			   	 L  = luaL_newstate();
 			   	 L1 = lua_newthread(L);
 			   	 luaL_openlibs(L1); // open standard libraries
 			   	 vRegisterHWLib(L1 );
-			   	 lua_state = LUA_ERROR;
+			   	 vDINInit();
+			   	 vOutInit();
+			     lua_state  = LUA_ERROR;
 			   	 if ( eIsLuaSkriptValid(uFLASHgetScript(), uFLASHgetLength()+1) == RESULT_TRUE )
 			     {
-			   		if  ((luaL_loadbuffer(L1, uFLASHgetScript(), uFLASHgetLength() , uFLASHgetScript())  || lua_pcall(L1, 0, LUA_MULTRET, 0)) == LUA_OK	)
+			   		if ((luaL_loadbuffer(L1, uFLASHgetScript(), uFLASHgetLength() , uFLASHgetScript())  || lua_pcall(L1, 0, LUA_MULTRET, 0)) == LUA_OK	)
 			   		 {
-			   			ulTaskNotifyValueClearIndexed(NULL, 0, 0xFFFF);
+			   			lua_state = LUA_RUN;
 			   			DinNotifyTaskToInit();
 			   			AinNotifyTaskToInit();
-			   			lua_state  = LUA_WAIT_READY;
 			   		 }
-			     }
-			   	  if (lua_state == LUA_ERROR)
-			   		 vStopPDMState(lua_state );
+			      }
 			   	  break;
-		          case LUA_WAIT_READY:
-		        	xTaskNotifyWait(0, 0, &ulNotifiedValue,portMAX_DELAY);
-		        	if ( ulNotifiedValue == 2)
-		        	{
-		        		ulTaskNotifyValueClearIndexed(NULL, 0, 0xFFFF);
-		        		vSetRunState();
-		        	}
-		        	break;
 			   	 case LUA_RUN:
-			   	   if ( xTaskNotifyWaitIndexed(1,0x00,0xFF, &ulNVRestart ,0) == pdTRUE)
-			   	   {
-			   		   vStopPDMState(LUA_STOP);
-			   		   break;
-			   	   }
+
 			   	   lua_getglobal(L1, "main");
 			   	   ulWorkCicleIn10us  = uGetFreeRuningTimer(TIMER11 );
 			   	   lua_pushinteger(L1, ulWorkCicleIn10us );
@@ -296,20 +278,25 @@ void vLuaTask(void *argument)
 			   	   		 break;
 			   	   	 default:
 			   	   	   pcLuaErrorString =  (char *) lua_tostring( L1, LAST_ARGUMENT );
-			   	   	   vStopPDMState(LUA_ERROR);
+			   	       lua_state  = LUA_ERROR;
 			   	   	   break;
 			   	   }
 			   	   lua_pop ( L1, temp);
 			   	   break;
 			   	 case LUA_ERROR:
 			   	 case LUA_STOP:
-			   	   DinNotifyTaskToStop();
-			   	   AinNotifyTaskToStop();
-			   	   xEventGroupSetBits(xPDMstatusEvent, PDM_STOP_STATE );
-			   	   ulTaskNotifyTakeIndexed(1,pdTRUE, portMAX_DELAY);
-			   	   lua_close(L);
-			   	   vSetInitState();
+			   		if (eSafeModeIsEnable == IS_DISABLE)
+			   	    {
+			   			DinNotifyTaskToStop();
+			   		    AinNotifyTaskToStop();
+			   			vSafeModeOutState();
+			   			eSafeModeIsEnable = IS_ENABLE;
+			   	    }
 			   	   break;
+			   	case LUA_RESTART:
+			   		   	   lua_close(L);
+			   		   	   lua_state = LUA_INIT;
+			   		   	   break;
 			   	 default:
 			   	   break;
 			  }

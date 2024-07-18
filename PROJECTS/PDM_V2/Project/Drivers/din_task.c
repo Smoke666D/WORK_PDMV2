@@ -40,13 +40,13 @@ TaskHandle_t * xGetDinTaskHandle()
 
 void DinNotifyTaskToStop()
 {
-	xTaskNotify(pTaskHandle, TASK_STOP_NOTIFY , eSetValueWithOverwrite);
+	ulTaskNotifyValueClear(pTaskHandle, TASK_RUN_NOTIFY);
 }
 
 void DinNotifyTaskToInit()
 {
-	pTaskToNotifykHandle = xTaskGetCurrentTaskHandle();
-	xTaskNotify(pTaskHandle, TASK_INIT_NOTIFY , eSetValueWithOverwrite);
+
+	xTaskNotify(pTaskHandle, TASK_RUN_NOTIFY , eSetValueWithOverwrite);
 }
 
 
@@ -168,38 +168,22 @@ void vDinTask(void *argument)
     uint32_t ulNotifiedValue;
     state = TASK_IDLE_STATE;
     InitDinStcurt();
+    TickType_t xLastWakeTime;
+    const TickType_t xPeriod = pdMS_TO_TICKS( 1 );
+    xLastWakeTime = xTaskGetTickCount();
 	while(1)
 	{
-		vTaskDelay(1);
-		switch (state)
+		xTaskNotifyWait(0,0x00,&ulNotifiedValue,0);
+		if ( ulNotifiedValue == TASK_RUN_NOTIFY )
 		{
-			case  TASK_IDLE_STATE:
-				xTaskNotifyWait(0,0xFF,&ulNotifiedValue,portMAX_DELAY);
-				if ((ulNotifiedValue & TASK_INIT_NOTIFY) !=0)
-				{
-					vDINInit();
-					state = TASK_INIT_STATE;
-				}
-				break;
-			case TASK_INIT_STATE:
-				for (uint8_t i = 0; i < 3; i++)
-				{
-					vTaskDelay(1);
-				    vDinInitStateProcess();
-				}
-				xTaskNotify(pTaskToNotifykHandle, DIN_DRIVER_READY ,eIncrement);
-				state = TASK_RUN_STATE;
-				break;
-			case TASK_RUN_STATE:
-				vDinDoutProcess();
-				if ( xTaskNotifyWait(0,0xFF,&ulNotifiedValue,0) == pdTRUE )
-				{
-					if (((ulNotifiedValue & TASK_STOP_NOTIFY) !=0) || (ulNotifiedValue & TASK_INIT_NOTIFY) !=0)
-						 state = TASK_IDLE_STATE;
-				}
-				break;
-			default:
-				break;
+			vTaskDelayUntil( &xLastWakeTime, xPeriod );
+			vDinDoutProcess();
 		}
+		else
+		{
+			xTaskNotifyWait(0,0x00,&ulNotifiedValue,portMAX_DELAY);
+		}
+
+				    //vDinInitStateProcess();
 	}
 }
