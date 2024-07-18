@@ -12,6 +12,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+//#inlcude "main.h"
+
 //The pointer size in this project is not size_t (16 Bit).
 #define  luaPointerSize_t uint32_t
 
@@ -35,7 +37,7 @@ extern void vPortFree( void *pv );
 #define LUA_MEM_LEAVE_CRITICAL_SECTION() xTaskResumeAll()
 #endif
 
-#define LUA_HEAP_SIZE (2 * 62000)
+#define LUA_HEAP_SIZE (2 * 62500)
 
 
 #endif /* LUAPROJECTCONFIG_H_ */

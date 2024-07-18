@@ -160,18 +160,24 @@ void vDINInit()
 	 eDinConfig( INPUT_10, DIN_CONFIG_POSITIVE ,DEF_H_FRONT, DEF_L_FRONT );
 	 eDinConfig( INPUT_11, DIN_CONFIG_POSITIVE ,DEF_H_FRONT, DEF_L_FRONT );
 	 eDinConfig( INPUT_12, DIN_CONFIG_POSITIVE ,DEF_H_FRONT, DEF_L_FRONT );
+	 vDinInitStateProcess();
 }
 
+static EventGroupHandle_t  * pxPDMstatusEvent	__SECTION(RAM_SECTION_CCMRAM);
 
 void vDinTask(void *argument)
 {
     uint32_t ulNotifiedValue;
     state = TASK_IDLE_STATE;
+    pxPDMstatusEvent = osLUAetPDMstatusHandle();
     InitDinStcurt();
 	while(1)
 	{
+
 		vTaskDelay(1);
-		switch (state)
+		xEventGroupWaitBits(* pxPDMstatusEvent, RUN_STATE, pdFALSE, pdTRUE, portMAX_DELAY );
+
+		/*switch (state)
 		{
 			case  TASK_IDLE_STATE:
 				xTaskNotifyWait(0,0xFF,&ulNotifiedValue,portMAX_DELAY);
@@ -182,17 +188,12 @@ void vDinTask(void *argument)
 				}
 				break;
 			case TASK_INIT_STATE:
-				for (uint8_t i = 0; i < 3; i++)
-				{
-					vTaskDelay(1);
-				    vDinInitStateProcess();
-				}
 				xTaskNotify(pTaskToNotifykHandle, DIN_DRIVER_READY ,eIncrement);
 				state = TASK_RUN_STATE;
 				break;
-			case TASK_RUN_STATE:
+			case TASK_RUN_STATE:*/
 				vDinDoutProcess();
-				if ( xTaskNotifyWait(0,0xFF,&ulNotifiedValue,0) == pdTRUE )
+				/*if ( xTaskNotifyWait(0,0xFF,&ulNotifiedValue,0) == pdTRUE )
 				{
 					if (((ulNotifiedValue & TASK_STOP_NOTIFY) !=0) || (ulNotifiedValue & TASK_INIT_NOTIFY) !=0)
 						 state = TASK_IDLE_STATE;
@@ -200,6 +201,6 @@ void vDinTask(void *argument)
 				break;
 			default:
 				break;
-		}
+		}*/
 	}
 }

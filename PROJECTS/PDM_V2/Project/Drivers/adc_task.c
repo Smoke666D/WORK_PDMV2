@@ -780,7 +780,7 @@ void AinNotifyTaskToInit()
    xLastWakeTime = xTaskGetTickCount();
    for(;;)
    {
-       switch (state)
+      /* switch (state)
 	   {
 	   	   case ADC_IDLE_STATE:
 	   		    xTaskNotifyWait(0,0xFF ,&ulNotifiedValue,portMAX_DELAY);							//Состояние инициализации
@@ -794,15 +794,17 @@ void AinNotifyTaskToInit()
 	   		    xTaskNotify(pTaskToNotifykHandle, AIN_DRIVER_READY , eIncrement);					//Уведомляем вызвавший процесс, что драйвер запущен
 	   			state = ADC_RUN1_STATE;
 	   		   break;
-	   	   case ADC_RUN1_STATE:
-	   		    vTaskDelayUntil( &xLastWakeTime, xPeriod );											//Запускаем преобразование на 3-х АЦП
+	   	   case ADC_RUN1_STATE:*/
+
+	   		    vTaskDelayUntil( &xLastWakeTime, xPeriod );
+	   		    xEventGroupWaitBits(* pxPDMstatusEvent, RUN_STATE, pdFALSE, pdTRUE, portMAX_DELAY );//Запускаем преобразование на 3-х АЦП
 	   		    ulTaskNotifyValueClearIndexed(NULL, 1, 0xFFFF);
 	   		    HAL_ADC_StartDMA( DMA2_CH4, (uint16_t *)getADC1Buffer(), ( ADC_FRAME_SIZE * ADC1_CHANNELS ));
 	   		    HAL_ADC_StartDMA( DMA2_CH2, (uint16_t *)getADC2Buffer(), ( ADC_FRAME_SIZE * ADC2_CHANNELS ));
 	   		    HAL_ADC_StartDMA( DMA2_CH0, (uint16_t *)getADC3Buffer(), ( ADC_FRAME_SIZE * ADC3_CHANNELS ));
-	   		    state = ADC_WHAIT_CONVERSION_STATE;
+	   		   /* state = ADC_WHAIT_CONVERSION_STATE;
 	   		    break;
-	   	   case ADC_WHAIT_CONVERSION_STATE:
+	   	   case ADC_WHAIT_CONVERSION_STATE:*/
 	   		    xTaskNotifyWaitIndexed( 1, 0, 0  ,&ulNotifiedValue,portMAX_DELAY);					//Ждем пока из обработчиков прерваний DMA прилетят уведомления об окончании преобразований
 	   		    if(  ulNotifiedValue >= 3 )
 	   		    {
@@ -815,7 +817,7 @@ void AinNotifyTaskToInit()
 	   		    	HAL_ADC_Enable(ADC_2);
 	   		    	HAL_ADC_Enable(ADC_3);
 	   		    	ulTaskNotifyValueClearIndexed(NULL, 1, 0xFFFF);
-	   		    	state = ADC_RUN2_STATE;
+	   		    	/*state = ADC_RUN2_STATE;
 	   		    }
 	   		    break;
 	   	   case ADC_RUN2_STATE:
@@ -830,7 +832,7 @@ void AinNotifyTaskToInit()
 	   			}
 	   		    else
 	   		     state = ADC_RUN1_STATE;
-	   		    break;
+	   		    break;*/
 	   }
    }
    /* USER CODE END vADCTask */

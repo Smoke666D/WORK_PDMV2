@@ -22,6 +22,8 @@
 #include "adc_task.h"
 
 
+#define LUA_MAIN_HEAP  (62000)
+
 #define  DEFAULT_TASK_STACK_SIZE        128U
 #define  LUA_TASK_STACK_SIZE            3000U
 #define  ADC_TASK_STACK_SIZE            250U
