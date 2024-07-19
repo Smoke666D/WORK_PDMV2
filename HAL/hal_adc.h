@@ -11,7 +11,7 @@
 
 #include "main.h"
 #include "hal_config.h"
-
+#include "hal_dma.h"
 typedef enum
 {
     ADC_CH_0 = 0,  /*!< ADC Channel 0 */
@@ -51,13 +51,13 @@ typedef enum
    u16 Get_ConversionVal(s16 val);
 #endif
 
-
+void HAL_ADC_StartDMA( DMA_Stram_t chanel, uint16_t * data, uint16_t size);
 void HAL_ADC_CommonConfig();
 void HAL_ADC_ContiniusScanCinvertionDMA( ADC_NUMBER_t adc, uint8_t channel_count, uint8_t * channel_nmber);
 void HAL_ADC_TempEnable();
 void HAL_ADC_VrefEnable();
 void HAL_ADC_Enable(ADC_NUMBER_t adc_number);
-void HAL_ADCDMA_Disable(ADC_NUMBER_t adc_number);
+void HAL_ADCDMA_Disable(ADC_NUMBER_t adc);
 void HAL_ADC_AWDT_IT_Init( ADC_NUMBER_t adc, uint8_t channel );
 
 #endif /* HAL_HAL_ADC_H_ */

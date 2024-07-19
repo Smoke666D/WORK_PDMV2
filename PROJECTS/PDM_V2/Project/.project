@@ -86,6 +86,11 @@
 			<locationURI>copy_PARENT1/Source/main.c</locationURI>
 		</link>
 		<link>
+			<name>CMSIS/apm32f4xx.h</name>
+			<type>1</type>
+			<location>C:/Users/i.dymov/Desktop/WORK/Libraries/Device/Geehy/APM32F4xx/Include/apm32f4xx.h</location>
+		</link>
+		<link>
 			<name>CMSIS/startup_apm32f40x.S</name>
 			<type>1</type>
 			<locationURI>copy_PARENT/Libraries/Device/Geehy/APM32F4xx/Source/gcc/startup_apm32f40x.S</locationURI>

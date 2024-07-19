@@ -94,7 +94,6 @@ PDM_INPUT_CONFIG_ERROR eDinConfig( uint8_t ucCh, DIN_INPUT_TYPE inType, uint32_t
 			{
 				eDinConfigWtihStruct(ucCh,&DIN_CONFIG);
 				HAL_InitGpioInPUP(xDinPortConfig[ucCh].PORT, xDinPortConfig[ucCh].Pin);
-
 			}
 			else
 				vRecinfigDin(ucCh,&DIN_CONFIG);

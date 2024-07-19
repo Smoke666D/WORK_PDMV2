@@ -211,7 +211,6 @@ void vLuaTask(void *argument)
 			      }
 			   	  break;
 			   	 case LUA_RUN:
-
 			   	   lua_getglobal(L1, "main");
 			   	   ulWorkCicleIn10us  = uGetFreeRuningTimer(TIMER11 );
 			   	   lua_pushinteger(L1, ulWorkCicleIn10us );
@@ -236,7 +235,7 @@ void vLuaTask(void *argument)
 		           int temp;
 		           switch ( lua_resume( L1, L, (1+1+2+OUT_COUNT+2+4+3+1), &temp) )
 			   	   {
-			   	     case  LUA_OK:
+			   	     case LUA_OK:
 			   	   	 case LUA_YIELD:
 			   	   		 for ( uint8_t i = 0; i < OUT_COUNT; i++)
 			   	   		 {

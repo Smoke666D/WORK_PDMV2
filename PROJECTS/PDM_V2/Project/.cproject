@@ -469,7 +469,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="DRIVERS|CMSIS/startup_apm32f411.S|APM32F4xxxE_FLASH.ld" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="hal_can_ch32.c|DRIVERS|CMSIS/startup_apm32f411.S|APM32F4xxxE_FLASH.ld" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -577,7 +577,7 @@
 					<fileInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.671947223.1083112675.2007914408" name="APM32F4xxxG_FLASH.ld" rcbsApplicability="disable" resourcePath="APM32F4xxxG_FLASH.ld" toolsToInvoke=""/>
 					<fileInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.671947223.1083112675.APM32F4xxxE_FLASH.ld" name="APM32F4xxxE_FLASH.ld" rcbsApplicability="disable" resourcePath="APM32F4xxxE_FLASH.ld" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry excluding="DRIVERS|APM32F4xxxG_FLASH.ld|CMSIS/startup_apm32f40x.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="hal_can_ch32.c|DRIVERS|APM32F4xxxG_FLASH.ld|CMSIS/startup_apm32f40x.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

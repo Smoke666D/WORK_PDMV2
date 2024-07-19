@@ -15,6 +15,8 @@
 
 
 #if MCU == APM32
+#include "apm32f4xx_dma.h"
+
 #define DMA_Stram_t DMA_Stream_T*
 #define DMA2_CH0  	DMA2_Stream0
 #define DMA2_CH1  	DMA2_Stream1
@@ -39,11 +41,15 @@
 #define DMA1_CH8  	DMA1_Channel8
 #endif
 
+
+#if MCU== APM32
 typedef enum
 {
-  PTOM,
-  MTOP,
+  PTOM = DMA_DIR_PERIPHERALTOMEMORY,
+  MTOP = DMA_DIR_MEMORYTOPERIPHERAL,
 } DMA_Derection_t;
+
+#endif
 
 typedef enum
 {
@@ -76,7 +82,8 @@ typedef struct
 void HAL_DMA_Enable(DMA_Stram_t stream  );
 void HAL_DMA_Disable(DMA_Stram_t stream  );
 void HAL_DMA_SetCounter( DMA_Stram_t stream, uint32_t counter );
-void HAL_ADC_StartDMA( DMA_Stram_t chanel, uint16_t * data, uint16_t size);
+void HAL_DMA_TCEnable( DMA_Stram_t chanel);
+void HAL_DMA_SerSource( DMA_Stram_t chanel, uint16_t * data, uint16_t size );
 #if MCU == APM32
 void DMA2_STR4_IRQHandler( void );
 void DMA2_STR2_IRQHandler( void );

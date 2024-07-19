@@ -146,33 +146,42 @@ void HAL_ADC_VrefEnable()
 #endif
 }
 
-
+void HAL_ADC_StartDMA( DMA_Stram_t chanel, uint16_t * data, uint16_t size)
+{
+	ADC_T* adc;
+	if (chanel == DMA2_CH4)
+	{
+		    DMA2->HIFCLR = ((DMA_FLAG_TEIFLG4 | DMA_FLAG_DMEIFLG4 ) & 0x0F7D0F7D); //Clears the DMAy channelx's pending flags.
+			adc = ADC1;
+	}
+	else if (chanel == DMA2_CH2)
+	{
+		    DMA2->LIFCLR =((DMA_FLAG_TEIFLG2 | DMA_FLAG_DMEIFLG2 ) & 0x0F7D0F7D); //Clears the DMAy channelx's pending flags.
+			adc = ADC2;
+	}
+	else if (chanel == DMA2_CH0)
+    {
+		    DMA2->LIFCLR =((DMA_FLAG_TEIFLG0 | DMA_FLAG_DMEIFLG0 ) & 0x0F7D0F7D); //Clears the DMAy channelx's pending flags.
+			adc = ADC3;
+	}
+	HAL_DMA_SerSource( chanel,  data, size );
+	adc->STS = ~(uint32_t)(ADC_FLAG_EOC | ADC_FLAG_OVR);  // Clears the pending ADC flag
+	adc->CTRL2_B.DMAEN = BIT_SET;   // Enables the specified ADC DMA request.
+	HAL_DMA_TCEnable(chanel);
+	adc->CTRL2_B.REGSWSC = BIT_SET; // Enables the selected ADC software start conversion of the regular channels.
+}
 
 
 void HAL_ADC_Enable(ADC_NUMBER_t adc_number)
 {
-#if MCU == APM32
-	ADC_Enable(adc_number);
-#endif
+	adc_number->CTRL2_B.ADCEN = BIT_SET;  //Enables the specified ADC peripheral.
 }
 
 
 void HAL_ADCDMA_Disable(ADC_NUMBER_t adc_number)
 {
-#if MCU == APM32
-	ADC_Disable(adc_number);
-	ADC_DisableDMA(adc_number);
-#endif
+	adc_number->CTRL2_B.ADCEN = BIT_RESET; //Disable the specified ADC peripheral.
+	adc_number->CTRL2_B.DMAEN = BIT_RESET; // Disables the specified ADC DMA request.
 }
 
-void HAL_ADC_AWDT_IT_Init( ADC_NUMBER_t adc, uint8_t channel )
-{
-#if MCU == CH32V2
-	 ADC_Cmd(adc, DISABLE);
-	 ADC_AnalogWatchdogThresholdsConfig(adc, 3500, 1000);
-	 ADC_AnalogWatchdogSingleChannelConfig( adc, ADC_Channel_6);
-	 ADC_AnalogWatchdogCmd( adc, ADC_AnalogWatchdog_SingleRegEnable);
-	 ADC_ITConfig( adc, ADC_IT_AWD, ENABLE);
-	 ADC_Cmd(adc, ENABLE);
-#endif
-}
+
