@@ -721,30 +721,7 @@ static void vOutControlFSM(void)
 
 void ADC_InputPortInit()
 {
-	 HAL_InitGpioAIN(CS20_1_GPIO_Port,CS20_1_Pin);
-	 HAL_InitGpioAIN(CS20_2_GPIO_Port,CS20_2_Pin);
-	 HAL_InitGpioAIN(CS20_3_GPIO_Port,CS20_3_Pin);
-	 HAL_InitGpioAIN(CS20_4_GPIO_Port,CS20_4_Pin);
-	 HAL_InitGpioAIN(CS20_5_GPIO_Port,CS20_5_Pin);
-	 HAL_InitGpioAIN(CS20_6_GPIO_Port,CS20_6_Pin);
-	 HAL_InitGpioAIN(CS20_7_GPIO_Port,CS20_7_Pin);
-	 HAL_InitGpioAIN(CS20_8_GPIO_Port,CS20_8_Pin);
-	 HAL_InitGpioAIN(CS8_9_GPIO_Port,CS8_9_Pin);
-	 HAL_InitGpioAIN(CS8_10_GPIO_Port,CS8_10_Pin);
-	 HAL_InitGpioAIN(CS8_11_GPIO_Port,CS8_11_Pin);
-	 HAL_InitGpioAIN(CS8_12_GPIO_Port,CS8_12_Pin);
-	 HAL_InitGpioAIN(CS8_13_GPIO_Port,CS8_13_Pin);
-	 HAL_InitGpioAIN(CS8_14_GPIO_Port,CS8_14_Pin);
-	 HAL_InitGpioAIN(CS8_15_GPIO_Port,CS8_15_Pin);
-	 HAL_InitGpioAIN(CS8_16_GPIO_Port,CS8_16_Pin);
-	 HAL_InitGpioAIN(CS8_17_GPIO_Port,CS8_17_Pin);
-	 HAL_InitGpioAIN(CS8_18_GPIO_Port,CS8_18_Pin);
-	 HAL_InitGpioAIN(CS8_19_GPIO_Port,CS8_19_Pin);
-	 HAL_InitGpioAIN(CS8_20_GPIO_Port,CS8_20_Pin);
-	 HAL_InitGpioAIN(ADC1_4_GPIO_Port,ADC1_4_Pin);
-	 HAL_InitGpioAIN(ADC1_5_GPIO_Port,ADC1_5_Pin);
-	 HAL_InitGpioAIN(ADC1_8_GPIO_Port,ADC1_8_Pin);
-	 HAL_InitGpioAIN(ADC1_9_GPIO_Port,ADC1_9_Pin);
+
 }
 
 
@@ -768,8 +745,7 @@ void AinNotifyTaskToInit()
  void vADCTask(void * argument)
  {
    /* USER CODE BEGIN vADCTask */
-   uint32_t ulNotifiedValue;
-   ADC_InputPortInit();
+   uint32_t ulNotifiedValue;;
    ADC_Init();
    TickType_t xLastWakeTime;
    const TickType_t xPeriod = pdMS_TO_TICKS( 1 );

@@ -15,6 +15,7 @@
 
 #define APM32     0
 #define CH32V2      1
+#define CH32V3		2
 
 
 #include "board_define.h"
