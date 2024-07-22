@@ -96,6 +96,7 @@ void  HW_TIMER_BaseTimerInit(TimerName_t TimerName  )
 
 
 
+
 }
 
 void HAL_TIMER_PWMTimersInit(TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel)
@@ -117,29 +118,28 @@ void HAL_TIMER_PWMTimersInit(TimerName_t TimerName , uint32_t freq_in_hz, uint32
 	OCcongigStruct.pulse = Period;// + 1;
 	if (channel &  TIM_CHANNEL_1)
 	{ TMR_ConfigOC1(timers[TimerName], &OCcongigStruct);
-	  TMR_ConfigOC1Fast(timers[TimerName],TMR_OC_FAST_ENABLE);
-	  TMR_ConfigOC1Preload(timers[TimerName], TMR_OC_PRELOAD_ENABLE);
-	  TMR_DisableCCxChannel(timers[TimerName],TMR_CHANNEL_1); }
+
+	  timers[TimerName]->CCM1_COMPARE_B.OC1FEN = TMR_OC_FAST_ENABLE;
+	  timers[TimerName]->CCM1_COMPARE_B.OC1PEN = TMR_OC_PRELOAD_ENABLE;
+	  HAL_TIMER_DisablePWMCH(TimerName,TMR_CHANNEL_1); }
 	if (channel &  TIM_CHANNEL_2)
 	{ TMR_ConfigOC2(timers[TimerName], &OCcongigStruct);
-	  TMR_ConfigOC2Fast(timers[TimerName],TMR_OC_FAST_ENABLE);
-	  TMR_ConfigOC2Preload(timers[TimerName], TMR_OC_PRELOAD_ENABLE);
-	  TMR_DisableCCxChannel(timers[TimerName],TMR_CHANNEL_2);}
+	  timers[TimerName]->CCM1_COMPARE_B.OC2FEN = TMR_OC_FAST_ENABLE;
+	  timers[TimerName]->CCM1_COMPARE_B.OC1PEN = TMR_OC_PRELOAD_ENABLE;
+	  HAL_TIMER_DisablePWMCH(TimerName,TMR_CHANNEL_2);}
 	if (channel &  TIM_CHANNEL_3)
 	{ TMR_ConfigOC3(timers[TimerName], &OCcongigStruct);
-	  TMR_ConfigOC3Fast(timers[TimerName],TMR_OC_FAST_ENABLE);
-	  TMR_ConfigOC3Preload(timers[TimerName], TMR_OC_PRELOAD_ENABLE);
-	  TMR_DisableCCxChannel(timers[TimerName],TMR_CHANNEL_3); }
+	timers[TimerName]->CCM2_COMPARE_B.OC3FEN = TMR_OC_FAST_ENABLE;
+	  timers[TimerName]->CCM2_COMPARE_B.OC3PEN = TMR_OC_PRELOAD_ENABLE;
+	  HAL_TIMER_DisablePWMCH(TimerName,TMR_CHANNEL_3); }
 	if (channel &  TIM_CHANNEL_4)
 	{ TMR_ConfigOC4(timers[TimerName], &OCcongigStruct);
-	  TMR_ConfigOC4Fast(timers[TimerName],TMR_OC_FAST_ENABLE);
-	  TMR_ConfigOC4Preload(timers[TimerName], TMR_OC_PRELOAD_ENABLE);
-	  TMR_DisableCCxChannel(timers[TimerName],TMR_CHANNEL_4); }
-	TMR_EnableAutoReload(timers[TimerName]);
-	TMR_Enable(timers[TimerName]);
-	TMR_EnablePWMOutputs(timers[TimerName]);
-
-
+	  timers[TimerName]->CCM2_COMPARE_B.OC4FEN = TMR_OC_FAST_ENABLE;
+	  timers[TimerName]->CCM2_COMPARE_B.OC4PEN = TMR_OC_PRELOAD_ENABLE;
+	  HAL_TIMER_DisablePWMCH(TimerName,TMR_CHANNEL_4); }
+	timers[TimerName]->CTRL1_B.ARPEN = ENABLE;  // Enables peripheral Preload register on AUTORLD.
+	HAL_TiemrEneblae(TimerName);
+	timers[TimerName]->BDT_B.MOEN = ENABLE; // Enable TMRx PWM output
 
 }
 
@@ -148,7 +148,7 @@ void vHAL_EnableTimerIRQ(TimerName_t TimerName,uint8_t priority, uint16_t interu
 {
 #if MCU == APM32
 	NVIC_EnableIRQRequest((IRQn_Type)interupt, priority, 0);
-	TMR_EnableInterrupt(timers[TimerName], INT_FLAG);
+	timers[TimerName]->DIEN |= INT_FLAG;
 #endif
 }
 
@@ -180,11 +180,11 @@ void HAL_InitCaptureIRQTimer( TimerName_t TimerName , uint32_t freq_in_hz, uint3
 	baseConfig.period =  Period;
 	baseConfig.repetitionCounter = 0;
 	TMR_ConfigTimeBase(timers[TimerName] , &baseConfig);
-	TMR_ConfigInternalClock(timers[TimerName]);
-    if (channel &  TIM_CHANNEL_1) { ICConfig.channel = TMR_CHANNEL_1;  TMR_EnableInterrupt(timers[TimerName], TIM_CC1_FLAG);}
-    if (channel &  TIM_CHANNEL_2) { ICConfig.channel = TMR_CHANNEL_2;  TMR_EnableInterrupt(timers[TimerName], TIM_CC2_FLAG);}
-    if (channel &  TIM_CHANNEL_3) { ICConfig.channel = TMR_CHANNEL_3;  TMR_EnableInterrupt(timers[TimerName], TIM_CC3_FLAG);}
-    if (channel &  TIM_CHANNEL_4) { ICConfig.channel = TMR_CHANNEL_4;  TMR_EnableInterrupt(timers[TimerName], TIM_CC4_FLAG);}
+	timers[TimerName]->SMCTRL_B.SMFSEL = BIT_RESET;  // Configures the TMRx internal Clock
+    if (channel &  TIM_CHANNEL_1) { ICConfig.channel = TMR_CHANNEL_1;  timers[TimerName]->DIEN |= TIM_CC1_FLAG;}
+    if (channel &  TIM_CHANNEL_2) { ICConfig.channel = TMR_CHANNEL_2;  timers[TimerName]->DIEN |= TIM_CC2_FLAG;}
+    if (channel &  TIM_CHANNEL_3) { ICConfig.channel = TMR_CHANNEL_3;  timers[TimerName]->DIEN |= TIM_CC3_FLAG;}
+    if (channel &  TIM_CHANNEL_4) { ICConfig.channel = TMR_CHANNEL_4;  timers[TimerName]->DIEN |= TIM_CC4_FLAG;}
 	ICConfig.polarity = TMR_IC_POLARITY_BOTHEDGE;
 	ICConfig.selection = TMR_IC_SELECTION_DIRECT_TI;
 	ICConfig.prescaler = TMR_IC_PSC_1;
@@ -234,7 +234,7 @@ uint16_t vHAL_CaptureTimerInteruptCallback(TimerName_t TimerName , uint16_t TimI
 		temp_data = TMR_ReadCaputer1( timers[TimerName] );
 		if ((temp_data) > EDGE)
 		{
-			TMR_ConfigCounter( timers[TimerName], 0x0000);
+			timers[TimerName]->CNT = 0 ;   // Configs the Counter Register value
 		}
 		TMR_ClearIntFlag( timers[TimerName], TimInterupt);
 	}
@@ -246,12 +246,10 @@ void HAL_TIMER_SetPWMPulse( TimerName_t TimerName , uint8_t channel, uint32_t pu
 {
 	HAL_TIMER_DisablePWMCH(TimerName , channel );
 
-	if (channel &  TIM_CHANNEL_1) TMR_ConfigCompare1(timers[TimerName],pulse);
-	if (channel &  TIM_CHANNEL_2) TMR_ConfigCompare2(timers[TimerName],pulse);
-	if (channel &  TIM_CHANNEL_3) TMR_ConfigCompare3(timers[TimerName],pulse);
-	if (channel &  TIM_CHANNEL_4) TMR_ConfigCompare4(timers[TimerName],pulse);
-
-
+	if (channel &  TIM_CHANNEL_1) timers[TimerName]->CC1 = pulse;   //   Configs the Capture Compare1 Register value
+	if (channel &  TIM_CHANNEL_2) timers[TimerName]->CC2 = pulse;   //   Configs the Capture Compare2 Register value
+	if (channel &  TIM_CHANNEL_3) timers[TimerName]->CC3 = pulse;   //   Configs the Capture Compare3 Register value
+	if (channel &  TIM_CHANNEL_4) timers[TimerName]->CC4 = pulse;   //   Configs the Capture Compare4 Register value
 }
 
 
@@ -290,13 +288,10 @@ static void vTimerInitRCC(TimerName_t TimerName)
 	switch (TimerName)
 	{
 		default:
-
 			RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_TMR1);
 			break;
 		case TIMER2:
-
 			RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_TMR2);
-
 		    break;
 		case TIMER3:
 			RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_TMR3);
@@ -305,44 +300,28 @@ static void vTimerInitRCC(TimerName_t TimerName)
 			RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_TMR4);
 			break;
 		case TIMER5:
-
-		RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_TMR5);
-
+			RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_TMR5);
 		     break;
 		case TIMER6:
-
 			RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_TMR6);
-
 			 break;
 		case TIMER7:
-
 			RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_TMR7);
-
 			 break;
 		case TIMER8:
-
 			RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_TMR8);
-
 			 break;
 		case TIMER9:
-
 			RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_TMR9);
-
 			 break;
 		case TIMER10:
-
 			RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_TMR10);
-
 		     break;
 		case TIMER11:
-
 			RCM_EnableAPB2PeriphClock(RCM_APB2_PERIPH_TMR11);
-
 		     break;
 		case TIMER12:
-
 			RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_TMR12);
-
 			 break;
 		case TIMER13:
 			RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_TMR13);
@@ -350,8 +329,6 @@ static void vTimerInitRCC(TimerName_t TimerName)
 		case TIMER14:
 			RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_TMR14);
 		     break;
-
-
 	}
 }
 
@@ -360,10 +337,8 @@ static uint32_t getTimerFreq( TimerName_t TimerName )
 {
 	switch (TimerName)
 	{
-
 			default:
 				return  ( 84000000U );
-
 			case TIMER1:
 			case TIMER8:
 			case TIMER9:
