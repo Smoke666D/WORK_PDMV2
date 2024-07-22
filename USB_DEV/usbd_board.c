@@ -24,7 +24,7 @@
  */
 
 /* Includes */
-
+#include "system_init.h"
 #include "bsp_delay.h"
 #include "usbd_board.h"
 #include "usbd_core.h"
@@ -60,7 +60,7 @@
   @{
   */
 
-USBD_HANDLE_T usbDeviceHandler;
+USBD_HANDLE_T usbDeviceHandler  __SECTION(RAM_SECTION_CCMRAM);
 
 /**@} end of group OTGD_Custom_HID_Variables*/
 

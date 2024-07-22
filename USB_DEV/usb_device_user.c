@@ -77,7 +77,6 @@ __weak void USB_DevUserApplication(void)
                 USBD_USR_LOG("USBD_APP_READY");
                 break;
         }
-
         preAppStatus = gUsbDevAppStatus;
     }
 }
@@ -99,11 +98,9 @@ static void USB_DevUserHandler(USBD_INFO_T* usbInfo, uint8_t userStatus)
             break;
         case USBD_USER_RESUME:
             break;
-
         case USBD_USER_SUSPEND:
             gUsbDevAppStatus = USBD_APP_SUSPEND;
             break;
-
         case USBD_USER_CONNECT:
             break;
         case USBD_USER_DISCONNECT:

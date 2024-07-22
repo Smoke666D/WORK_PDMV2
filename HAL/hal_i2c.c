@@ -533,47 +533,7 @@ static void I2C_FSM()
 
 
     #endif
-#if  I2C_MODE == MODE_DMA
 
-
-    if ( ( int_flags  & (I2C_INT_FLAG_ADDR  & 0xFF) )  &&  ( pEEPROM->direciorn == 0 )  )
-    {
-
-    	if (pEEPROM->DMA_TX == 0)
-    	{
-    		I2C_ReadRegister( pEEPROM->dev,  I2C_REGISTER_STS2 );
-    		I2C_TxData( pEEPROM->dev , (pEEPROM->Index & 0xFF) );
-    	}
-    	else
-    	{
-    		 I2C_EnableDMA( pEEPROM->dev );
-    		 I2C_ReadRegister( pEEPROM->dev,  I2C_REGISTER_STS2 );
-    	}
-    	 return;
-    }
-    if ((pEEPROM->DMA_TX == 0) && (int_flags  &  I2C_INT_FLAG_BTC) )
-    {
-    	pEEPROM->direciorn =   1;
-    	I2C_EnableGenerateStart(  pEEPROM->dev  );
-    }
-
-
-    if (( int_flags  & ((I2C_INT_FLAG_TXBE  | I2C_INT_FLAG_BTC)   & 0xFF) ) )
-    {
-    	if (pEEPROM->DMA_TX == 1)
-
-    	{
-    		I2C_EnableGenerateStop( pEEPROM->dev);
-    		xTaskNotifyIndexedFromISR(pEEPROM->NotifyTaskHeandle, pEEPROM->ucTaskNatificationIndex,0x01, eSetValueWithOverwrite, &xHigherPriorityTaskWoken  );
-    		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-
-    	}
-
-    	return;
-
-    }
-
-#endif
 #endif
 }
 

@@ -10,15 +10,15 @@
 #include "drivers_config.h"
 
 
-static AIN_DATA_t xAinData[AIN_NUMBER] 			__SECTION(RAM_SECTION_CCMRAM);
-static LIN_COOF   xKoofData[ MAX_COOF_COUNT] 	__SECTION(RAM_SECTION_CCMRAM);
-static uint16_t usCurMaxIndex 					__SECTION(RAM_SECTION_CCMRAM);
+static AIN_DATA_t xAinData[AIN_NUMBER] 							__SECTION(RAM_SECTION_CCMRAM);
+static LIN_COOF   xKoofData[ MAX_COOF_COUNT] 					__SECTION(RAM_SECTION_CCMRAM);
+static uint16_t usCurMaxIndex 									__SECTION(RAM_SECTION_CCMRAM);
 #ifdef IPS_OUTS
-	static uint16_t muRawCurData[OUT_COUNT] 		__SECTION(RAM_SECTION_CCMRAM);
-	static uint16_t muRawOldOutCurData[OUT_COUNT] 	__SECTION(RAM_SECTION_CCMRAM);
+	static uint16_t muRawCurData[OUT_COUNT] 					__SECTION(RAM_SECTION_CCMRAM);
+	static uint16_t muRawOldOutCurData[OUT_COUNT] 				__SECTION(RAM_SECTION_CCMRAM);
 #endif
-static uint16_t muRawVData[AIN_NUMBER + 2]  	__SECTION(RAM_SECTION_CCMRAM);
-static uint16_t muRawOldVData[AIN_NUMBER + 2]	__SECTION(RAM_SECTION_CCMRAM);
+static uint16_t muRawVData[AIN_NUMBER + 2]  					__SECTION(RAM_SECTION_CCMRAM);
+static uint16_t muRawOldVData[AIN_NUMBER + 2]					__SECTION(RAM_SECTION_CCMRAM);
 int16_t            ADC1_IN_Buffer[ADC_FRAME_SIZE*ADC1_CHANNELS] __SECTION(RAM_SECTION_RAM );  //ADC1 input data buffer
 int16_t            ADC2_IN_Buffer[ADC_FRAME_SIZE*ADC2_CHANNELS] __SECTION(RAM_SECTION_RAM );   //ADC2 input data buffer
 int16_t            ADC3_IN_Buffer[ADC_FRAME_SIZE*ADC3_CHANNELS] __SECTION(RAM_SECTION_RAM );

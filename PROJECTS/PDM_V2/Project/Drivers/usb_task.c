@@ -522,7 +522,6 @@ void vUSBtask ( void *argument )
       switch( report.cmd )
       {
         /*----------------------------------------*/
-
       	  case USB_REPORT_CMD_GET_EEPROM:
       		vUSBsend( &report, vUSBEEPROMToReport );
       		 break;

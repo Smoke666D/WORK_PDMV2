@@ -21,7 +21,7 @@ static void (* func)( void);
 
 void vRTCInit()
 {
-#if MCU ==  APM32
+
 	RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_PMU);
 	PMU_EnableBackupAccess();
 	RCM_EnableLSI();
@@ -35,7 +35,7 @@ void vRTCInit()
 	RTC_WaitForSynchro();
 	RTC_ConfigStructInit(&Struct);
 	RTC_Config(&Struct);
-#endif
+
 }
 
 void HAL_RTC_IT_Init(  void (* rtc_it_callback) ( void ))

@@ -222,13 +222,9 @@ void vGetDoutStatus(uint32_t * Dout1_10Status, uint32_t * Dout11_20Status)
 	return;
 }
 
-
-void vHWOutEnable(OUT_NAME_TYPE out_name)
+ void vHWOutEnable(OUT_NAME_TYPE out_name)
 {
-	if ( out_name < OUT_COUNT )
-	{
-		HAL_SetBit(out[out_name].CS_PORT, out[out_name].CS_Pin );
-	}
+	HAL_SetBit(out[out_name].CS_PORT, out[out_name].CS_Pin );
 }
 
 /*
@@ -236,10 +232,7 @@ void vHWOutEnable(OUT_NAME_TYPE out_name)
  */
 void vHWOutDisable(OUT_NAME_TYPE out_name)
 {
-	if ( out_name < OUT_COUNT )
-	{
-		HAL_ResetBit(  out[out_name].CS_PORT, out[out_name].CS_Pin);
-	}
+	HAL_ResetBit(  out[out_name].CS_PORT, out[out_name].CS_Pin);
 }
 
 
@@ -717,14 +710,6 @@ static void vOutControlFSM(void)
 }
 
 
-
-
-void ADC_InputPortInit()
-{
-
-}
-
-
  /*
   *
   */
@@ -759,19 +744,16 @@ void AinNotifyTaskToInit()
 	   		    HAL_ADC_StartDMA( DMA2_CH4, (uint16_t *)getADC1Buffer(), ( ADC_FRAME_SIZE * ADC1_CHANNELS ));
 	   		    HAL_ADC_StartDMA( DMA2_CH2, (uint16_t *)getADC2Buffer(), ( ADC_FRAME_SIZE * ADC2_CHANNELS ));
 	   		    HAL_ADC_StartDMA( DMA2_CH0, (uint16_t *)getADC3Buffer(), ( ADC_FRAME_SIZE * ADC3_CHANNELS ));
-	   		    xTaskNotifyWaitIndexed( 1, 0, 0  ,&ulNotifiedValue,portMAX_DELAY);					//Ждем пока из обработчиков прерваний DMA прилетят уведомления об окончании преобразований
-	   		    if(  ulNotifiedValue >= 3 )
-	   		    {
-	   		    	HAL_ADCDMA_Disable(ADC_1);														//Выключаем DMA и АЦП
-	   		    	HAL_ADCDMA_Disable(ADC_2);														//АЦП в режиме циклеческого сканирования последовательности каналов
-	   		    	HAL_ADCDMA_Disable(ADC_3);														//C программным запуском. Нужон его выклчюать
-	   		    	vDataConvertToFloat();
-	   		    	vOutControlFSM();
-	   		    	HAL_ADC_Enable(ADC_1);
-	   		    	HAL_ADC_Enable(ADC_2);
-	   		    	HAL_ADC_Enable(ADC_3);
-	   		    	ulTaskNotifyValueClearIndexed(NULL, 1, 0xFFFF);
-	   		    }
+	   		    while  (ulNotifiedValue < 3)   xTaskNotifyWaitIndexed( 1, 0, 0  ,&ulNotifiedValue,portMAX_DELAY);					//Ждем пока из обработчиков прерваний DMA прилетят уведомления об окончании преобразований
+	   		    HAL_ADCDMA_Disable(ADC_1);														//Выключаем DMA и АЦП
+	   		    HAL_ADCDMA_Disable(ADC_2);														//АЦП в режиме циклеческого сканирования последовательности каналов
+	   		    HAL_ADCDMA_Disable(ADC_3);														//C программным запуском. Нужон его выклчюать
+	   		    vDataConvertToFloat();
+	   		    vOutControlFSM();
+	   		    HAL_ADC_Enable(ADC_1);
+	   		    HAL_ADC_Enable(ADC_2);
+	   		    HAL_ADC_Enable(ADC_3);
+	   		    ulTaskNotifyValueClearIndexed(NULL, 1, 0xFFFF);
 	   }
 	   else
 	   {
@@ -804,6 +786,7 @@ void AinNotifyTaskToInit()
    uint8_t ADC1_CHANNEL[9] = { ADC_CH_4,  ADC_CH_7, ADC_CH_6, ADC_CH_5,  ADC_CH_14, ADC_CH_15, ADC_CH_8,  ADC_CH_16, ADC_CH_9};
    uint8_t ADC2_CHANNEL[7] = { ADC_CH_11, ADC_CH_0, ADC_CH_1, ADC_CH_13, ADC_CH_12, ADC_CH_3,  ADC_CH_2 };
    uint8_t ADC3_CHANNEL[9] = { ADC_CH_14, ADC_CH_9, ADC_CH_7, ADC_CH_4,  ADC_CH_15, ADC_CH_8,  ADC_CH_10, ADC_CH_6, ADC_CH_5};
+   HAL_ADC_CommonConfig();
    HAL_ADC_ContiniusScanCinvertionDMA( ADC_1 ,  9 ,  ADC1_CHANNEL);
    HAL_ADC_ContiniusScanCinvertionDMA( ADC_2 ,  7 ,  ADC2_CHANNEL);
    HAL_ADC_ContiniusScanCinvertionDMA( ADC_3 ,  9 ,  ADC3_CHANNEL);

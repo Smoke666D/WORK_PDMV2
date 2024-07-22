@@ -208,7 +208,7 @@ void vGetDoutStatus(uint32_t * Dout1_10Status, uint32_t * Dout11_20Status);
 void vHWOutEnable(OUT_NAME_TYPE out_name);
 void vHWOutDisable(OUT_NAME_TYPE out_name);
 ERROR_CODE vHWOutResetConfig(OUT_NAME_TYPE out_name, uint8_t restart_count, uint16_t timer);
-void vHWOutEnable(OUT_NAME_TYPE out_name);
+
 ERROR_CODE vHWOutOverloadConfig(OUT_NAME_TYPE out_name,  float power, uint16_t overload_timer, float overload_power, OFF_STATE_TYPE off_state, uint8_t filter_enable);
 void vPWMFreqSet( OUT_CH_GROUPE_TYPE groupe, uint32_t Freq);
 void vSetRendomResetState( uint8_t out_name,  uint8_t state, uint8_t cool_down);

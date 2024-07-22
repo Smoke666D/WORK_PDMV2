@@ -8,13 +8,11 @@
 #include "hw_lib_din.h"
 #include "system_init.h"
 
-static DinConfig_t 				 xDinConfig[ DIN_COUNT] __SECTION(RAM_SECTION_CCMRAM);
-static median_filter_data_t      RPM_MIDIAN_FILTER_STRUC[RPM_CHANNEL_COUNT];
-static aver_filter_data_t        RPM_AVER_FILTER_STRUC  [RPM_CHANNEL_COUNT];
-static RPM_Struct                RPM[RPM_CHANNEL_COUNT] __SECTION(RAM_SECTION_CCMRAM);;
-static DoutCinfig_t              xDoutConfig[DOUT_COUNT] __SECTION(RAM_SECTION_CCMRAM);;
-
-
+static DinConfig_t 				 xDinConfig[ DIN_COUNT] 					__SECTION(RAM_SECTION_CCMRAM);
+static median_filter_data_t      RPM_MIDIAN_FILTER_STRUC[RPM_CHANNEL_COUNT] __SECTION(RAM_SECTION_CCMRAM);
+static aver_filter_data_t        RPM_AVER_FILTER_STRUC  [RPM_CHANNEL_COUNT] __SECTION(RAM_SECTION_CCMRAM);
+static RPM_Struct                RPM[RPM_CHANNEL_COUNT] 					__SECTION(RAM_SECTION_CCMRAM);;
+static DoutCinfig_t              xDoutConfig[DOUT_COUNT] 					__SECTION(RAM_SECTION_CCMRAM);;
 
 
 void InitDinStcurt()
