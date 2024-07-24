@@ -11,13 +11,10 @@
 	#include "apm32f4xx_rtc.h"
 	#include "apm32f4xx_pmu.h"
 	#include "apm32f4xx_rcm.h"
-#endif
-#if MCU == CH32
 
-#endif
+
 
 //Callbacl функция для вызова из секундрого прерывания RTC
-static void (* func)( void);
 
 void vRTCInit()
 {
@@ -38,59 +35,152 @@ void vRTCInit()
 
 }
 
-void HAL_RTC_IT_Init(  void (* rtc_it_callback) ( void ))
+static uint8_t RTC_ByteConBcd2(uint8_t val)
 {
-#if MCU == CH32V2
-	  NVIC_InitTypeDef      NVIC_InitStructure = {0};
-	  uint8_t temp = 0;
-	  RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
-	  PWR_BackupAccessCmd(ENABLE);
-	  /* Is it the first configuration */
-	  BKP_DeInit();
-	  RCC_LSEConfig(RCC_LSE_ON);
-	  while(RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET && temp < 250)
-	  {
-	            temp++;
-	            Delay_Ms(20);
-	  }
-	  if(temp >= 250)
-	  return;
+    uint8_t bcdhigh = 0;
 
-	  RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
-	  RCC_RTCCLKCmd(ENABLE);
-	  RTC_WaitForLastTask();
-	  RTC_WaitForSynchro();
-
-	  RTC_ITConfig(RTC_IT_SEC, ENABLE);
-	  RTC_WaitForLastTask();
-	  RTC_EnterConfigMode();
-	  RTC_SetPrescaler(32767);
-	  RTC_WaitForLastTask();
-	  RTC_ExitConfigMode();
-
-	  NVIC_InitStructure.NVIC_IRQChannel =  RTC_IRQn;
-	  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;
-	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	  NVIC_Init(&NVIC_InitStructure);
-#endif
-	  func = rtc_it_callback;
-	  return;
-}
-
-
-void RTC_IRQHandler ( void )
-{
-#if MCU== CH32V2
-    if (RTC_GetITStatus(RTC_FLAG_SEC) == SET)
+    while (val >= 10)
     {
-#endif
-        func();
-    	// vIncrementSystemCounters();
-#if MCU == CH32V2
-        RTC_ClearITPendingBit(RTC_FLAG_SEC);
+        bcdhigh++;
+        val -= 10;
     }
-#endif
-    return;
+
+    return  ((uint8_t)(bcdhigh << 4) | val);
+}
+static uint8_t RTC_Bcd2ConByte(uint8_t val)
+{
+    uint8_t tmp = 0;
+    tmp = ((uint8_t)(val & (uint8_t)0xF0) >> (uint8_t)0x4) * 10;
+    return (tmp + (val & (uint8_t)0x0F));
+}
+
+
+
+void HAL_RTC_ReadTime( HAL_TimeConfig_T* time)
+{
+    uint32_t temp = (uint32_t)((RTC->TIME) & 0x007F7F7F);
+    time->hours   = (uint8_t)((temp & 0x003F0000) >> 16);
+    time->minutes = (uint8_t)((temp & 0x00007F00) >>8);
+    time->seconds = (uint8_t)(temp & 0x0000007F);
+    time->hours   = (uint8_t)RTC_Bcd2ConByte(time->hours);
+    time->minutes = (uint8_t)RTC_Bcd2ConByte(time->minutes);
+    time->seconds = (uint8_t)RTC_Bcd2ConByte(time->seconds);
+}
+
+void HAL_RTC_ReadDate(HAL_DateConfig_T* date)
+{
+    uint32_t temp = 0;
+    temp = (uint32_t)((RTC->DATE) & 0x00FFFF3F);
+    date->year  = (uint8_t)((temp & 0x00FF0000) >> 16);
+    date->month = (RTC_MONTH_T)((temp & 0x00001F00) >>8);
+    date->date  = (uint8_t)(temp &  0x0000003F);
+    date->weekday =(RTC_WEEKDAY_T)((temp & 0x0000E000) >> 13);
+    date->year  = (uint8_t)RTC_Bcd2ConByte(date->year);
+    date->month = (RTC_MONTH_T)RTC_Bcd2ConByte(date->month);
+    date->date  = (uint8_t)RTC_Bcd2ConByte(date->date);
+    date->weekday = (RTC_WEEKDAY_T)(date->weekday);
 
 }
+
+
+uint8_t HAL_RTC_ConfigTime( HAL_TimeConfig_T* timeConfig)
+{
+    uint8_t state = ERROR;
+    uint32_t temp = 0;
+
+    if (RTC->CTRL_B.TIMEFCFG == BIT_RESET)
+    {
+        timeConfig->h12 = RTC_H12_AM;
+    }
+
+    /* Combine parameters of time */
+
+
+        temp = (uint32_t)(((uint32_t)RTC_ByteConBcd2(timeConfig->hours) << 16) | \
+                          ((uint32_t)RTC_ByteConBcd2(timeConfig->minutes) << 8) | \
+                          ((uint32_t)RTC_ByteConBcd2(timeConfig->seconds))| \
+                          (((uint32_t)(timeConfig->h12) << 22)));
+
+
+    RTC_DisableWriteProtection();
+
+    if (RTC_EnableInit() == ERROR)
+    {
+        state = ERROR;
+    }
+    else
+    {
+        RTC->TIME = (uint32_t)(temp & 0x007F7F7F);
+        RTC->STS_B.INITEN = BIT_RESET;  //disable init
+
+        if (RTC->CTRL_B.RCMCFG == RESET)
+        {
+            if (RTC_WaitForSynchro() == ERROR)
+            {
+                state = ERROR;
+            }
+            else
+            {
+                state = SUCCESS;
+            }
+        }
+        else
+        {
+            state = SUCCESS;
+        }
+    }
+
+    RTC->WRPROT = 0xFF; //Enable the write protection for RTC registers
+
+    return state;
+}
+
+
+uint8_t HAL_RTC_ConfigDate( HAL_DateConfig_T* dateConfig)
+{
+    uint8_t state = ERROR;
+    uint32_t temp = 0;
+
+    if (  ((dateConfig->month & 0x10) == 0x10))
+    {
+        dateConfig->month = (RTC_MONTH_T)((dateConfig->month & (uint32_t)~(0x10)) + 0x0A);
+    }
+
+
+        temp = (((uint32_t)RTC_ByteConBcd2(dateConfig->year) << 16) | \
+                ((uint32_t)RTC_ByteConBcd2(dateConfig->month) << 8) | \
+                ((uint32_t)RTC_ByteConBcd2(dateConfig->date))| \
+                ((uint32_t)(dateConfig->weekday) << 13));
+
+    RTC_DisableWriteProtection();
+
+    if (RTC_EnableInit() == ERROR)
+    {
+        state = ERROR;
+    }
+    else
+    {
+        RTC->DATE = (uint32_t)(temp & 0x00FFFF3F);
+        RTC->STS_B.INITEN = BIT_RESET;  //disable init
+
+        if (RTC->CTRL_B.RCMCFG == RESET)
+        {
+            if (RTC_WaitForSynchro() == ERROR)
+            {
+                state = ERROR;
+            }
+            else
+            {
+                state = SUCCESS;
+            }
+        }
+        else
+        {
+            state = SUCCESS;
+        }
+    }
+
+    RTC->WRPROT = 0xFF; //Enable the write protection for RTC registers
+    return state;
+}
+#endif

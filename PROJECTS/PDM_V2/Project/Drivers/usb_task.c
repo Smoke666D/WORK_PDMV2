@@ -13,9 +13,10 @@
 
 
 #include "flash_task.h"
-#include "apm32f4xx_rtc.h"
+
 #include "hw_lib_datastorage.h"
 #include "data.h"
+#include "hal_rtc.h"
 #include "hal_wdt.h"
 #include <stdio.h>
 
@@ -264,10 +265,10 @@ void vUSBEEPROMSizeToReport ( USB_REPORT* report )
 
 void vUSBTimeToReport ( USB_REPORT* report )
 {
-	RTC_TimeConfig_T time_buffer;
-    RTC_DateConfig_T date_buffer;
-    RTC_ReadTime(RTC_FORMAT_BIN,  &time_buffer );
-    RTC_ReadDate(RTC_FORMAT_BIN,  &date_buffer );
+	HAL_TimeConfig_T time_buffer;
+    HAL_DateConfig_T date_buffer;
+    HAL_RTC_ReadTime(  &time_buffer );
+    HAL_RTC_ReadDate(  &date_buffer );
 	report->stat   = USB_REPORT_STATE_OK;
 	report->length = 6;
 	report->data[0] = time_buffer.hours;
@@ -299,8 +300,8 @@ USB_STATUS  eUSBreportToToken( USB_REPORT* report )
 USB_STATUS  eUSBreportToTime  ( const USB_REPORT* report )
 {
     USB_STATUS res = USB_STATUS_DONE;
-    RTC_TimeConfig_T time_buffer;
-    RTC_DateConfig_T date_buffer;
+    HAL_TimeConfig_T time_buffer;
+    HAL_DateConfig_T date_buffer;
 	if (report->length != 6)
 	{
 		res = USB_STATUS_ERROR_LENGTH;
@@ -314,8 +315,8 @@ USB_STATUS  eUSBreportToTime  ( const USB_REPORT* report )
 		date_buffer.date	 = report->data[3];
 		date_buffer.month    = report->data[4];
 		date_buffer.year     = report->data[5];
-		RTC_ConfigTime(RTC_FORMAT_BIN,&time_buffer );
-		RTC_ConfigDate(RTC_FORMAT_BIN,&date_buffer );
+		HAL_RTC_ConfigTime(&time_buffer );
+		HAL_RTC_ConfigDate(&date_buffer );
 
 	}
 	return res;

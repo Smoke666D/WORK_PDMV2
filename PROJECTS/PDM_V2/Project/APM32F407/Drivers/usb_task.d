@@ -32,7 +32,6 @@ Drivers/usb_task.o: ../Drivers/usb_task.c ../Drivers/usb_task.h \
  C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h \
  C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_fmc.h \
- c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rtc.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_datastorage.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_eeprom.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
@@ -58,7 +57,8 @@ Drivers/usb_task.o: ../Drivers/usb_task.c ../Drivers/usb_task.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_i2c.h \
  ../Drivers/data.h ../Drivers/drivers_config.h ../Drivers/lua_task.h \
- ../Drivers/version.h C:\Users\i.dymov\Desktop\WORK\HAL/hal_wdt.h
+ ../Drivers/version.h C:\Users\i.dymov\Desktop\WORK\HAL/hal_rtc.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/hal_wdt.h
 
 ../Drivers/usb_task.h:
 
@@ -130,8 +130,6 @@ C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
 
 c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_fmc.h:
 
-c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rtc.h:
-
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_datastorage.h:
 
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_eeprom.h:
@@ -187,5 +185,7 @@ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_
 ../Drivers/lua_task.h:
 
 ../Drivers/version.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_rtc.h:
 
 C:\Users\i.dymov\Desktop\WORK\HAL/hal_wdt.h:

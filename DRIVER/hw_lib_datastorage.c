@@ -7,7 +7,7 @@
 
 
 #include "hw_lib_datastorage.h"
-#include "apm32f4xx_rtc.h"
+#include "hal_rtc.h"
 #include "system_init.h"
 #include "main.h"
 
@@ -304,8 +304,8 @@ STORAGE_ERROR vSetRecordData(uint8_t index, uint8_t * data)
 {
 	   uint32_t record_type  = DataStorageDiscriptor.record_mask;
 	   uint16_t data_offset = 0;
-	   RTC_TimeConfig_T time_buffer;
-	   RTC_DateConfig_T date_buffer;
+	   HAL_TimeConfig_T time_buffer;
+	   HAL_DateConfig_T date_buffer;
 	   PDM_DATA_TIME temp_time;
 	   if (index < DataStorageDiscriptor.record_fields_count)
 	   {
@@ -333,8 +333,8 @@ STORAGE_ERROR vSetRecordData(uint8_t index, uint8_t * data)
 			   	   	  case RECORD_TIME_STAMP:
 
 
-			   	   	      RTC_ReadTime(RTC_FORMAT_BIN,  &time_buffer );
-			   	   	      RTC_ReadDate(RTC_FORMAT_BIN,  &date_buffer );
+			   	   	      HAL_RTC_ReadTime(  &time_buffer );
+			   	   	      HAL_RTC_ReadDate(  &date_buffer );
 			   	   		  temp_time.Day 	= date_buffer.date;
 			   	   		  temp_time.Month 	= date_buffer.month;
 			   	   		  temp_time.Year 	= date_buffer.year;

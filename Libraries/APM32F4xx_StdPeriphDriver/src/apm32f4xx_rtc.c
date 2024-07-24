@@ -230,7 +230,7 @@ uint8_t RTC_EnableInit(void)
 }
 
 /*!
- * @brief     Disable the RTC Initialization mode.
+ * @brief     F.
  *
  * @param     None
  *
@@ -376,65 +376,6 @@ void RTC_DisableBypassShadow(void)
  *
  * @retval    SUCCESS or ERROR
  */
-uint8_t RTC_ConfigTime(RTC_FORMAT_T format, RTC_TimeConfig_T* timeConfig)
-{
-    uint8_t state = ERROR;
-    uint32_t temp = 0;
-
-    if (RTC->CTRL_B.TIMEFCFG == BIT_RESET)
-    {
-        timeConfig->h12 = RTC_H12_AM;
-    }
-
-    /* Combine parameters of time */
-    if (format != RTC_FORMAT_BIN)
-    {
-        temp = (((uint32_t)(timeConfig->hours) << 16) | \
-                ((uint32_t)(timeConfig->minutes) << 8) | \
-                ((uint32_t)(timeConfig->seconds))| \
-                ((uint32_t)(timeConfig->h12) << 22));
-    }
-    else
-    {
-        temp = (uint32_t)(((uint32_t)RTC_ByteConBcd2(timeConfig->hours) << 16) | \
-                          ((uint32_t)RTC_ByteConBcd2(timeConfig->minutes) << 8) | \
-                          ((uint32_t)RTC_ByteConBcd2(timeConfig->seconds))| \
-                          (((uint32_t)(timeConfig->h12) << 22)));
-    }
-
-    RTC_DisableWriteProtection();
-
-    if (RTC_EnableInit() == ERROR)
-    {
-        state = ERROR;
-    }
-    else
-    {
-        RTC->TIME = (uint32_t)(temp & 0x007F7F7F);
-
-        RTC_DisableInit();
-
-        if (RTC->CTRL_B.RCMCFG == RESET)
-        {
-            if (RTC_WaitForSynchro() == ERROR)
-            {
-                state = ERROR;
-            }
-            else
-            {
-                state = SUCCESS;
-            }
-        }
-        else
-        {
-            state = SUCCESS;
-        }
-    }
-
-    RTC_EnableWriteProtection();
-
-    return state;
-}
 
 /*!
  * @brief     Fills each timeConfig member with its default value

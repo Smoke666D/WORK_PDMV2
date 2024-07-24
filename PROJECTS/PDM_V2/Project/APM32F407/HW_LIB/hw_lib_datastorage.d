@@ -55,7 +55,7 @@ HW_LIB/hw_lib_datastorage.o: \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_i2c.h \
- c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rtc.h
+ C:\Users\i.dymov\Desktop\WORK\HAL/hal_rtc.h
 
 C:/Users/i.dymov/Desktop/WORK/DRIVER/hw_lib_datastorage.h:
 
@@ -167,4 +167,4 @@ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h:
 
 c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_i2c.h:
 
-c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rtc.h:
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_rtc.h:

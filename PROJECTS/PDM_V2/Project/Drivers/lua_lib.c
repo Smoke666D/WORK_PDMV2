@@ -15,10 +15,10 @@
 #include "adc_task.h"
 #include "hw_lib_can.h"
 #include "hw_lib_datastorage.h"
-#include "apm32f4xx_rtc.h"
 #include "lprefix.h"
 #include "lua.h"
 #include "lauxlib.h"
+#include "hal_rtc.h"
 
 
 
@@ -31,8 +31,8 @@
 {
 	uint32_t  res = ERROR, temp_bool,temp_int;
 	float temp_float;
-	RTC_TimeConfig_T time_buffer;
-	RTC_DateConfig_T date_buffer;
+	HAL_TimeConfig_T time_buffer;
+	HAL_DateConfig_T date_buffer;
 	PDM_DATA_TIME temp_time;
 	uint16_t adr  = lua_tointeger( L , FIRST_ARGUMENT );
 	switch (lua_gettop(L))
@@ -61,8 +61,8 @@
 			}
 			break;
 		case ONE_ARGUMENT:
-			RTC_ReadTime( RTC_FORMAT_BIN, &time_buffer );
-		    RTC_ReadDate( RTC_FORMAT_BIN, &date_buffer);
+			HAL_RTC_ReadTime( &time_buffer );
+		    HAL_RTC_ReadDate(  &date_buffer);
 			temp_time.Day 	 = date_buffer.date;
 			temp_time.Month  = date_buffer.month;
 			temp_time.Year 	 = date_buffer.year;
@@ -236,8 +236,8 @@
   */
  int iSetTime( lua_State *L )
  {
-	 RTC_TimeConfig_T time_buffer;
-	 RTC_DateConfig_T date_buffer;
+	 HAL_TimeConfig_T time_buffer;
+	 HAL_DateConfig_T date_buffer;
      if (lua_gettop(L) == SIX_ARGUMENT )
  	{
      	time_buffer.hours   = lua_tointeger( L , FIRST_ARGUMENT );
@@ -246,8 +246,8 @@
  		date_buffer.date = lua_tointeger( L ,FOURTH_ARGUMENT  );
  		date_buffer.month = lua_tointeger( L ,FIVE_ARGUMENT);
  		date_buffer.year = lua_tointeger( L ,SIX_ARGUMENT );
- 		RTC_ConfigTime(  RTC_FORMAT_BIN,  &time_buffer );
- 		RTC_ConfigDate(  RTC_FORMAT_BIN,  &date_buffer );
+ 		HAL_RTC_ConfigTime(    &time_buffer );
+ 		HAL_RTC_ConfigDate(    &date_buffer );
  	}
  	return ( NO_RESULT );
  }
@@ -256,10 +256,10 @@
   */
 int iGetTime( lua_State *L )
  {
-	RTC_TimeConfig_T time_buffer;
-	RTC_DateConfig_T date_buffer;
-	RTC_ReadTime( RTC_FORMAT_BIN, &time_buffer );
-	RTC_ReadDate( RTC_FORMAT_BIN, &date_buffer);
+	HAL_TimeConfig_T time_buffer;
+	HAL_DateConfig_T date_buffer;
+	HAL_RTC_ReadTime( &time_buffer );
+	HAL_RTC_ReadDate( &date_buffer);
  	lua_pushinteger( L, time_buffer.hours );
  	lua_pushinteger( L, time_buffer.minutes );
  	lua_pushinteger( L,	time_buffer.seconds );
