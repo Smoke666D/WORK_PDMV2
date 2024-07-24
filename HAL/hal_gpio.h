@@ -68,7 +68,6 @@ typedef enum
 } GPIO_MODE_t;
 
 void HAL_InitGPO();
-void HAL_InitRCC(PortName_t PORT );
 void HAL_InitGpioIn(PortName_t PORT, uint16_t Pin);
 void HAL_InitGpioAF(PortName_t PORT, uint16_t Pin, uint32_t AF , GPIO_MODE_t mode );
 void HAL_InitGpioInPUP(PortName_t PORT, uint16_t Pin);

@@ -1,15 +1,14 @@
 /*
- * hal_can_ch32.c
+ * hal_can.c
  *
- *  Created on: 19 июл. 2024 г.
+ *  Created on: 13 мая 2024 г.
  *      Author: i.dymov
  */
-
-
 #include "hal_can.h"
+#include "string.h"
+
 
 #if MCU == CH32V2
-#include "string.h"
 #include "hal_irq.h"
 
 static HAL_CAN_t CAN;
@@ -44,13 +43,10 @@ void HAL_CANSetERRCallback(void (* f) ( void ))
 
 void HAL_CANIntIT(  uint16_t   CANbitRate, uint8_t prior, uint8_t subprior)
 {
-
-#if MCU == CH32V2
      u16 CAN_Prescaler;
      RCC->APB1PRSTR |= RCC_APB1Periph_CAN1;
      RCC->APB1PRSTR &= ~RCC_APB1Periph_CAN1;
      RCC->APB1PCENR |= RCC_APB1Periph_CAN1;
-
      /* Configure CAN timing */
       switch (CANbitRate)
       {
@@ -113,7 +109,7 @@ void HAL_CANIntIT(  uint16_t   CANbitRate, uint8_t prior, uint8_t subprior)
              PFIC_IRQ_ENABLE_PG1(CAN1_SCE_IRQn,prior,subprior);
          }
       }
-#endif
+
 }
 
 uint8_t HAL_CANToInitMode()
@@ -235,35 +231,32 @@ void HAL_CANSetFiters(uint8_t filter_index, uint32_t f1,uint32_t f2,uint32_t f3,
 
 HAL_CAN_ERROR_t HAL_CANGetRXMessage( HAL_CAN_RX_FIFO_NUMBER_t fifo,  CAN_FRAME_TYPE * rx_message )
 {
-	HAL_CAN_ERROR_t res = HAL_CAN_ERROR;
+    u32 StdId;
+    if (((uint8_t)0x04 & CAN1->sFIFOMailBox[fifo ].RXMIR )!= CAN_Id_Standard)
+        return (HAL_CAN_ERROR);
+    else
+    {
 
-     u8 FIFONumber = (fifo == HAL_RX_FIFO0) ? CAN_FIFO0 : CAN_FIFO1;
-     u32 StdId;
-     u8 IDE = (uint8_t)0x04 & CAN1->sFIFOMailBox[FIFONumber].RXMIR;
-      if (IDE == CAN_Id_Standard)
-      {
-           StdId = (uint32_t)0x000007FF & (CAN1->sFIFOMailBox[FIFONumber].RXMIR >> 21);
-           u8 RTR = (uint8_t)0x02 & CAN1->sFIFOMailBox[FIFONumber].RXMIR;
-           rx_message->DLC = (uint8_t)0x0F & CAN1->sFIFOMailBox[FIFONumber].RXMDTR;
-           rx_message->data[0] = (uint8_t)0xFF &  CAN1->sFIFOMailBox[FIFONumber].RXMDLR;
-           rx_message->data[1] = (uint8_t)0xFF & (CAN1->sFIFOMailBox[FIFONumber].RXMDLR >> 8);
-           rx_message->data[2] = (uint8_t)0xFF & (CAN1->sFIFOMailBox[FIFONumber].RXMDLR >> 16);
-           rx_message->data[3] = (uint8_t)0xFF & (CAN1->sFIFOMailBox[FIFONumber].RXMDLR >> 24);
-           rx_message->data[4] = (uint8_t)0xFF &  CAN1->sFIFOMailBox[FIFONumber].RXMDHR;
-           rx_message->data[5] = (uint8_t)0xFF & (CAN1->sFIFOMailBox[FIFONumber].RXMDHR >> 8);
-           rx_message->data[6] = (uint8_t)0xFF & (CAN1->sFIFOMailBox[FIFONumber].RXMDHR >> 16);
-           rx_message->data[7] = (uint8_t)0xFF & (CAN1->sFIFOMailBox[FIFONumber].RXMDHR >> 24);
-           if (FIFONumber == CAN_FIFO0)
-                CAN1->RFIFO0 |= CAN_RFIFO0_RFOM0;
-           else
-               CAN1->RFIFO1 |= CAN_RFIFO1_RFOM1;
-           rx_message->ident = (StdId & CAN_SFID_MASK) | ((RTR == CAN_RTR_Remote) ? FLAG_RTR : 0x00)   ;
-           rx_message->filter_id = 0;
-           res =HAL_CAN_OK;
+       StdId = (uint32_t)0x000007FF & (CAN1->sFIFOMailBox[fifo ].RXMIR >> 21);
+       u8 RTR = (uint8_t)0x02 & CAN1->sFIFOMailBox[fifo ].RXMIR;
+       rx_message->DLC = (uint8_t)0x0F & CAN1->sFIFOMailBox[fifo ].RXMDTR;
+       rx_message->data[0] = (uint8_t)0xFF &  CAN1->sFIFOMailBox[fifo ].RXMDLR;
+       rx_message->data[1] = (uint8_t)0xFF & (CAN1->sFIFOMailBox[fifo ].RXMDLR >> 8);
+       rx_message->data[2] = (uint8_t)0xFF & (CAN1->sFIFOMailBox[fifo ].RXMDLR >> 16);
+       rx_message->data[3] = (uint8_t)0xFF & (CAN1->sFIFOMailBox[fifo ].RXMDLR >> 24);
+       rx_message->data[4] = (uint8_t)0xFF &  CAN1->sFIFOMailBox[fifo ].RXMDHR;
+       rx_message->data[5] = (uint8_t)0xFF & (CAN1->sFIFOMailBox[fifo ].RXMDHR >> 8);
+       rx_message->data[6] = (uint8_t)0xFF & (CAN1->sFIFOMailBox[fifo ].RXMDHR >> 16);
+       rx_message->data[7] = (uint8_t)0xFF & (CAN1->sFIFOMailBox[fifo ].RXMDHR >> 24);
+       if (fifo == CAN_FIFO0)
+           CAN1->RFIFO0 |= CAN_RFIFO0_RFOM0;
+       else
+           CAN1->RFIFO1 |= CAN_RFIFO1_RFOM1;
+       rx_message->ident = (StdId & CAN_SFID_MASK) | ((RTR == CAN_RTR_Remote) ? FLAG_RTR : 0x00)   ;
+       rx_message->filter_id = 0;
+       return (HAL_CAN_OK);
       }
 
-
-   return (res);
 
 }
 

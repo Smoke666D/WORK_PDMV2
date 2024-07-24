@@ -1,7 +1,7 @@
 /*
  * hal_can.h
  *
- *  Created on: 13 мая 2024 г.
+ *  Created on: 13 屑邪褟 2024 谐.
  *      Author: i.dymov
  */
 
@@ -16,10 +16,6 @@
 #define CANID_MASK                              0x07FF  /*!< CAN standard ID mask */
 #define FLAG_RTR                                0x8000  /*!< RTR flag, part of identifier */
 
-#if MCU == APM32
-#include "apm32f4xx_can.h"
-#include "apm32f4xx_rcm.h"
-#endif
 
 #if MCU == CH32V2
 #include "ch32v20x_can.h"
@@ -33,14 +29,22 @@ typedef enum
 } HAL_CAN_FILTER_FIFO_t;
 
 #if MCU==APM32
+
+#include "apm32f4xx_can.h"
 typedef enum
 {
-	HAL_RX_FIFO0 = CAN_RX_FIFO_0,
-	HAL_RX_FIFO1 = CAN_RX_FIFO_1,
+    HAL_RX_FIFO0 = CAN_RX_FIFO_0,
+    HAL_RX_FIFO1 = CAN_RX_FIFO_1,
 } HAL_CAN_RX_FIFO_NUMBER_t;
 #endif
 
-
+#if MCU == CH32V2
+typedef enum
+{
+	HAL_RX_FIFO0 =  CAN_FIFO0,
+	HAL_RX_FIFO1 =  CAN_FIFO1,
+} HAL_CAN_RX_FIFO_NUMBER_t;
+#endif
 /* Transmit message object */
 typedef struct {
     uint32_t ident;
@@ -48,8 +52,6 @@ typedef struct {
     uint8_t data[8];
 
 } CAN_TX_FRAME_TYPE;
-
-
 
 
 typedef struct {

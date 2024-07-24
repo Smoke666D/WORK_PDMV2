@@ -114,7 +114,6 @@ void HAL_CANSetERRCallback(void (* f) ( void ))
 
 void HAL_CANIntIT(  uint16_t   CANbitRate, uint8_t prior, uint8_t subprior)
 {
-
 	 uint16_t            prescaler;
 	//Включаем тактирование шины и перезапускаем переферию
 	RCM->APB1CLKEN |= RCM_APB1_PERIPH_CAN1;
@@ -191,8 +190,6 @@ void HAL_CANIntIT(  uint16_t   CANbitRate, uint8_t prior, uint8_t subprior)
                 initStatus = SUCCESS;
             }
         }
-
-
      if (initStatus!= ERROR)
      {
     	 CAN1->INTEN |=  ( CAN_INT_TXME |  CAN_INT_F0MP | CAN_INT_F1MP  );
@@ -374,10 +371,6 @@ HAL_CAN_ERROR_t HAL_CANGetRXMessage( HAL_CAN_RX_FIFO_NUMBER_t fifo,  CAN_FRAME_T
    return (res);
 
 }
-
-
-
-
 
 void CAN1_SCE_IRQHandler(void)
 {

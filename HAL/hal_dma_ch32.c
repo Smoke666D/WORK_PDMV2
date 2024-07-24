@@ -12,8 +12,6 @@
 DMA_CFG_t DMA_CALLback[7]   __SECTION(RAM_SECTION_CCMRAM);
 
 
-
-    #include "hal_adc.h"
     #include "hal_irq.h"
     #include "ch32v20x_dma.h"
 	#include "ch32v20x_adc.h"
@@ -48,7 +46,7 @@ void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t d
 	   /* Enable DMA clock */
 	          RCC->AHBPCENR |= RCC_AHBPeriph_DMA1;
 
-	          u32 DMA_DIR = ( direction== MTOP ) ?DMA_DIR_PeripheralDST : DMA_DIR_PeripheralSRC;
+	          u32 DMA_DIR =  direction;
 	          u32 DMA_MemoryDataSize;
 	          u32 DMA_PeripheralDataSize;
 	          switch (dma_size)

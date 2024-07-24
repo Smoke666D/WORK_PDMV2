@@ -122,38 +122,7 @@ void HAL_ResetBit(  PortName_t  port, uint16_t pin )
 {
 	port->BSCH = pin;
 }
-/*
- * Функция инициализации тактирования указанного порта
- */
- void HAL_InitRCC(PortName_t PORT )
-{
-	if (PORT ==  PORT_A)
-			RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOA);
-	else
-	if (PORT ==  PORT_B)
 
-			RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOB);
-	else
-	if (PORT ==  PORT_C)
-
-			RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOC);
-	else
-	if (PORT ==  PORT_D)
-			RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOD);
-	else
-	if (PORT ==  PORT_E)
-			RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOE);
-			else
-	if (PORT ==  PORT_F)
-			RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOF);
-	else
-	if (PORT ==  PORT_H)
-			RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOH);
-	else
-	if (PORT ==  PORT_G)
-			RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOG);
-
-}
 
 #define GPIO_PORT_COUNT  7
 static const RCM_AHB1_PERIPH_T PERIPH_MASK[GPIO_PORT_COUNT] = { RCM_AHB1_PERIPH_GPIOA,RCM_AHB1_PERIPH_GPIOB,RCM_AHB1_PERIPH_GPIOC,RCM_AHB1_PERIPH_GPIOD,RCM_AHB1_PERIPH_GPIOG,

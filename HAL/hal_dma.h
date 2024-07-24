@@ -29,16 +29,25 @@
 #define DMA2_CH8  	DMA2_Stream8
 #endif
 #if MCU == CH32V2
-#define DMA_Stram_t DMA_Channel_TypeDef *
+#include "ch32v20x_dma.h"
+typedef enum
+{
+  PTOM = DMA_DIR_PeripheralSRC,
+  MTOP = DMA_DIR_PeripheralDST,
+} DMA_Derection_t;
 
-#define DMA1_CH1  	DMA1_Channel1
-#define DMA1_CH2  	DMA1_Channel2
-#define DMA1_CH3  	DMA1_Channel3
-#define DMA1_CH4  	DMA1_Channel4
-#define DMA1_CH5  	DMA1_Channel5
-#define DMA1_CH6  	DMA1_Channel6
-#define DMA1_CH7  	DMA1_Channel7
-#define DMA1_CH8  	DMA1_Channel8
+
+typedef enum
+{
+    DMA1_CH1 =0,
+    DMA1_CH2 =1,
+    DMA1_CH3 =2,
+    DMA1_CH4 =3,
+    DMA1_CH5 =4,
+    DMA1_CH6 =5,
+    DMA1_CH7 =6,
+}
+DMA_Stram_t;
 #endif
 
 
@@ -88,7 +97,10 @@ void HAL_DMA_SerSource( DMA_Stram_t chanel, uint16_t * data, uint16_t size );
 void DMA2_STR4_IRQHandler( void );
 void DMA2_STR2_IRQHandler( void );
 void DMA2_STR0_IRQHandler( void );
-#endif
 void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, uint32_t memadr, DMA_CHANNEL_t channel, uint8_t prior, uint8_t subprior, void (*f)(void));
-
+#endif
+#if MCU == CH32V2 || MCU== CH32V3
+void HAL_DMA_SetCouterAndEnable(DMA_Stram_t stream, uint32_t counter );
+void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, uint32_t memadr,  uint8_t prior, uint8_t subprior, void (*f)(void));
+#endif
 #endif /* HAL_HAL_DMA_H_ */

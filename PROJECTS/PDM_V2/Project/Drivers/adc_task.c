@@ -798,7 +798,6 @@ void AinNotifyTaskToInit()
    HAL_ADC_ContiniusScanCinvertionDMA( ADC_2 ,  7 ,  ADC2_CHANNEL);
    HAL_ADC_ContiniusScanCinvertionDMA( ADC_3 ,  9 ,  ADC3_CHANNEL);
    HAL_ADC_TempEnable();
-  // HAL_ADC_VrefEnable();
    HAL_ADC_Enable(ADC_1);
    HAL_ADC_Enable(ADC_2);
    HAL_ADC_Enable(ADC_3);
