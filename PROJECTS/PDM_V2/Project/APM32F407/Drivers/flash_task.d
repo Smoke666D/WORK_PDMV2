@@ -19,6 +19,10 @@ Drivers/flash_task.o: ../Drivers/flash_task.c ../Drivers/flash_task.h \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\mpu_wrappers.h \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\task.h \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\list.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/hal_flash.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
+ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_fmc.h \
  ../Drivers/lua_task.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\system/system_init.h \
  c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\queue.h \
@@ -29,8 +33,6 @@ Drivers/flash_task.o: ../Drivers/flash_task.c ../Drivers/flash_task.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/din_task.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_din.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
- C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
- C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h \
  C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h \
@@ -50,8 +52,7 @@ Drivers/flash_task.o: ../Drivers/flash_task.c ../Drivers/flash_task.h \
  C:\Users\i.dymov\Desktop\WORK\USB_DEV/usbd_custom_hid_if.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/adc_task.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h \
- C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
- c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_fmc.h
+ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h
 
 ../Drivers/flash_task.h:
 
@@ -95,6 +96,14 @@ c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\s
 
 c:\users\i.dymov\desktop\work\middlewares\freertos\freertosv202012.00\freertos\source\include\list.h:
 
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_flash.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
+
+c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_fmc.h:
+
 ../Drivers/lua_task.h:
 
 C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\system/system_init.h:
@@ -114,10 +123,6 @@ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/din_task.h:
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_din.h:
 
 C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h:
-
-C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
-
-C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h:
 
 C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
 
@@ -158,5 +163,3 @@ C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/adc_task.h:
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_adc.h:
 
 C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h:
-
-c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_fmc.h:

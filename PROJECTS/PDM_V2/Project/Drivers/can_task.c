@@ -124,7 +124,7 @@ void vCANBoudInit( uint16_t boudrate )
 
     HAL_CANToInitMode();
 	boundrate_can1 = boudrate;
-	HAL_CANIntIT( boundrate_can1,5,0);
+	HAL_CANIntIT( boundrate_can1,CAN_PRIOR,CAN_SUBPRIOR);
 	HAL_CANToOperatingMode();
 
     return;

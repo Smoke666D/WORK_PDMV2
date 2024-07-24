@@ -8,10 +8,11 @@
 
 #include "hal_flash.h"
 
+#if MCU == CH32V2
 
  void HAL_FLASH_WriteByWord( uint8_t * src, uint8_t * dest, uint32_t len)
 {
-#if MCU == CH32V2
+
 	 for (uint32_t i=0U; i<len; i+=4U )
 	   {
 	 	if ( ( uint32_t )( dest + i ) > FLASH_SIZE )
@@ -36,14 +37,14 @@
 	   }
 	   return;
 
-#endif
+
 }
 
  void HAL_FLASH_Lock()
  {
-#if MCU == CH32V2
+
 	 FLASH_Lock();
-#endif
+
  }
 /*
  *  Функция стирания заднной страницы
@@ -51,8 +52,9 @@
  */
  void HAL_FLASH_ErasePage(uint32_t Page_Address)
  {
-#if MCU == CH32V2
+
 	 FLASH_Unlock();
 	 FLASH_ErasePage(Page_Address);
-#endif
+
  }
+#endif

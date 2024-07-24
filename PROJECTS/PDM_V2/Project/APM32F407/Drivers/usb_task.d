@@ -28,13 +28,14 @@ Drivers/usb_task.o: ../Drivers/usb_task.c ../Drivers/usb_task.h \
  C:\Users\i.dymov\Desktop\WORK\USB_DEV/usb_device_user.h \
  C:\Users\i.dymov\Desktop\WORK\USB_DEV/usbd_descriptor.h \
  C:\Users\i.dymov\Desktop\WORK\USB_DEV/usbd_custom_hid_if.h \
- ../Drivers/flash_task.h \
+ ../Drivers/flash_task.h C:\Users\i.dymov\Desktop\WORK\HAL/hal_flash.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h \
+ C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
+ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_fmc.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rtc.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_datastorage.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_eeprom.h \
  C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h \
- C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
- C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h \
  C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_tmr.h \
  c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rcm.h \
@@ -121,6 +122,14 @@ C:\Users\i.dymov\Desktop\WORK\USB_DEV/usbd_custom_hid_if.h:
 
 ../Drivers/flash_task.h:
 
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_flash.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
+
+c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_fmc.h:
+
 c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_rtc.h:
 
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_datastorage.h:
@@ -128,10 +137,6 @@ C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_datastorage.h:
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_eeprom.h:
 
 C:\Users\i.dymov\Desktop\WORK\PROJECTS\PDM_V2\Project\Drivers/drivers_config.h:
-
-C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
-
-C:\Users\i.dymov\Desktop\WORK\HAL/hal_config.h:
 
 C:\Users\i.dymov\Desktop\WORK\HAL/board_define.h:
 

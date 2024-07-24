@@ -269,8 +269,6 @@ int iGetTime( lua_State *L )
  	return (  SIX_ARGUMENT );
  }
 
-
-
 /*
  * Setting discrete input configuration API function
  */
@@ -351,9 +349,6 @@ int  iOutConfig( lua_State *L )
 	}
 	return ( NO_RESULT );
 }
-
-
-
 
 /*
  *
@@ -569,7 +564,6 @@ int iCanGetResivedData(lua_State *L )
 	return ( 1U );
 }
 
-
 /*
  *  Setting Can parameter API function
  */
@@ -585,5 +579,22 @@ int iCanSetConfig(lua_State *L)
 /*
  *
  */
+static float DEBUG_DATA[DEBUG_DATA_COUNT ] __SECTION(RAM_SECTION_CCMRAM);
 
+int iSetDebugData(lua_State *L )
+{
+	if (lua_gettop(L) == TWO_ARGUMENTS )  //Проверяем, что при вызове нам передали нужное число аргументов
+	{
+		u8 index =  lua_tointeger(L, FIRST_ARGUMENT ) -1U;
+		if (index < DEBUG_DATA_COUNT)
+		{
+		  DEBUG_DATA[index] = 	( float ) lua_tonumber(L, SECOND_ARGUMENT );
+		}
+	}
+	return ( NO_RESULT );
+}
 
+float fGetDebugData( uint8_t index)
+{
+	return DEBUG_DATA[index];
+}

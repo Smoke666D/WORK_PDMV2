@@ -129,7 +129,14 @@ typedef enum
 #define ADC3_READY         0x40
 #define ADC1_READY         0x80
 
-
+#define CAN_PRIOR         5
+#define CAN_SUBPRIOR      0
+#define ADC_DMA_PRIOR     6
+#define ADC_DMA_SUBPRIOR  0
+#define CAP_TIM_PRIOR     5
+#define CAP_TIM_SUBPRIOR  1
+#define I2C_PRIOR         4
+#define I2C_SUBPRIOR      0//
 
 
 void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,

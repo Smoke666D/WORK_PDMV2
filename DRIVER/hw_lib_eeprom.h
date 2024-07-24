@@ -76,17 +76,15 @@ typedef struct
 {
    uint8_t ucTaskNatificationIndex;
    uint8_t BusyFlag;
-   uint8_t direciorn;
-   uint8_t ADDR[2];
-   uint8_t DevAdrres;
-   uint16_t data_address;
    uint8_t DataLength;
    uint8_t Index;
+   uint8_t ADDR[2];
+   uint8_t DevAdrres;
+   I2C_STATE_t I2C_State;
+   uint16_t data_address;
    uint8_t * ReciveBuffer;
    I2C_NAME_t dev;
    TaskHandle_t NotifyTaskHeandle;
-   uint8_t DMA_TX;
-   I2C_STATE_t I2C_State;
    EERPOM_ERROR_CODE_t (*I2C_Master_Recive_func) (  u8 , u16,  u8 * , u16 , u32 ,u8 );
    EERPOM_ERROR_CODE_t (*I2C_Master_Transmit_func)( u8 , u16,  u8 * , u16 , u32 ,u8 );
 } EEPOROM;

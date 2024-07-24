@@ -89,8 +89,6 @@ void USBD_HardwareInit(USBD_INFO_T* usbInfo)
         /* Configure USB OTG */
         RCM_EnableAHB2PeriphClock(RCM_AHB2_PERIPH_OTG_FS);
 
-        /* Configure USB OTG GPIO */
-        RCM_EnableAHB1PeriphClock(RCM_AHB1_PERIPH_GPIOA);
 
         /* Link structure */
         usbDeviceHandler.usbGlobal    = USB_OTG_FS;

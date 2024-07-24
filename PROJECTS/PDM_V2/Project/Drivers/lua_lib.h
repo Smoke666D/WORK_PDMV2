@@ -11,6 +11,8 @@
 #include "lua.h"
 
 
+#define DEBUG_DATA_COUNT  10
+
 #define CAN_FRAME_SIZE  				8U
 #define CAN_ID_POS					    1U
 #define FRAME_SIZE_POS					2U
@@ -69,5 +71,6 @@ int iGetEEPROM( lua_State *L );
 int iSetEEPROM( lua_State *L );
 int iSetStorageFormat( lua_State *L );
 int iSetRecord( lua_State *L );
-
+int iSetDebugData(lua_State *L );
+float fGetDebugData( uint8_t index);
 #endif /* DRIVERS_LUA_LIB_H_ */

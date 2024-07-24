@@ -9,4 +9,4 @@
 #include "hal_config.h"
 
 #define MCU APM32
-//#define WDT
+#define WDT

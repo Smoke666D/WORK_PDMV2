@@ -65,7 +65,8 @@ Drivers/lua_task.o: ../Drivers/lua_task.c ../Drivers/lua_task.h \
  C:\Users\i.dymov\Desktop\WORK\LUA/ltm.h \
  C:\Users\i.dymov\Desktop\WORK\LUA/lzio.h \
  C:\Users\i.dymov\Desktop\WORK\LUA/lmem.h ../Drivers/din_task.h \
- ../Drivers/flash_task.h \
+ ../Drivers/flash_task.h C:\Users\i.dymov\Desktop\WORK\HAL/hal_flash.h \
+ c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_fmc.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_datastorage.h \
  C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_eeprom.h \
  C:\Users\i.dymov\Desktop\WORK\HAL/hal_i2c.h \
@@ -209,6 +210,10 @@ C:\Users\i.dymov\Desktop\WORK\LUA/lmem.h:
 ../Drivers/din_task.h:
 
 ../Drivers/flash_task.h:
+
+C:\Users\i.dymov\Desktop\WORK\HAL/hal_flash.h:
+
+c:\users\i.dymov\desktop\work\libraries\apm32f4xx_stdperiphdriver\inc\apm32f4xx_fmc.h:
 
 C:\Users\i.dymov\Desktop\WORK\DRIVER/hw_lib_datastorage.h:
 

@@ -71,10 +71,8 @@ void vDATAupdate ( void )
   {
     telemetry.temperature[i] = fTemperatureGet( i );
   }
-  for ( uint8_t i=0U; i<ANGLE_COUNT; i++ )
-  {
-    telemetry.angle[i] = 0;//fAngleGet( ( ANGLE_TYPE )i );
-  }
+  telemetry.angle[0] =  GetTotalCurrent();
+  telemetry.angle[1] =  0;
   return;
 }
 

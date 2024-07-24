@@ -409,7 +409,7 @@ void vUSBsendReport ( USB_REPORT* report )
   vUSBmakeReport( report );
   while ( eUSBwrite( report->buf, ( USB_DATA_BYTE + report->length ) ) == USBD_BUSY )
   {
-    vTaskDelay( 2U );
+    vTaskDelay( 1U );
   }
   return;
 }

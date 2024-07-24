@@ -7,6 +7,7 @@
 
 
 #include "hal_timers.h"
+#include "system_init.h"
 //#include "hw_lib_din.h"
 
 
@@ -27,7 +28,6 @@ void vHAL_SetTimerFreq( TimerName_t TimerName, uint32_t freq_in_hz  )
 	timers[TimerName]->PSC_B.PSC = ( getTimerFreq(TimerName) / freq_in_hz);
 	timers[TimerName]->CEG_B.UEG = TMR_PSC_RELOAD_IMMEDIATE;
 	HAL_TiemrEneblae(TimerName);
-
 }
 
 
@@ -36,14 +36,11 @@ void vHW_L_LIB_FreeRunInit( TimerName_t TimerName, uint32_t freq_in_hz  )
 	uint32_t Freq= getTimerFreq( TimerName );
 
 	vTimerInitRCC(TimerName );
-#if MCU == APM32
 	config[TimerName].Period = 0xFFFF;
 	config[TimerName].Div = (Freq /freq_in_hz);
-#endif
 	HW_TIMER_BaseTimerInit(TimerName);
 
 }
-
 
 
 
@@ -60,7 +57,6 @@ void HAL_TiemrDisable( TimerName_t TimerName )
 	timers[TimerName]->CTRL1_B.CNTEN = DISABLE;//  Disable the specified TMR peripheral
 
 }
-
 
 
 void  HW_TIMER_BaseTimerInit(TimerName_t TimerName  )
@@ -118,7 +114,6 @@ void HAL_TIMER_PWMTimersInit(TimerName_t TimerName , uint32_t freq_in_hz, uint32
 	OCcongigStruct.pulse = Period;// + 1;
 	if (channel &  TIM_CHANNEL_1)
 	{ TMR_ConfigOC1(timers[TimerName], &OCcongigStruct);
-
 	  timers[TimerName]->CCM1_COMPARE_B.OC1FEN = TMR_OC_FAST_ENABLE;
 	  timers[TimerName]->CCM1_COMPARE_B.OC1PEN = TMR_OC_PRELOAD_ENABLE;
 	  HAL_TIMER_DisablePWMCH(TimerName,TMR_CHANNEL_1); }
@@ -190,7 +185,7 @@ void HAL_InitCaptureIRQTimer( TimerName_t TimerName , uint32_t freq_in_hz, uint3
 	ICConfig.prescaler = TMR_IC_PSC_1;
 	ICConfig.filter = 0x00;
 	TMR_ConfigPWM(timers[TimerName], &ICConfig);
-	NVIC_EnableIRQRequest(getTimerIRQ(TimerName), 5, 0);
+	NVIC_EnableIRQRequest(getTimerIRQ(TimerName), CAP_TIM_PRIOR, CAP_TIM_SUBPRIOR);
 	HAL_TiemrEneblae( TimerName );
 
 }

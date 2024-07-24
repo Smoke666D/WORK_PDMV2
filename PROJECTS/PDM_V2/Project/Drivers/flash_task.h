@@ -10,7 +10,7 @@
 
 /*----------------------- Includes -------------------------------------*/
 #include "main.h"
-
+#include "hal_flash.h"
 /*------------------------ Define --------------------------------------*/
 #define  FLASH_STORAGE_ADR         0x080E0000UL
 #define  FLASH_STORAGE_LENGTH      0x20000U /* byte */
@@ -20,18 +20,7 @@
 /*------------------------- Macros -------------------------------------*/
 
 /*-------------------------- ENUM --------------------------------------*/
-typedef enum
-{
-  FLASH_OK,
-  FLASH_ERROR_ADR,
-  FLASH_ERROR_LENGTH,
-  FLASH_ERROR_UNLOCK,
-  FLASH_ERROR_LOCK,
-  FLASH_ERROR_ACCESS,
-  FLASH_ERROR_WRITING,
-  FLASH_ERROR_WRITING_TIMEOUT,
-  FLASH_ERROR_VERIFICATION
-} FLASH_STATE;
+
 
 typedef enum
 {

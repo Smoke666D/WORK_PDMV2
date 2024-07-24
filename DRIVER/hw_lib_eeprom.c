@@ -58,12 +58,11 @@ EERPOM_ERROR_CODE_t eEEPROMWr(  EEPROM_ADRESS_TYPE addr, uint8_t * data, EEPROM_
          {
              cur_len = SECTOR_SIZE - ( cur_addr % SECTOR_SIZE );
              if ( cur_len > byte_to_send )  cur_len = byte_to_send;
-             //memcpy( &sector_buffer[ADDRESS_DATA], &data[offset], cur_len );
-             //sector_buffer[0] =  (cur_addr >> 8) & 0xFF ;
-             //sector_buffer[0] =  cur_addr & 0xFF ;
              for (int i =0; i<6;i++)
              {
+
                 res = Dev.I2C_Master_Transmit_func( Device_ADD , cur_addr  , &data[offset],  cur_len  , 10, NotifyIndex );
+                vTaskDelay(5);
                 if  (res == EEPROM_OK) break;
                 HAL_WDTReset();
              }

@@ -206,6 +206,7 @@ void vOutSetState(OUT_NAME_TYPE out_name, uint8_t state);
 void vHWOutOFF( uint8_t ucChannel );
 void vGetDoutStatus(uint32_t * Dout1_10Status, uint32_t * Dout11_20Status);
 void vHWOutEnable(OUT_NAME_TYPE out_name);
+float GetTotalCurrent();
 void vHWOutDisable(OUT_NAME_TYPE out_name);
 ERROR_CODE vHWOutResetConfig(OUT_NAME_TYPE out_name, uint8_t restart_count, uint16_t timer);
 

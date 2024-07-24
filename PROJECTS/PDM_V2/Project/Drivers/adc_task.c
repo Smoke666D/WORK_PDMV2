@@ -17,7 +17,7 @@
 
 static PDM_OUTPUT_TYPE out[OUT_COUNT]  	 				__SECTION(RAM_SECTION_CCMRAM);
 static TaskHandle_t  pTaskHandle  						__SECTION(RAM_SECTION_CCMRAM);
-
+static float total_current __SECTION(RAM_SECTION_CCMRAM);
 
 static const KAL_DATA CurSensData[OUT_COUNT][KOOF_COUNT] ={   {{K002O20,V002O20},{K01O20,V01O20},{K10O20,V10O20},{K15O20,V15O20}},
 										{{K002O20,V002O20},{K01O20,V01O20},{K10O20,V10O20},{K15O20,V15O20}},
@@ -47,6 +47,10 @@ static void ADC_Init(void);
 static void ADC_ReadyEvent( uint32_t event );
 
 
+float GetTotalCurrent()
+{
+	return total_current;
+}
 
 TaskHandle_t * xGetADCTaskHandle()
 {
@@ -537,6 +541,7 @@ static float fGetDataFromRaw( float fraw,PDM_OUTPUT_TYPE xOut)
  */
 static void vOutControlFSM(void)
 {
+	total_current = 0;
    for (uint8_t i = 0U; i < OUT_COUNT; i++ )
    {
    	if (IS_FLAG_SET(i,ENABLE_FLAG) )		/*Если канал не выключен или не в режиме конфигурации*/
@@ -559,6 +564,7 @@ static void vOutControlFSM(void)
    	       	     out[i].PWM_err_counter ++;
    	        }
    	    }
+
    	    switch (out[i].SysReg & FSM_MASK )
 			{
 				case FSM_OFF_STATE : //Состония входа - выключен
@@ -687,6 +693,7 @@ static void vOutControlFSM(void)
 
 
   		 }
+   	      total_current+=out[i].current;
 	}
    for (uint8_t i = 0U; i < OUT_COUNT; i++ )
    {
@@ -791,13 +798,13 @@ void AinNotifyTaskToInit()
    HAL_ADC_ContiniusScanCinvertionDMA( ADC_2 ,  7 ,  ADC2_CHANNEL);
    HAL_ADC_ContiniusScanCinvertionDMA( ADC_3 ,  9 ,  ADC3_CHANNEL);
    HAL_ADC_TempEnable();
-   HAL_ADC_VrefEnable();
+  // HAL_ADC_VrefEnable();
    HAL_ADC_Enable(ADC_1);
    HAL_ADC_Enable(ADC_2);
    HAL_ADC_Enable(ADC_3);
-   HAL_DMAInitIT( DMA2_CH4 ,  PTOM, DMA_HWORD, (uint32_t)&ADC1->REGDATA, 0, DMA_CH_0,6,0, &ADC1_Ready);
-   HAL_DMAInitIT( DMA2_CH2 ,  PTOM, DMA_HWORD, (uint32_t)&ADC2->REGDATA, 0, DMA_CH_1,6,0, &ADC2_Ready);
-   HAL_DMAInitIT( DMA2_CH0 ,  PTOM, DMA_HWORD, (uint32_t)&ADC3->REGDATA, 0, DMA_CH_2,6,0, &ADC3_Ready);
+   HAL_DMAInitIT( DMA2_CH4 ,  PTOM, DMA_HWORD, (uint32_t)&ADC1->REGDATA, 0, DMA_CH_0,ADC_DMA_PRIOR,ADC_DMA_SUBPRIOR, &ADC1_Ready);
+   HAL_DMAInitIT( DMA2_CH2 ,  PTOM, DMA_HWORD, (uint32_t)&ADC2->REGDATA, 0, DMA_CH_1,ADC_DMA_PRIOR,ADC_DMA_SUBPRIOR, &ADC2_Ready);
+   HAL_DMAInitIT( DMA2_CH0 ,  PTOM, DMA_HWORD, (uint32_t)&ADC3->REGDATA, 0, DMA_CH_2,ADC_DMA_PRIOR,ADC_DMA_SUBPRIOR, &ADC3_Ready);
 
  }
 

@@ -160,6 +160,7 @@ void vRegisterHWLib( lua_State *L1 )
 	lua_register(L1,"GetTimeDate",iGetTime);
 	lua_register(L1,"AddReccord",iSetRecord);
 	lua_register(L1,"ConfigStorage",iSetStorageFormat);
+	lua_register(L1,"WriteDebug",iSetDebugData);
 }
 
 
@@ -191,7 +192,6 @@ void vLuaTask(void *argument)
 		       case LUA_INIT:
 		         vAINInit();
 		         eSafeModeIsEnable = IS_DISABLE;
-		    //     vTestEEPROM();
 			   	 L  = luaL_newstate();
 			   	 L1 = lua_newthread(L);
 			   	 luaL_openlibs(L1); // open standard libraries
@@ -263,7 +263,6 @@ void vLuaTask(void *argument)
 			   		  lua_state = LUA_INIT;
 			   		  break;
 			  }
-
 	}
 }
 

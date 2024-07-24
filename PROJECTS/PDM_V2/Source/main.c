@@ -74,6 +74,8 @@ void vInitGPIO()
 	HAL_InitGpioAIN(ADC1_5_GPIO_Port,ADC1_5_Pin);
     HAL_InitGpioAIN(ADC1_8_GPIO_Port,ADC1_8_Pin);
 	HAL_InitGpioAIN(ADC1_9_GPIO_Port,ADC1_9_Pin);
+	HAL_InitGpioAF( PORT_F, GPIO_PIN_0, GPIO_AF_I2C2, GPIO_OTYPE_OD );
+	HAL_InitGpioAF( PORT_F, GPIO_PIN_1, GPIO_AF_I2C2 ,GPIO_OTYPE_OD );
 }
 /*!
  * @brief       Main program
