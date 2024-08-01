@@ -23,16 +23,22 @@ void vRTCInit()
 	PMU_EnableBackupAccess();
 	RCM_EnableLSI();
 	RTC_Reset();
-	RTC_Config_T Struct;
 	RCM_EnableLSI();
 	while(RCM_ReadStatusFlag(RCM_FLAG_LSIRDY) == RESET);
 	RCM_ConfigRTCCLK(RCM_RTCCLK_LSI);
 	RCM_EnableRTCCLK();
 	RTC_DisableWriteProtection();
 	RTC_WaitForSynchro();
-	RTC_ConfigStructInit(&Struct);
-	RTC_Config(&Struct);
+	RTC_DisableWriteProtection();
+	if (RTC_EnableInit() != ERROR)
+	{
+	    RTC->CTRL_B.TIMEFCFG  = (RTC_HOURFORMAT_24);
+	    RTC->PSC_B.SPSC =  (uint32_t)0xFF;
+	    RTC->PSC_B.APSC = (uint32_t)0x7F;
+	    RTC->STS_B.INITEN = BIT_RESET;  //disable init
 
+	}
+    RTC->WRPROT = 0xFF; //Enable the write protection for RTC registers
 }
 
 static uint8_t RTC_ByteConBcd2(uint8_t val)

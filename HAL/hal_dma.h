@@ -100,6 +100,7 @@ void DMA2_STR0_IRQHandler( void );
 void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, uint32_t memadr, DMA_CHANNEL_t channel, uint8_t prior, uint8_t subprior, void (*f)(void));
 #endif
 #if MCU == CH32V2 || MCU== CH32V3
+void HAL_DMA_ITENABLE( DMA_Stram_t stream, uint32_t it );
 void HAL_DMA_SetCouterAndEnable(DMA_Stram_t stream, uint32_t counter );
 void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, uint32_t memadr,  uint8_t prior, uint8_t subprior, void (*f)(void));
 #endif

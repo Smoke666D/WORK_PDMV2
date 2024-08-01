@@ -109,7 +109,7 @@ void HAL_InitGPIO(GPIO_TypeDef *GPIOx,    uint16_t GPIO_Pin, GPIOSpeed_TypeDef G
  */
 void HAL_InitGpioOut( PortName_t PORT, uint16_t Pin  )
 {
-     HAL_InitRCC( PORT);
+
 #if MCU == CH32V2
     HAL_InitGPIO( PORT, Pin,GPIO_Speed_2MHz, GPIO_Mode_Out_PP );
 #else
@@ -126,7 +126,7 @@ void HAL_InitGpioOut( PortName_t PORT, uint16_t Pin  )
  */
 void HAL_InitGpioAIN(PortName_t PORT, uint16_t Pin )
 {
-     HAL_InitRCC( PORT);
+
 #if MCU == CH32V2
     HAL_InitGPIO( PORT, Pin,GPIO_Speed_50MHz, GPIO_Mode_AIN );
 #else
@@ -142,7 +142,7 @@ void HAL_InitGpioAIN(PortName_t PORT, uint16_t Pin )
  */
 void HAL_InitGpioInPUP(PortName_t PORT, uint16_t Pin)
 {
-     HAL_InitRCC( PORT);
+
 #if MCU == CH32V2
     HAL_InitGPIO( PORT, Pin,GPIO_Speed_50MHz, GPIO_Mode_IPU );
 #endif
@@ -155,7 +155,7 @@ void HAL_InitGpioInPUP(PortName_t PORT, uint16_t Pin)
  */
 void HAL_InitGpioIn(PortName_t PORT, uint16_t Pin)
 {
-     HAL_InitRCC( PORT);
+
 #if MCU == CH32V2
     HAL_InitGPIO( PORT, Pin,GPIO_Speed_50MHz,GPIO_Mode_IN_FLOATING );
 #else
@@ -173,7 +173,7 @@ void HAL_InitGpioIn(PortName_t PORT, uint16_t Pin)
  */
 void HAL_InitGpioAF(PortName_t PORT, uint16_t Pin, uint32_t AF ,  GPIO_MODE_t mode )
 {
-    HAL_InitRCC( PORT);
+
     if (AF != 0 )
     {
         RCC->APB2PCENR |= RCC_APB2Periph_AFIO;
@@ -257,4 +257,27 @@ static void HAL_InitRCC(PortName_t PORT )
         RCC->APB2PCENR |= RCC_APB2Periph_GPIOE;
 #endif
 }
+
+
+#if MCU == CH32V3
+#define GPIO_PORT_COUNT  5
+static const uint32_t PERIPH_MASK[GPIO_PORT_COUNT] = { RCC_APB2Periph_GPIOA,RCC_APB2Periph_GPIOB,RCC_APB2Periph_GPIOC,RCC_APB2Periph_GPIOD,RCC_APB2Periph_GPIOE};
+#endif
+#if MCU == CH32V2
+#define GPIO_PORT_COUNT  3
+static const uint32_t PERIPH_MASK[GPIO_PORT_COUNT] = { RCC_APB2Periph_GPIOA,RCC_APB2Periph_GPIOB,RCC_APB2Periph_GPIOC};
+#endif
+
+ void HAL_InitGPO()
+ {
+     for (u8 i=0;i< GPIO_PORT_COUNT;i++)
+     {
+         RCC->APB2PCENR |= PERIPH_MASK[i];
+         RCC->APB2PRSTR |= PERIPH_MASK[i];
+         RCC->APB2PRSTR &= ~PERIPH_MASK[i];
+
+     }
+ }
+
+
 #endif

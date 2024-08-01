@@ -67,14 +67,19 @@ typedef struct
 } HAL_DateConfig_T;
 
 
+#if MCU == APM32
+
 void vRTCInit();
 void HAL_RTC_ReadTime( HAL_TimeConfig_T* time);
 void HAL_RTC_ReadDate(HAL_DateConfig_T* date);
 uint8_t HAL_RTC_ConfigTime( HAL_TimeConfig_T* timeConfig);
 uint8_t HAL_RTC_ConfigDate( HAL_DateConfig_T* dateConfig);
+
+#endif
+
 #if MCU== CH32V2 || MCU == CH32V3
 void RTC_IRQHandler ( void );
-void HAL_RTC_IT_Init(  void (* rtc_it_callback) ( void ));
+void HAL_RTC_IT_Init(  void (* rtc_it_callback) ( void ), uint8_t prior, uint8_t subprior );
 #endif
 
 #endif /* HAL_HAL_RTC_H_ */

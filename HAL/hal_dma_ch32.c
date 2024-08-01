@@ -8,13 +8,9 @@
 #include "hal_dma.h"
 
 #if MCU == CH32V2
-
 DMA_CFG_t DMA_CALLback[7]   __SECTION(RAM_SECTION_CCMRAM);
-
-
-    #include "hal_irq.h"
+    #include <hal_irq.h>
     #include "ch32v20x_dma.h"
-	#include "ch32v20x_adc.h"
 	#include "ch32v20x_rcc.h"
 /* DMA registers Masks */
 #define CFGR_CLEAR_Mask          ((uint32_t)0xFFFF800F)
@@ -44,42 +40,30 @@ void     DMA1_Channel7_IRQHandler(void)   __attribute__((interrupt()));
 void HAL_DMAInitIT( DMA_Stram_t stream , DMA_Derection_t direction, DMA_Size_t dma_size, uint32_t paddr, uint32_t memadr,  uint8_t prior, uint8_t subprior, void (*f)(void))
 {
 	   /* Enable DMA clock */
-	          RCC->AHBPCENR |= RCC_AHBPeriph_DMA1;
+	    RCC->AHBPCENR |= RCC_AHBPeriph_DMA1;
 
-	          u32 DMA_DIR =  direction;
-	          u32 DMA_MemoryDataSize;
-	          u32 DMA_PeripheralDataSize;
-	          switch (dma_size)
-	          {
-	              case DMA_BYTE:
-	                  DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-	                  DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-	                  break;
-	              case DMA_HWORD:
-	                  DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-	                  DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-	                  break;
-	              default:
-	                  DMA_MemoryDataSize = DMA_MemoryDataSize_Word ;
-	                  DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word ;
-	                  break;
-	          }
-
-	          DMA_CALLback[stream].CallBack = f;
-	          HAL_DMA_Disable(stream);
-	          uint32_t tmpreg = 0;
-	          tmpreg = DMACH[stream]->CFGR;
-	          tmpreg &= CFGR_CLEAR_Mask;
-	          tmpreg |= DMA_DIR | DMA_Mode_Normal | DMA_PeripheralInc_Disable | DMA_MemoryInc_Enable |
-	                       DMA_PeripheralDataSize | DMA_MemoryDataSize |DMA_Priority_Medium | DMA_M2M_Disable;
-
-	          DMACH[stream]->CFGR = tmpreg;
-	          DMACH[stream]->CNTR = 0;
-	          DMACH[stream]->PADDR = paddr;
-	          DMACH[stream]->MADDR = memadr;
-	          DMACH[stream]->CFGR |= DMA_IT_TC;
-	          PFIC_IRQ_ENABLE_PG1(DMA1_Channel1_IRQn  + stream ,prior,subprior);
-
+	    DMA_CALLback[stream].CallBack = f;
+	    HAL_DMA_Disable(stream);
+	    uint32_t  tmpreg = DMACH[stream]->CFGR & CFGR_CLEAR_Mask;
+	    switch (dma_size)
+	    {
+	        case DMA_BYTE:
+	           tmpreg |= DMA_MemoryDataSize_Byte | DMA_PeripheralDataSize_Byte;
+	           break;
+	       case DMA_HWORD:
+	           tmpreg |= DMA_MemoryDataSize_HalfWord | DMA_PeripheralDataSize_HalfWord;
+	           break;
+	       default:
+	           tmpreg |= DMA_MemoryDataSize_Word | DMA_PeripheralDataSize_Word;
+	           break;
+	    }
+	    tmpreg |= direction | DMA_Mode_Normal | DMA_PeripheralInc_Disable | DMA_MemoryInc_Enable  |DMA_Priority_Medium | DMA_M2M_Disable;
+	    DMACH[stream]->CFGR = tmpreg;
+	    DMACH[stream]->CNTR = 0;
+	    DMACH[stream]->PADDR = paddr;
+	    DMACH[stream]->MADDR = memadr;
+	    DMACH[stream]->CFGR |= DMA_IT_TC;
+	    PFIC_IRQ_ENABLE_PG1(DMA1_Channel1_IRQn  + stream ,prior,subprior);
 }
 
 /*

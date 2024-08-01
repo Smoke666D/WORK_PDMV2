@@ -44,9 +44,10 @@ void HAL_CANSetERRCallback(void (* f) ( void ))
 void HAL_CANIntIT(  uint16_t   CANbitRate, uint8_t prior, uint8_t subprior)
 {
      u16 CAN_Prescaler;
+     RCC->APB1PCENR |= RCC_APB1Periph_CAN1;
      RCC->APB1PRSTR |= RCC_APB1Periph_CAN1;
      RCC->APB1PRSTR &= ~RCC_APB1Periph_CAN1;
-     RCC->APB1PCENR |= RCC_APB1Periph_CAN1;
+
      /* Configure CAN timing */
       switch (CANbitRate)
       {

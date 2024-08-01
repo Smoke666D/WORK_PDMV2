@@ -134,17 +134,19 @@ void HAL_ADC_ContiniusScanCinvertionDMA( ADC_NUMBER_t adc, uint8_t channel_count
 #if ADC_1_ENABLE == 1
     if ( adc == ADC_1)
     {
+        RCC->APB2PCENR |= RCC_APB2Periph_ADC1;
         RCC->APB2PRSTR |= RCC_APB2Periph_ADC1;
         RCC->APB2PRSTR &= ~RCC_APB2Periph_ADC1;
-        RCC->APB2PCENR |= RCC_APB2Periph_ADC1;
+
     }
 #endif
 #if ADC_2_ENABLE == 1
     else
     {
+        RCC->APB2PCENR |= RCC_APB2Periph_ADC2;
         RCC->APB2PRSTR |= RCC_APB2Periph_ADC2;
         RCC->APB2PRSTR &= ~RCC_APB2Periph_ADC2;
-        RCC->APB2PCENR |= RCC_APB2Periph_ADC2;
+
     }
 #endif
      uint32_t tmpreg = 0;
@@ -152,22 +154,10 @@ void HAL_ADC_ContiniusScanCinvertionDMA( ADC_NUMBER_t adc, uint8_t channel_count
      tmpreg &= CFGR0_ADCPRE_Reset_Mask;
      tmpreg |= RCC_PCLK2_Div8;
      RCC->CFGR0 = tmpreg;
-     ADC_TypeDef * ADCx = ADCS[adc];
-     uint32_t tmpreg1 = 0;
-     uint8_t  tmpreg2 = 0;
-     tmpreg1 = ADCx->CTLR1;
-     tmpreg1 &= CTLR1_CLEAR_Mask;
-     tmpreg1 |= (uint32_t)(ADC_Mode_Independent | (uint32_t)ADC_OutputBuffer_Disable |(uint32_t)ADC_Pga_1 | ((uint32_t)ENABLE<< 8));
-     ADCx->CTLR1 = tmpreg1;
-     tmpreg1 = ADCx->CTLR2;
-     tmpreg1 &= CTLR2_CLEAR_Mask;
-     tmpreg1 |= (uint32_t)( ADC_DataAlign_Right | ADC_ExternalTrigConv_None | ((uint32_t)ENABLE<< 1));
-     ADCx->CTLR2 = tmpreg1;
-     tmpreg1 = ADCx->RSQR1;
-     tmpreg1 &= RSQR1_CLEAR_Mask;
-     tmpreg2 |= (uint8_t)(ADC_CHANNEL - (uint8_t)1);
-     tmpreg1 |= (uint32_t)tmpreg2 << 20;
-     ADCx->RSQR1 = tmpreg1;
+
+     ADCS[adc]->CTLR1 = (uint32_t)(ADC_Mode_Independent | (uint32_t)ADC_OutputBuffer_Disable |(uint32_t)ADC_Pga_1 | ((uint32_t)ENABLE<< 8));
+     ADCS[adc]->CTLR2 = (uint32_t)( ADC_DataAlign_Right | ADC_ExternalTrigConv_None | ((uint32_t)ENABLE<< 1));
+     ADCS[adc]->RSQR1 = ((uint32_t)(ADC_CHANNEL-1)) << 20;;
      for (u8 i=0; i< (channel_count) ;i++)
      {
          HAL_ADC_RegularChannelConfig(ADCS[adc],ADC_chennel_ref[channel_nmber[ i  ]], i + 1,  ADC_SampleTime_239Cycles5 );

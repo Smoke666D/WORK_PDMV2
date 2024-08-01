@@ -7,11 +7,19 @@
 
 #include "hal_wdt.h"
 
+#if MCU == CH32V2 || MCU == CH32V3
+
 #if MCU == CH32V2
     #include "ch32v20x_iwdg.h"
+#endif
+#if MCU == CH32V3
+   #include "ch32v30x_iwdg.h"
+#endif
 
-    #define CTLR_KEY_Reload    ((uint16_t)0xAAAA)
-    #define CTLR_KEY_Enable    ((uint16_t)0xCCCC)
+
+
+#define CTLR_KEY_Reload    ((uint16_t)0xAAAA)
+#define CTLR_KEY_Enable    ((uint16_t)0xCCCC)
 
 
 void HAL_WDTInit()
