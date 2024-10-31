@@ -11,17 +11,17 @@
 
 #include "hal_config.h"
 
-#if MCU == CH32V2
-
-#include "ch32v20x.h"
-
-void PFIC_IRQ_ENABLE_PG1(IRQn_Type irg, u8 prior, u8 subprior);
-
-#endif
-#if MCU == CH32V3
-#include "ch32v30x.h"
-#include "ch32v30x_misc.h"
-void PFIC_IRQ_ENABLE_PG2(IRQn_Type irg, u8 prior, u8 subprior);
+#if MCU == CH32V2 || MCU == CH32V3
+	void HAL_InitAPB1(uint32_t apbmask);
+	void HAL_InitAPB2(uint32_t apbmask);
+	#if MCU == CH32V2
+		#include "ch32v20x.h"
+		void PFIC_IRQ_ENABLE_PG1(IRQn_Type irg, u8 prior, u8 subprior);
+	#else
+		#include "ch32v30x.h"
+		#include "ch32v30x_misc.h"
+		void PFIC_IRQ_ENABLE_PG2(IRQn_Type irg, u8 prior, u8 subprior);
+	#endif
 #endif
 
 #endif /* HAL_HAL_IRQ_H_ */

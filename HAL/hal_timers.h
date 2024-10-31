@@ -1,7 +1,7 @@
 /*
  * hal_timers.h
  *
- *  Created on: 9 апр. 2024 г.
+ *  Created on: 9 邪锌褉. 2024 谐.
  *      Author: i.dymov
  */
 
@@ -65,31 +65,27 @@ typedef enum {
 #define TIMERS_COUNT  5
 #endif
 
-/*typedef struct
-{
-	uint16_t Period;
-	uint16_t Div;
-	TimerRef_t timers;
-	void (* callback_function)();
-} TimerConfif_t;
 
-*/
 typedef struct
 {
 	uint16_t Period;
 	uint16_t Div;
 	uint16_t ClockDiv;
-	TimerRef_t timers;
-	void (* callback_function)();
-	void (* event_callback_function)(u8, u16);
 } TimerConfif_t;
+
+typedef struct
+{
+    void (* callback_function)();
+    void (* event_callback_function)(u8, u16);
+} TimerCallback_t;
+
 
 #if MCU == CH32V2
 u32 HAL_GetTimerCounterRegAdres(TimerName_t TimerName , uint8_t ch );
 void HAL_TIMER_EnablePWMCH(TimerName_t TimerName  );
 void HAL_TimeInitCaptureDMA( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel );
 void HAL_TIMER_InitIt( TimerName_t TimerName, uint32_t freq_in_hz, uint32_t Period, void (*f)() ,uint8_t prior, uint8_t subprior );
-void HW_TIMER_BaseTimerInit(TimerName_t TimerName  );
+void  HW_TIMER_BaseTimerInit(TimerName_t TimerName , TimerConfif_t * config );
 void HAL_TimeInitCaptureIT( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel,uint8_t prior, uint8_t subprior, void (*f)( u8 ,u16) );
 #endif
 
@@ -116,3 +112,4 @@ void HW_TIMER_BaseTimerInit(TimerName_t TimerName  );
 
 
 #endif /* HAL_HAL_TIMERS_H_ */
+

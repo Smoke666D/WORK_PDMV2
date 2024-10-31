@@ -12,8 +12,7 @@
 #include "hal_irq.h"
 
 static void vTimerInitRCC(TimerName_t TimerName);
-static TimerConfif_t config[TIMERS_COUNT];
-
+static TimerCallback_t callback[TIMERS_COUNT];
 static TIM_TypeDef * timers[TIMERS_COUNT] = { TIM1,TIM2,TIM3,TIM4};
 #if TIM1_UP_ENABLE == 1
 void TIM1_UP_IRQHandler(void) __attribute__((interrupt()));
@@ -31,12 +30,12 @@ void TIM4_IRQHandler(void) __attribute__((interrupt()));
 
 void HAL_TIMER_InitIt( TimerName_t TimerName, uint32_t freq_in_hz, uint32_t Period, void (*f)() ,uint8_t prior, uint8_t subprior )
 {
-    vTimerInitRCC(TimerName) ;
-    config[TimerName].Period = Period;
-    config[TimerName].Div = ( 72000000U /freq_in_hz);
-    config[TimerName].callback_function = f;
-    HW_TIMER_BaseTimerInit(TimerName);
-    timers[TimerName]->INTFR = (uint16_t)~TIM_IT_Update;
+    TimerConfif_t config;
+    config.Period = Period;
+    config.Div = ( 72000000U /freq_in_hz);
+    config.ClockDiv = 0;
+    callback[TimerName].callback_function = f;
+    HW_TIMER_BaseTimerInit(TimerName,&config);
     timers[TimerName]->DMAINTENR |=  TIM_IT_Update;
     uint8_t irq;
     switch (TimerName )
@@ -70,7 +69,7 @@ void static TimerUPIrq( TimerName_t TimerName )
 {
     if   (SET == TIM_GetITStatus(timers[TimerName], TIM_IT_Update) )
     {
-        config[TimerName].callback_function();
+        callback[TimerName].callback_function();
         timers[TimerName]->INTFR = (uint16_t)~TIM_IT_Update;
     }
 }
@@ -101,8 +100,6 @@ void  TIM4_IRQHandler(void)
 #endif
 
 
-
-
 void HAL_TiemrEneblae( TimerName_t TimerName )
 {
     timers[TimerName]->CTLR1 |= TIM_CEN;
@@ -112,21 +109,23 @@ void HAL_TiemrDisable( TimerName_t TimerName )
 {
     timers[TimerName]->CTLR1 &= (uint16_t)(~((uint16_t)TIM_CEN));
 }
+/*
+ * Функция базовой инициализации таймера.
+ * Проводиться через полный ресет. Поэтому регитстры в дефолных,  обычно нулевых значениях
+ * Необхоидмости сброса разных битов нет, все они уже сброшены после ресета
+ */
 
-void  HW_TIMER_BaseTimerInit(TimerName_t TimerName  )
+void  HW_TIMER_BaseTimerInit(TimerName_t TimerName , TimerConfif_t * config )
 {
-    timers[TimerName]->SMCFGR &= (uint16_t)(~((uint16_t)TIM_SMS)); //Тактирование от внутренней шины
-    uint16_t tmpcr1 = 0;
-    tmpcr1 = timers[TimerName]->CTLR1;
-    tmpcr1 &= (uint16_t)(~((uint16_t)(TIM_DIR | TIM_CMS)));
-    tmpcr1 |= (uint32_t)TIM_CounterMode_Up;
-    tmpcr1 &= (uint16_t)(~((uint16_t)TIM_CTLR1_CKD));
-    tmpcr1 |= (uint32_t)config[TimerName].ClockDiv;
-    timers[TimerName]->CTLR1 = tmpcr1;
-    timers[TimerName]->ATRLR = config[TimerName].Period;
-    timers[TimerName]->PSC = config[TimerName].Div;
+    vTimerInitRCC(TimerName) ;
+    //uint16_t tmpcr1 = timers[TimerName]->CTLR1;
+   // tmpcr1 |= (uint32_t)TIM_CounterMode_Up;
+   // tmpcr1 |= (uint32_t)config->ClockDiv;
+    timers[TimerName]->CTLR1    = ( uint32_t)(TIM_CounterMode_Up | config->ClockDiv) ;
+    timers[TimerName]->ATRLR    = config->Period;
+    timers[TimerName]->PSC      = config->Div;
     if((TimerName == TIMER1 ))  timers[TimerName]->RPTCR = 0x0000;
-    timers[TimerName]->SWEVGR = TIM_PSCReloadMode_Immediate;
+    timers[TimerName]->SWEVGR   = TIM_PSCReloadMode_Immediate;
 }
 
 
@@ -149,11 +148,11 @@ u32 HAL_GetTimerCounterRegAdres(TimerName_t TimerName , uint8_t ch )
 void HAL_TIMER_PWMTimersInit(TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel)
 {
 	 TIM_OCInitTypeDef TIM_OCInitStructure={0};
-	 vTimerInitRCC(TimerName) ;
-	 config[TimerName].Period = Period;
-	 config[TimerName].Div = (72000000U /freq_in_hz);
-	 config[TimerName].ClockDiv = 0;
-	 HW_TIMER_BaseTimerInit(TimerName);
+	 TimerConfif_t config;
+	 config.Period = Period;
+	 config.Div = (72000000U /freq_in_hz);
+	 config.ClockDiv = 0;
+	 HW_TIMER_BaseTimerInit(TimerName, &config);
 	 TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;
 	 TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 	 TIM_OCInitStructure.TIM_Pulse = Period;
@@ -219,11 +218,11 @@ static void TI4_Config(TimerName_t TimerName, uint16_t TIM_ICPolarity, uint16_t 
 
 void HAL_TimeInitCaptureDMA( TimerName_t TimerName , uint32_t freq_in_hz, uint32_t Period, uint8_t channel )
 {
-     vTimerInitRCC(TimerName) ;
-     config[TimerName].Period = Period;
-     config[TimerName].Div = (72000000U /freq_in_hz);
-     config[TimerName].ClockDiv = 0;
-     HW_TIMER_BaseTimerInit(TimerName);
+     TimerConfif_t config;
+     config.Period = Period;
+     config.Div = (72000000U /freq_in_hz);
+     config.ClockDiv = 0;
+     HW_TIMER_BaseTimerInit(TimerName,&config);
      if ( channel == TIM_CHANNEL_2 )
      {
          TI2_Config(TimerName, TIM_ICPolarity_Rising, TIM_ICSelection_DirectTI, 4);
@@ -293,5 +292,4 @@ static void vTimerInitRCC(TimerName_t TimerName)
     }
 }
 #endif
-
 

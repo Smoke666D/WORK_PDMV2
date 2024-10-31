@@ -15,6 +15,22 @@
  */
 #include "hal_irq.h"
 
+#if MCU == CH32V2 ||  MCU == CH32V3
+void HAL_InitAPB1(uint32_t apbmask)
+{
+    RCC->APB1PCENR |= apbmask;
+    RCC->APB1PRSTR |= apbmask;
+    RCC->APB1PRSTR &= ~apbmask;
+
+}
+void HAL_InitAPB2(uint32_t apbmask)
+{
+    RCC->APB2PCENR |= apbmask;
+    RCC->APB2PRSTR |= apbmask;
+    RCC->APB2PRSTR &= ~apbmask;
+
+}
+
 #if MCU == CH32V2
 void PFIC_IRQ_ENABLE_PG1(IRQn_Type irg, u8 prior, u8 subprior)
 {
@@ -48,4 +64,5 @@ void PFIC_IRQ_ENABLE_PG2(IRQn_Type irq, u8 prior, u8 subprior)
     }
 
 
+#endif
 #endif
