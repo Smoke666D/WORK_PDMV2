@@ -1,0 +1,10 @@
+^C:\USERS\I.DYMOV\DESKTOP\WORK\WCH_DEMO_VSCODE-MASTER\WCH_DEMO_VSCODE-MASTER\_DEPS\CH32-LIBS-SUBBUILD\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild -BC:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild --check-stamp-file C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

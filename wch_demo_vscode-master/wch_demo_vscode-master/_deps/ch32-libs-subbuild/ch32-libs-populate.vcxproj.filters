@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-subbuild\CMakeFiles\44beeea87db5b8325423286a717c57f8\ch32-libs-populate-mkdir.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-subbuild\CMakeFiles\44beeea87db5b8325423286a717c57f8\ch32-libs-populate-download.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-subbuild\CMakeFiles\44beeea87db5b8325423286a717c57f8\ch32-libs-populate-update.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-subbuild\CMakeFiles\44beeea87db5b8325423286a717c57f8\ch32-libs-populate-patch.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-subbuild\CMakeFiles\44beeea87db5b8325423286a717c57f8\ch32-libs-populate-configure.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-subbuild\CMakeFiles\44beeea87db5b8325423286a717c57f8\ch32-libs-populate-build.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-subbuild\CMakeFiles\44beeea87db5b8325423286a717c57f8\ch32-libs-populate-install.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-subbuild\CMakeFiles\44beeea87db5b8325423286a717c57f8\ch32-libs-populate-test.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-subbuild\CMakeFiles\b213caa54e0d78d8e6dbfaf0c5c80da6\ch32-libs-populate-complete.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-subbuild\CMakeFiles\c3ad2d836dcb3ffb68c0ef4b270882d1\ch32-libs-populate.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-subbuild\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-subbuild\CMakeFiles\ch32-libs-populate" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{B9A2F1FC-EFF4-3305-BAC1-BBF9D3459266}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

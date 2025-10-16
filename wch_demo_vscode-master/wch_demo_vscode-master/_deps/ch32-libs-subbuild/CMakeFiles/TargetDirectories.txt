@@ -1,0 +1,3 @@
+C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/ch32-libs-populate.dir
+C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/ALL_BUILD.dir
+C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/ZERO_CHECK.dir

@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/ch32-libs-populate"
+		},
+		{
+			"file" : "C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/c3ad2d836dcb3ffb68c0ef4b270882d1/ch32-libs-populate.rule"
+		},
+		{
+			"file" : "C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/b213caa54e0d78d8e6dbfaf0c5c80da6/ch32-libs-populate-complete.rule"
+		},
+		{
+			"file" : "C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/44beeea87db5b8325423286a717c57f8/ch32-libs-populate-build.rule"
+		},
+		{
+			"file" : "C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/44beeea87db5b8325423286a717c57f8/ch32-libs-populate-configure.rule"
+		},
+		{
+			"file" : "C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/44beeea87db5b8325423286a717c57f8/ch32-libs-populate-download.rule"
+		},
+		{
+			"file" : "C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/44beeea87db5b8325423286a717c57f8/ch32-libs-populate-install.rule"
+		},
+		{
+			"file" : "C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/44beeea87db5b8325423286a717c57f8/ch32-libs-populate-mkdir.rule"
+		},
+		{
+			"file" : "C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/44beeea87db5b8325423286a717c57f8/ch32-libs-populate-patch.rule"
+		},
+		{
+			"file" : "C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/44beeea87db5b8325423286a717c57f8/ch32-libs-populate-test.rule"
+		},
+		{
+			"file" : "C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/44beeea87db5b8325423286a717c57f8/ch32-libs-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"ch32-libs-populate"
+		],
+		"name" : "ch32-libs-populate"
+	}
+}

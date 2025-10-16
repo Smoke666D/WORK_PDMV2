@@ -1,0 +1,150 @@
+^C:\USERS\I.DYMOV\DESKTOP\WORK\WCH_DEMO_VSCODE-MASTER\WCH_DEMO_VSCODE-MASTER\_DEPS\CH32-LIBS-SUBBUILD\CMAKEFILES\44BEEEA87DB5B8325423286A717C57F8\CH32-LIBS-POPULATE-MKDIR.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -Dcfgdir=/Debug -P C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/ch32-libs-populate-prefix/tmp/ch32-libs-populate-mkdirs.cmake
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/ch32-libs-populate-prefix/src/ch32-libs-populate-stamp/Debug/ch32-libs-populate-mkdir
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\I.DYMOV\DESKTOP\WORK\WCH_DEMO_VSCODE-MASTER\WCH_DEMO_VSCODE-MASTER\_DEPS\CH32-LIBS-SUBBUILD\CMAKEFILES\44BEEEA87DB5B8325423286A717C57F8\CH32-LIBS-POPULATE-DOWNLOAD.RULE
+setlocal
+cd C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/ch32-libs-populate-prefix/tmp/ch32-libs-populate-gitclone.cmake
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/ch32-libs-populate-prefix/src/ch32-libs-populate-stamp/Debug/ch32-libs-populate-download
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\I.DYMOV\DESKTOP\WORK\WCH_DEMO_VSCODE-MASTER\WCH_DEMO_VSCODE-MASTER\_DEPS\CH32-LIBS-SUBBUILD\CMAKEFILES\44BEEEA87DB5B8325423286A717C57F8\CH32-LIBS-POPULATE-UPDATE.RULE
+setlocal
+cd C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-src
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -Dcan_fetch=YES -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/ch32-libs-populate-prefix/tmp/ch32-libs-populate-gitupdate.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\I.DYMOV\DESKTOP\WORK\WCH_DEMO_VSCODE-MASTER\WCH_DEMO_VSCODE-MASTER\_DEPS\CH32-LIBS-SUBBUILD\CMAKEFILES\44BEEEA87DB5B8325423286A717C57F8\CH32-LIBS-POPULATE-PATCH.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/ch32-libs-populate-prefix/src/ch32-libs-populate-stamp/Debug/ch32-libs-populate-patch
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\I.DYMOV\DESKTOP\WORK\WCH_DEMO_VSCODE-MASTER\WCH_DEMO_VSCODE-MASTER\_DEPS\CH32-LIBS-SUBBUILD\CMAKEFILES\44BEEEA87DB5B8325423286A717C57F8\CH32-LIBS-POPULATE-CONFIGURE.RULE
+setlocal
+cd C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/ch32-libs-populate-prefix/src/ch32-libs-populate-stamp/Debug/ch32-libs-populate-configure
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\I.DYMOV\DESKTOP\WORK\WCH_DEMO_VSCODE-MASTER\WCH_DEMO_VSCODE-MASTER\_DEPS\CH32-LIBS-SUBBUILD\CMAKEFILES\44BEEEA87DB5B8325423286A717C57F8\CH32-LIBS-POPULATE-BUILD.RULE
+setlocal
+cd C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/ch32-libs-populate-prefix/src/ch32-libs-populate-stamp/Debug/ch32-libs-populate-build
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\I.DYMOV\DESKTOP\WORK\WCH_DEMO_VSCODE-MASTER\WCH_DEMO_VSCODE-MASTER\_DEPS\CH32-LIBS-SUBBUILD\CMAKEFILES\44BEEEA87DB5B8325423286A717C57F8\CH32-LIBS-POPULATE-INSTALL.RULE
+setlocal
+cd C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/ch32-libs-populate-prefix/src/ch32-libs-populate-stamp/Debug/ch32-libs-populate-install
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\I.DYMOV\DESKTOP\WORK\WCH_DEMO_VSCODE-MASTER\WCH_DEMO_VSCODE-MASTER\_DEPS\CH32-LIBS-SUBBUILD\CMAKEFILES\44BEEEA87DB5B8325423286A717C57F8\CH32-LIBS-POPULATE-TEST.RULE
+setlocal
+cd C:\Users\i.dymov\Desktop\WORK\wch_demo_vscode-master\wch_demo_vscode-master\_deps\ch32-libs-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/ch32-libs-populate-prefix/src/ch32-libs-populate-stamp/Debug/ch32-libs-populate-test
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\I.DYMOV\DESKTOP\WORK\WCH_DEMO_VSCODE-MASTER\WCH_DEMO_VSCODE-MASTER\_DEPS\CH32-LIBS-SUBBUILD\CMAKEFILES\B213CAA54E0D78D8E6DBFAF0C5C80DA6\CH32-LIBS-POPULATE-COMPLETE.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/Debug/ch32-libs-populate-complete
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/ch32-libs-populate-prefix/src/ch32-libs-populate-stamp/Debug/ch32-libs-populate-done
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\I.DYMOV\DESKTOP\WORK\WCH_DEMO_VSCODE-MASTER\WCH_DEMO_VSCODE-MASTER\_DEPS\CH32-LIBS-SUBBUILD\CMAKEFILES\C3AD2D836DCB3FFB68C0EF4B270882D1\CH32-LIBS-POPULATE.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\I.DYMOV\DESKTOP\WORK\WCH_DEMO_VSCODE-MASTER\WCH_DEMO_VSCODE-MASTER\_DEPS\CH32-LIBS-SUBBUILD\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild -BC:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild --check-stamp-file C:/Users/i.dymov/Desktop/WORK/wch_demo_vscode-master/wch_demo_vscode-master/_deps/ch32-libs-subbuild/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
